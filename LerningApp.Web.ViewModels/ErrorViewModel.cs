@@ -1,4 +1,4 @@
-namespace LerningApp.Models;
+namespace LerningApp.Web.ViewModels;
 
 public class ErrorViewModel
 {

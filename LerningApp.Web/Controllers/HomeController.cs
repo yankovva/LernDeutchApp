@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using LerningApp.Models;
+using LerningApp.Web.ViewModels;
 
 namespace LerningApp.Controllers;
 

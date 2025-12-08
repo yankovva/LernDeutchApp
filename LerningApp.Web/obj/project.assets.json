@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net9.0": {}
+    "net9.0": {
+      "LerningApp.Web.ViewModels/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v9.0",
+        "compile": {
+          "bin/placeholder/LerningApp.Web.ViewModels.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/LerningApp.Web.ViewModels.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "LerningApp.Web.ViewModels/1.0.0": {
+      "type": "project",
+      "path": "../LerningApp.Web.ViewModels/LerningApp.Web.ViewModels.csproj",
+      "msbuildProject": "../LerningApp.Web.ViewModels/LerningApp.Web.ViewModels.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net9.0": []
+    "net9.0": [
+      "LerningApp.Web.ViewModels >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "/Users/magdalenaqnkova/.nuget/packages/": {}
@@ -31,7 +50,11 @@
       "frameworks": {
         "net9.0": {
           "targetAlias": "net9.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "/Users/magdalenaqnkova/RiderProjects/LerningApp/LerningApp.Web.ViewModels/LerningApp.Web.ViewModels.csproj": {
+              "projectPath": "/Users/magdalenaqnkova/RiderProjects/LerningApp/LerningApp.Web.ViewModels/LerningApp.Web.ViewModels.csproj"
+            }
+          }
         }
       },
       "warningProperties": {
