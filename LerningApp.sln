@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LerningApp", "LerningApp\LerningApp.csproj", "{120F1BCF-CB14-4E24-B58F-A3CC3AD0B2EA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LerningApp.Web", "LerningApp.Web\LerningApp.Web.csproj", "{120F1BCF-CB14-4E24-B58F-A3CC3AD0B2EA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

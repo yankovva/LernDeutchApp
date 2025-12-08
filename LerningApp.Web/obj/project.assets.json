@@ -13,11 +13,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/magdalenaqnkova/RiderProjects/LerningApp/LerningApp/LerningApp.csproj",
-      "projectName": "LerningApp",
-      "projectPath": "/Users/magdalenaqnkova/RiderProjects/LerningApp/LerningApp/LerningApp.csproj",
+      "projectUniqueName": "/Users/magdalenaqnkova/RiderProjects/LerningApp/LerningApp.Web/LerningApp.Web.csproj",
+      "projectName": "LerningApp.Web",
+      "projectPath": "/Users/magdalenaqnkova/RiderProjects/LerningApp/LerningApp.Web/LerningApp.Web.csproj",
       "packagesPath": "/Users/magdalenaqnkova/.nuget/packages/",
-      "outputPath": "/Users/magdalenaqnkova/RiderProjects/LerningApp/LerningApp/obj/",
+      "outputPath": "/Users/magdalenaqnkova/RiderProjects/LerningApp/LerningApp.Web/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/magdalenaqnkova/.nuget/NuGet/NuGet.Config"
