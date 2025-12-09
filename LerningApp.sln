@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LerningApp.Web", "LerningAp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LerningApp.Web.ViewModels", "LerningApp.Web.ViewModels\LerningApp.Web.ViewModels.csproj", "{19E32830-7EE3-4D5F-8CBF-155C012A4DC7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApplicationConstants", "ApplicationConstants\ApplicationConstants.csproj", "{66B7C147-AF11-41E0-A23F-45523ED7DDCB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LerningApp.Common", "LerningApp.Common\LerningApp.Common.csproj", "{FD98E339-BF29-48FB-8B82-38344F7C861F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,9 +20,9 @@ Global
 		{19E32830-7EE3-4D5F-8CBF-155C012A4DC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{19E32830-7EE3-4D5F-8CBF-155C012A4DC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{19E32830-7EE3-4D5F-8CBF-155C012A4DC7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{66B7C147-AF11-41E0-A23F-45523ED7DDCB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{66B7C147-AF11-41E0-A23F-45523ED7DDCB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{66B7C147-AF11-41E0-A23F-45523ED7DDCB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{66B7C147-AF11-41E0-A23F-45523ED7DDCB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD98E339-BF29-48FB-8B82-38344F7C861F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD98E339-BF29-48FB-8B82-38344F7C861F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD98E339-BF29-48FB-8B82-38344F7C861F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD98E339-BF29-48FB-8B82-38344F7C861F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
