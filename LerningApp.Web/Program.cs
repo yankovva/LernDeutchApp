@@ -1,6 +1,15 @@
-var builder = WebApplication.CreateBuilder(args);
+using LerningApp.Data;
+using Microsoft.EntityFrameworkCore;
 
+var builder = WebApplication.CreateBuilder(args);
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 // Add services to the container.
+builder.Services
+    .AddDbContext<LerningAppContext>(options =>
+        {
+            options.UseSqlServer(connectionString);
+        });
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

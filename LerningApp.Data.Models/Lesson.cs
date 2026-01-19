@@ -1,5 +1,4 @@
 namespace LerningApp.Data.Models;
-
 public class Lesson{
 
     public Lesson()
@@ -10,7 +9,7 @@ public class Lesson{
 
     public string Name { get; set; } = null!;
     
-    public string ContentHtml { get; set; } = null!;
+    public string Content { get; set; } = null!;
     
     public int OrderIndex { get; set; }
     
