@@ -1,0 +1,17 @@
+# .NET build output (ALL projects)
+**/bin/
+**/obj/
+
+# Visual Studio
+.vs/
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# Rider / ReSharper user settings
+*.DotSettings.user
+
+# Logs
+*.log
+
