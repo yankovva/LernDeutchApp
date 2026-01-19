@@ -11,3 +11,17 @@
 # Datasource local storage ignored files
 /dataSources/
 /dataSources.local.xml
+
+# .NET build output
+bin/
+obj/
+
+# Visual Studio
+.vs/
+
+# logs
+*.log
+
+# JetBrains Rider (по-сигурно)
+.idea/
+*.sln.iml
