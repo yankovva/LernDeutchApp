@@ -39,9 +39,8 @@ namespace LerningApp.Data.Migrations
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Level")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid>("LevelId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -49,6 +48,8 @@ namespace LerningApp.Data.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("LevelId");
 
                     b.ToTable("Courses");
                 });
@@ -64,11 +65,7 @@ namespace LerningApp.Data.Migrations
                         .HasMaxLength(10000)
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CourseId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("CourseId1")
+                    b.Property<Guid>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -84,16 +81,48 @@ namespace LerningApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CourseId1");
+                    b.HasIndex("CourseId");
 
                     b.ToTable("Lessons");
+                });
+
+            modelBuilder.Entity("LerningApp.Data.Models.Level", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1500)
+                        .HasColumnType("nvarchar(1500)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(3)
+                        .HasColumnType("nvarchar(3)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Levels");
+                });
+
+            modelBuilder.Entity("LerningApp.Data.Models.Course", b =>
+                {
+                    b.HasOne("LerningApp.Data.Models.Level", "Level")
+                        .WithMany("CoursesForLevel")
+                        .HasForeignKey("LevelId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Level");
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.Lesson", b =>
                 {
                     b.HasOne("LerningApp.Data.Models.Course", "Course")
-                        .WithMany("Lessons")
-                        .HasForeignKey("CourseId1")
+                        .WithMany("LessonsForCourse")
+                        .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -102,7 +131,12 @@ namespace LerningApp.Data.Migrations
 
             modelBuilder.Entity("LerningApp.Data.Models.Course", b =>
                 {
-                    b.Navigation("Lessons");
+                    b.Navigation("LessonsForCourse");
+                });
+
+            modelBuilder.Entity("LerningApp.Data.Models.Level", b =>
+                {
+                    b.Navigation("CoursesForLevel");
                 });
 #pragma warning restore 612, 618
         }

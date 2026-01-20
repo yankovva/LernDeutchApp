@@ -16,7 +16,15 @@ public static class EntityValidationConstants
         public const int NameMinLength = 5;
         public const int NameMaxLength = 100;
         
-        public const int DescriptionMinLength = 100;
+        public const int DescriptionMinLength = 500;
         public const int DescriptionMaxLength = 3000;
+    }
+    public static class Level
+    {
+        public const int NameMinLength = 2;
+        public const int NameMaxLength = 3;
+        
+        public const int DescriptionMinLength = 200;
+        public const int DescriptionMaxLength = 1500;
     }
 }

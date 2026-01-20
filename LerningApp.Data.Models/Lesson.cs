@@ -16,8 +16,7 @@ public class Lesson{
     public int OrderIndex { get; set; }
     
     public DateTime CreatedAt { get; set; }
-    
-    public string CourseId { get; set; } 
+    public Guid CourseId { get; set; } 
     
     public Course Course { get; set; }
 }

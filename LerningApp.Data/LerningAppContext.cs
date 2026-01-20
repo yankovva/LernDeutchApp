@@ -13,7 +13,11 @@ public class LerningAppContext : DbContext
     }
 
     public virtual DbSet<Lesson> Lessons { get; set; } = null!;
+    
     public virtual DbSet<Course> Courses { get; set; } = null!;
+    
+    public virtual DbSet<Level> Levels { get; set; } = null!;
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
