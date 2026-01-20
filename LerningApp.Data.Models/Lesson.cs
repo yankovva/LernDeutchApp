@@ -1,3 +1,5 @@
+using System;
+
 namespace LerningApp.Data.Models;
 public class Lesson{
 

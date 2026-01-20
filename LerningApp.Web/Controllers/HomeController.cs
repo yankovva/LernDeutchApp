@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using LerningApp.Web.ViewModels;
+using Microsoft.Extensions.Logging;
 
 namespace LerningApp.Controllers;
 
