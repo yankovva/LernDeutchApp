@@ -11,8 +11,6 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
     {
         // Fluent Api
         builder.HasKey(c => c.Id);
-        builder.Property(c => c.Id)
-            .IsRequired();
         
         builder.Property(c => c.Name)
             .HasMaxLength(NameMaxLength)
@@ -21,5 +19,11 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(c => c.Description)
             .HasMaxLength(DescriptionMaxLength)
             .IsRequired();
+        
+        builder
+            .HasOne(e => e.Level)
+            .WithMany(g => g.CoursesForLevel)
+            .HasForeignKey(e => e.LevelId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

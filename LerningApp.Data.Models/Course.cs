@@ -21,7 +21,9 @@ public class Course
     
     public DateTime CreatedAt { get; set; }
     
-    public string Level { get; set; } = null!;
+    public Guid LevelId { get; set; } 
     
-    public ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+    public Level Level { get; set; } = null!;
+    
+    public ICollection<Lesson> LessonsForCourse { get; set; } = new List<Lesson>();
 }
