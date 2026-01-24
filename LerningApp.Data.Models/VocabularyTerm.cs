@@ -8,6 +8,8 @@ public class VocabularyTerm
     }
     public Guid Id { get; set; }
     
+    public Guid VocabularyItemId { get; set; }
+    public VocabularyItem VocabularyItem { get; set; } = null!;
     public string Text { get; set; } = null!;
 
     // "en" oder "de"
