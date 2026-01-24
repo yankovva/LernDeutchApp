@@ -17,6 +17,10 @@ public class LerningAppContext : DbContext
     public virtual DbSet<Course> Courses { get; set; } = null!;
     
     public virtual DbSet<Level> Levels { get; set; } = null!;
+    
+    public virtual DbSet<VocabularyItem> VocabularyItems { get; set; } = null!;
+    
+    public virtual DbSet<VocabularyTerm> VocabularyTerms { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
