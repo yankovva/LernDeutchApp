@@ -1,6 +1,7 @@
 using LerningApp.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using static LerningApp.Common.EntityValidationConstants.VocabularyTerm;
 
 namespace LerningApp.Data.Configurations;
 
@@ -13,11 +14,11 @@ public class VocabularyTermConfiguration
 
         builder.Property(x => x.Text)
             .IsRequired()
-            .HasMaxLength(200);
+            .HasMaxLength(NameMaxLength);
 
         builder.Property(x => x.Side)
             .IsRequired()
-            .HasMaxLength(5);
+            .HasMaxLength(SideMaxLength);
 
         builder.HasOne(x => x.VocabularyItem)
             .WithMany(i => i.Terms)

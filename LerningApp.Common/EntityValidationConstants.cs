@@ -27,4 +27,13 @@ public static class EntityValidationConstants
         public const int DescriptionMinLength = 200;
         public const int DescriptionMaxLength = 1500;
     }
+    public static class VocabularyTerm
+    {
+        public const int NameMinLength = 1;
+        public const int NameMaxLength = 150;
+        
+        public const int SideMinLength = 2;
+        public const int SideMaxLength = 5;
+        
+    }
 }
