@@ -1,5 +1,7 @@
 using LerningApp.Data;
 using LerningApp.Data.Models;
+using LerningApp.Web.ViewModels.Course;
+using LerningApp.Web.ViewModels.Level;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -43,5 +45,58 @@ public class CourseController : Controller
         }
 
         return this.View(course);
+    }
+
+    [HttpGet]
+    public IActionResult Create()
+    {
+       
+        var model = new AddCourseViewModel
+        {
+             Levels = this._dbcontext.Levels
+                .OrderBy(l => l.Name)
+                .Select(l => new LevelOptionsViewModel
+                {
+                    Id = l.Id.ToString(),
+                    Name = l.Name
+                })
+                .ToList()
+        };
+
+        return this.View(model);
+    }
+    
+    [HttpPost]
+    public IActionResult Create(AddCourseViewModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            model.Levels = this._dbcontext.Levels
+                .OrderBy(l => l.Name)
+                .Select(l => new LevelOptionsViewModel
+                {
+                    Id = l.Id.ToString(),
+                    Name = l.Name
+                })
+                .ToList();
+
+            return View(model);
+        }
+       
+
+        var course = new Course
+        {
+            Id = Guid.NewGuid(),
+            Name = model.Name,
+            Description = model.Description,
+            LevelId = model.LevelId!.Value,
+            IsPublished = true,
+            CreatedAt = DateTime.Now,
+        };
+
+        this._dbcontext.Courses.Add(course);
+        this._dbcontext.SaveChanges();
+
+        return RedirectToAction(nameof(Index));
     }
 }
