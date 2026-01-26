@@ -1,0 +1,55 @@
+@using LerningApp.Data.Models
+@model Course
+
+@{
+    ViewData["Title"] = "Course Details";
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                    <div>
+                        <h2 class="mb-1">@Model.Name</h2>
+                        <div class="text-muted">
+                            Ниво:
+                            <span class="badge bg-secondary">
+                                @(Model.Level?.Name ?? "—")
+                            </span>
+                        </div>
+                    </div>
+
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        ← Назад
+                    </a>
+                </div>
+
+                <hr class="my-4" />
+
+                <h5 class="mb-2">Описание</h5>
+
+                @if (string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p class="text-muted mb-0">Няма описание за този курс.</p>
+                }
+                else
+                {
+                    <p class="mb-0">@Model.Description</p>
+                }
+
+                <hr class="my-4" />
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
+                        ✏️ Редактирай
+                    </a>
+
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
+                        🗑️ Изтрий
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
