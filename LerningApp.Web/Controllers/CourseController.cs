@@ -4,6 +4,7 @@ using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Level;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
@@ -17,9 +18,9 @@ public class CourseController : Controller
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        IEnumerable<CourseIndexViewModel> courses = this._dbcontext
+         IEnumerable<CourseIndexViewModel> courses = await this._dbcontext
             .Courses
             .Select(c => new CourseIndexViewModel
             {
@@ -28,13 +29,13 @@ public class CourseController : Controller
                 LessonsCount = c.LessonsForCourse.Count,
                 CourseLevel = c.Level.Name,
             })
-            .ToList();
+            .ToListAsync();
         
-        return this.View(courses);
+         return   this.View(courses);
     }
 
     [HttpGet]
-    public IActionResult Details(string id)
+    public  async Task<IActionResult> Details(string id)
     {
         bool isIdValid = Guid.TryParse(id, out Guid Guidid);
         if (!isIdValid)
@@ -42,9 +43,9 @@ public class CourseController : Controller
             return this.RedirectToAction(nameof(this.Index));
         }
         
-        Course? course = this._dbcontext
+        Course? course = await this._dbcontext
             .Courses
-            .FirstOrDefault(c=>c.Id == Guidid);
+            .FirstOrDefaultAsync(c=>c.Id == Guidid);
 
         if (course == null)
         {
@@ -55,37 +56,37 @@ public class CourseController : Controller
     }
 
     [HttpGet]
-    public IActionResult Create()
+    public async Task<IActionResult> Create()
     {
        
         var model = new AddCourseViewModel
         {
-             Levels = this._dbcontext.Levels
+             Levels = await this._dbcontext.Levels
                 .OrderBy(l => l.Name)
                 .Select(l => new LevelOptionsViewModel
                 {
                     Id = l.Id.ToString(),
                     Name = l.Name
                 })
-                .ToList()
+                .ToListAsync()
         };
 
         return this.View(model);
     }
     
     [HttpPost]
-    public IActionResult Create(AddCourseViewModel model)
+    public async Task<IActionResult> Create(AddCourseViewModel model)
     {
         if (!ModelState.IsValid)
         {
-            model.Levels = this._dbcontext.Levels
+            model.Levels = await  this._dbcontext.Levels
                 .OrderBy(l => l.Name)
                 .Select(l => new LevelOptionsViewModel
                 {
                     Id = l.Id.ToString(),
                     Name = l.Name
                 })
-                .ToList();
+                .ToListAsync();
 
             return View(model);
         }
@@ -101,8 +102,8 @@ public class CourseController : Controller
             CreatedAt = DateTime.Now,
         };
 
-        this._dbcontext.Courses.Add(course);
-        this._dbcontext.SaveChanges();
+       await this._dbcontext.Courses.AddAsync(course);
+       await  this._dbcontext.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
     }

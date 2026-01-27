@@ -15,10 +15,10 @@ public class LessonController  : Controller
     }
     
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
         
-        IEnumerable<LessonIndexViewModel> lessons = this._dbcontext.Lessons
+        IEnumerable<LessonIndexViewModel> lessons =  await this._dbcontext.Lessons
             .AsNoTracking()
             .Include(l => l.Course) 
             .OrderBy(l => l.Name)
@@ -31,7 +31,8 @@ public class LessonController  : Controller
                 LevelName = l.Course.Level != null ? l.Course.Level.Name : null, 
                 CreatedAt = l.CreatedAt.ToString("dd.MM.yyyy"),
             })
-            .ToList();
+            .ToListAsync();
+        
        return View(lessons);
     }
 }
