@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class CourseController : Controller
+public class CourseController : BaseController
 {
     private readonly LerningAppContext _dbcontext;
 
@@ -35,24 +35,36 @@ public class CourseController : Controller
     }
 
     [HttpGet]
-    public  async Task<IActionResult> Details(string id)
+    public async Task<IActionResult> Details(string id)
     {
-        bool isIdValid = Guid.TryParse(id, out Guid Guidid);
+        Guid courseId = Guid.Empty;
+
+        bool isIdValid = IsGuidValid(id, ref courseId);
+
         if (!isIdValid)
         {
             return this.RedirectToAction(nameof(this.Index));
         }
-        
+
         Course? course = await this._dbcontext
             .Courses
-            .FirstOrDefaultAsync(c=>c.Id == Guidid);
+            .Include(course => course.Level)
+            .FirstOrDefaultAsync(c => c.Id == courseId);
 
         if (course == null)
         {
             return this.RedirectToAction(nameof(this.Index));
         }
 
-        return this.View(course);
+        CourseDetailsViewModel detailsViewModel = new CourseDetailsViewModel()
+        {
+            Id = course.Id.ToString(),
+            Name = course.Name,
+            Description = course.Description,
+            LevelName = course.Level.Name,
+        };
+
+    return this.View(detailsViewModel);
     }
 
     [HttpGet]
@@ -97,7 +109,7 @@ public class CourseController : Controller
             Id = Guid.NewGuid(),
             Name = model.Name,
             Description = model.Description,
-            LevelId = model.LevelId!.Value,
+            LevelId = Guid.Parse(model.LevelId!),
             IsPublished = true,
             CreatedAt = DateTime.Now,
         };
@@ -107,4 +119,6 @@ public class CourseController : Controller
 
         return RedirectToAction(nameof(Index));
     }
+
+    
 }

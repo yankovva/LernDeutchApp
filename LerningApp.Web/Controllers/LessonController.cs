@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class LessonController  : Controller
+public class LessonController  : BaseController
 {
     private readonly LerningAppContext _dbcontext;
 
