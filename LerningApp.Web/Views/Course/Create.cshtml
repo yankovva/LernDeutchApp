@@ -35,7 +35,7 @@
 
                             @foreach (var level in Model.Levels)
                             {
-                                <option value="@level.Id" selected="@(Model.LevelId.ToString() == level.Id)">
+                                <option value="@level.Id" selected="@(Model.LevelId == level.Id)">
                                     @level.Name
                                 </option>
                             }

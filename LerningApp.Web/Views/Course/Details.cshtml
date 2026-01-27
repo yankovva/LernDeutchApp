@@ -1,5 +1,5 @@
-@using LerningApp.Data.Models
-@model Course
+@using LerningApp.Web.ViewModels.Course
+@model CourseDetailsViewModel
 
 @{
     ViewData["Title"] = "Course Details";
@@ -15,7 +15,7 @@
                         <div class="text-muted">
                             Ниво:
                             <span class="badge bg-secondary">
-                                @(Model.Level?.Name ?? "—")
+                                @(Model.LevelName ?? "—")
                             </span>
                         </div>
                     </div>
