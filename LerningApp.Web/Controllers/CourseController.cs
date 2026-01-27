@@ -19,8 +19,14 @@ public class CourseController : Controller
     [HttpGet]
     public IActionResult Index()
     {
-        IEnumerable<Course> courses = this._dbcontext
+        IEnumerable<CourseIndexViewModel> courses = this._dbcontext
             .Courses
+            .Select(c => new CourseIndexViewModel
+            {
+                Id = c.Id.ToString(),
+                Name = c.Name,
+                Description = c.Description,
+            })
             .ToList();
         
         return this.View(courses);
