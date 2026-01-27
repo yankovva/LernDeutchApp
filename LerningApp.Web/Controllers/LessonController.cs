@@ -1,5 +1,4 @@
 using LerningApp.Data;
-using LerningApp.Data.Models;
 using LerningApp.Web.ViewModels.Lesson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;

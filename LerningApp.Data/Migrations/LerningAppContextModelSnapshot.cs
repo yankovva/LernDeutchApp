@@ -65,7 +65,7 @@ namespace LerningApp.Data.Migrations
                         .HasMaxLength(10000)
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("CourseId")
+                    b.Property<Guid?>("CourseId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedAt")
@@ -168,8 +168,7 @@ namespace LerningApp.Data.Migrations
                     b.HasOne("LerningApp.Data.Models.Course", "Course")
                         .WithMany("LessonsForCourse")
                         .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Course");
                 });

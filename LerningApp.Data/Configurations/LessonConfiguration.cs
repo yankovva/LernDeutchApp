@@ -13,8 +13,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
          builder
              .HasKey(l => l.Id);
          builder
-             .Property(l => l.CourseId)
-             .IsRequired();
+             .Property(l => l.CourseId);
          
          builder
              .Property(l => l.Name)
