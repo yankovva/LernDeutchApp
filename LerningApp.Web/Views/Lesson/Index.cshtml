@@ -1,0 +1,139 @@
+@using LerningApp.Web.ViewModels.Lesson
+@model IEnumerable<LessonIndexViewModel>
+
+@{
+    ViewData["Title"] = "Lessons";
+}
+<style>
+    .table thead th {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #6c757d;
+    }
+
+    .table tbody tr:hover {
+        background-color: #f8f9fa;
+    }
+
+    .table td {
+        vertical-align: middle;
+    }
+
+    .id-cell {
+        max-width: 140px;
+        font-size: 0.75rem;
+        word-break: break-all;
+        color: #adb5bd;
+    }
+
+    .lesson-name {
+        font-weight: 600;
+    }
+
+    .badge.bg-light {
+        border: 1px dashed #ced4da;
+    }
+
+    .btn-group .btn {
+        white-space: nowrap;
+    }
+</style>
+
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">📋 Уроци </h1>
+
+    <a asp-action="Create" class="btn btn-outline-secondary">
+        ➕ Нов урок
+    </a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">Няма налични уроци.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+            <tr>
+                <th>Lesson ID</th>
+                <th>Курс</th>
+                <th>Ниво</th>
+                <th>Създаден</th>
+                <th>Урок</th>
+                <th class="text-end">Действия</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (LessonIndexViewModel row in Model)
+            {
+                <tr>
+                    <td class="id-cell">
+                        @(row.Id?.ToString() ?? "—")
+                    </td>
+
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(row.CourseName))
+                        {
+                            <span>@row.CourseName</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-light text-dark">Без курс</span>
+                        }
+                    </td>
+
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(row.LevelName))
+                        {
+                            <span class="badge bg-secondary">@row.LevelName</span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+
+                    <td>
+                        @row.CreatedAt
+                    </td>
+                    
+
+                    <td>
+                        <strong class="lesson-name">@row.Name</strong>
+                    </td>
+
+                    <td class="text-end">
+                        <div class="btn-group" role="group">
+                            @if (row.CourseId != null)
+                            {
+                                <a class="btn btn-sm btn-outline-primary"
+                                   asp-controller="Courses"
+                                   asp-action="Details"
+                                   asp-route-id="@row.CourseId">
+                                    Виж курс
+                                </a>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-outline-primary" disabled>
+                                    Виж курс
+                                </button>
+                            }
+
+                            <a class="btn btn-sm btn-primary"
+                               asp-action="Details"
+                               asp-route-id="@row.Id">
+                                Детайли урок
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
