@@ -6,12 +6,7 @@ namespace LerningApp.Data.Models;
 
 public class Course
 {
-    public Course()
-    {
-        this.Id = Guid.NewGuid();
-    }
-
-    public Guid Id { get; set; }
+    public Guid Id { get; set; }= Guid.NewGuid();
     
     public string Name { get; set; } = null!;
     
@@ -25,5 +20,5 @@ public class Course
     
     public Level Level { get; set; } = null!;
     
-    public ICollection<Lesson> LessonsForCourse { get; set; } = new List<Lesson>();
+    public virtual ICollection<Lesson> LessonsForCourse { get; set; } = new HashSet<Lesson>();
 }

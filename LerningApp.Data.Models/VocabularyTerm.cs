@@ -2,11 +2,8 @@ namespace LerningApp.Data.Models;
 
 public class VocabularyTerm
 {
-    public VocabularyTerm()
-    {
-        this.Id = Guid.NewGuid();
-    }
-    public Guid Id { get; set; }
+  
+    public Guid Id { get; set; }= Guid.NewGuid();
     
     public Guid VocabularyItemId { get; set; }
     public VocabularyItem VocabularyItem { get; set; } = null!;

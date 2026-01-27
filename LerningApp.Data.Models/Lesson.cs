@@ -2,12 +2,8 @@ using System;
 
 namespace LerningApp.Data.Models;
 public class Lesson{
-
-    public Lesson()
-    {
-        this.Id = Guid.NewGuid();
-    }
-    public Guid Id { get; set; }
+    
+    public Guid Id { get; set; } = Guid.NewGuid();
 
     public string Name { get; set; } = null!;
     
@@ -17,9 +13,9 @@ public class Lesson{
     
     public DateTime CreatedAt { get; set; }
     public Guid CourseId { get; set; } 
-    public Course Course { get; set; }
+    public  Course Course { get; set; }
     
-    public ICollection<VocabularyItem> VocabularyItems { get; set; }
-        = new List<VocabularyItem>();
+    public virtual ICollection<VocabularyItem> VocabularyItems { get; set; }
+        = new HashSet<VocabularyItem>();
 
 }
