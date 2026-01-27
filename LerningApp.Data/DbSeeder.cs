@@ -8,7 +8,7 @@ public class DbSeeder
 {
     public static async Task SeedAsync(IServiceProvider services)
     {
-        using var scope = services.CreateScope();
+        using IServiceScope scope = services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<LerningAppContext>();
 
         await db.Database.MigrateAsync();

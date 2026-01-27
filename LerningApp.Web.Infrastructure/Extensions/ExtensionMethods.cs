@@ -7,12 +7,12 @@ namespace LerningApp.Web.Infrastructure.Extensions;
 
 public static class ExtensionMethods
 {
-    public static IApplicationBuilder ApplyMigrations(this IApplicationBuilder app)
+    public static async Task<IApplicationBuilder> ApplyMigrations(this IApplicationBuilder app)
     {
         using IServiceScope serviceScope = app.ApplicationServices.CreateScope(); 
         
         LerningAppContext dbContext = serviceScope.ServiceProvider.GetRequiredService<LerningAppContext>()!;
-        dbContext.Database.Migrate();
+        await dbContext.Database.MigrateAsync();
         
         return app;
     }
