@@ -1,12 +1,9 @@
 using LerningApp.Data;
-using Microsoft.AspNetCore.Builder;
+using LerningApp.Web.Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
 // Add services to the container.
 builder.Services
     .AddDbContext<LerningAppContext>(options =>
@@ -14,9 +11,11 @@ builder.Services
             options.UseSqlServer(connectionString);
         });
 
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
+
 
 if (app.Environment.IsDevelopment())
 {
@@ -43,5 +42,5 @@ app.MapControllerRoute(
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-
+app.ApplyMigrations();
 app.Run();
