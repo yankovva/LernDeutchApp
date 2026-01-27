@@ -25,7 +25,8 @@ public class CourseController : Controller
             {
                 Id = c.Id.ToString(),
                 Name = c.Name,
-                Description = c.Description,
+                LessonsCount = c.LessonsForCourse.Count,
+                CourseLevel = c.Level.Name,
             })
             .ToList();
         

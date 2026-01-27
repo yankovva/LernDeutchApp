@@ -6,5 +6,7 @@ public class CourseIndexViewModel
     
     public string Name { get; set; } = null!;
     
-    public string Description { get; set; } = null!;
+   public int LessonsCount { get; set; }
+   
+   public string CourseLevel { get; set; } = null!;
 }

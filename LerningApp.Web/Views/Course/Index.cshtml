@@ -6,16 +6,29 @@
 }
 
 <style>
-    .card:hover {
-        transform: translateY(-4px);
-        transition: 0.2s ease-in-out;
+    .course-card {
+        background-color: rgba(255, 212, 143, 0.6);
+        border: none;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     }
-    .card{
-        background-color: rgba(255,212,143,0.6 );
+
+    .course-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .course-meta {
+        font-size: 0.9rem;
     }
 </style>
 
-<h1 class="mb-4">📚 Всички курсове</h1>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="mb-0">📚 Всички курсове</h1>
+
+    <a asp-action="Create" class="btn btn-outline-secondary">
+        ➕ Нов курс
+    </a>
+</div>
 
 @if (!Model.Any())
 {
@@ -29,15 +42,19 @@ else
         @foreach (var course in Model)
         {
             <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
+                <div class="card course-card h-100">
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title">@course.Name</h5>
+                        <h5 class="card-title mb-2">@course.Name</h5>
 
-                        <p class="card-text text-muted">
-                            @(string.IsNullOrWhiteSpace(course.Description)
-                                ? "Няма описание за този курс."
-                                : course.Description)
-                        </p>
+                        <div class="course-meta text-muted mb-3">
+                            <span class="badge bg-secondary me-2">
+                                @course.CourseLevel
+                            </span>
+
+                            <span class="badge bg-light text-dark">
+                                📘 @course.LessonsCount уроци
+                            </span>
+                        </div>
 
                         <div class="mt-auto">
                             <a asp-action="Details"
@@ -52,4 +69,3 @@ else
         }
     </div>
 }
-<a asp-action="Create" class=" btn btn-outline-secondary">Add new Course</a>
