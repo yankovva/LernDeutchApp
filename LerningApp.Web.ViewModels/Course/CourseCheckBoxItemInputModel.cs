@@ -11,6 +11,4 @@ public class CourseCheckBoxItemInputModel
     [MinLength(NameMinLength)]
     [MaxLength(NameMaxLength)]
     public string CourseName { get; set; } = null!;
-    
-    public bool IsChecked { get; set; }
 }
