@@ -14,6 +14,8 @@ public class AddLessonToCourseViewModel
     [MaxLength(NameMaxLength)]
     public string LessonName { get; set; } = null!;
     
+    public string? SelectedCourseId { get; set; } 
+    
     public List<CourseCheckBoxItemInputModel> Courses { get; set; }
         = new List<CourseCheckBoxItemInputModel>();
 }
