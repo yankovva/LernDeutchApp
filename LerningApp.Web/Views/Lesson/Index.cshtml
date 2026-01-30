@@ -111,7 +111,7 @@ else
                             @if (row.CourseId != null)
                             {
                                 <a class="btn btn-sm btn-outline-primary"
-                                   asp-controller="Courses"
+                                   asp-controller="Course"
                                    asp-action="Details"
                                    asp-route-id="@row.CourseId">
                                     Виж курс
@@ -125,9 +125,15 @@ else
                             }
 
                             <a class="btn btn-sm btn-primary"
+                               asp-action="Content"
+                               asp-route-id="@row.Id">
+                                Урок
+                            </a>
+
+                            <a class="btn btn-sm btn-primary"
                                asp-action="Details"
                                asp-route-id="@row.Id">
-                                Детайли урок
+                                Добави към курс
                             </a>
                         </div>
                     </td>
