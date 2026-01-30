@@ -1,3 +1,4 @@
+using LerningApp.Common;
 using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Web.ViewModels.Course;
@@ -91,21 +92,70 @@ public class LessonController  : BaseController
             return this.RedirectToAction(nameof(this.Index));
         }
 
-        AddLessonToCourseViewModel model = new AddLessonToCourseViewModel()
-        {
-            LessonId = lesson.Id.ToString(),
-            LessonName = lesson.Name,
-            Courses = await this._dbcontext
-                .Courses
-                .Select(c => new CourseCheckBoxItemInputModel()
-                {
-                    CourseId = c.Id.ToString(),
-                    CourseName = c.Name,
-                    IsChecked = c.LessonsForCourse
-                        .Any(cl => cl.Id == lessonId)
-                })
-                .ToListAsync()
-        };
+            AddLessonToCourseViewModel model = new AddLessonToCourseViewModel()
+            {
+                LessonId = lesson.Id.ToString(),
+                LessonName = lesson.Name,
+                SelectedCourseId = lesson.CourseId?.ToString().ToLower(),
+                Courses = await this._dbcontext.Courses
+                    .AsNoTracking()
+                    .Select(c => new CourseCheckBoxItemInputModel
+                    {
+                        CourseId = c.Id.ToString().ToLower(),
+                        CourseName = c.Name,
+                    })
+                    .ToListAsync()
+            };
+     
         return this.View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> AddToCourse(AddLessonToCourseViewModel model)
+    {
+        if (!this.ModelState.IsValid)
+        {
+            return this.View(model);
+        }
+        Guid lessonId = Guid.Empty;
+
+        if (!this.IsGuidValid(model.LessonId, ref lessonId))
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        
+        Lesson? lesson = await this._dbcontext.Lessons
+            .FirstOrDefaultAsync(l => l.Id == lessonId);
+
+        if (lesson == null)
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        
+        if (string.IsNullOrWhiteSpace(model.SelectedCourseId))
+        {
+            lesson.CourseId = null;
+            await this._dbcontext.SaveChangesAsync();
+            return RedirectToAction(nameof(this.Index));
+        }
+           
+        Guid courseId = Guid.Empty;
+        if (!this.IsGuidValid(model.SelectedCourseId, ref courseId))
+        {
+            ModelState.AddModelError(string.Empty, "Invalid course ID.");
+            return View(model);
+        }
+
+        Course? course = await this._dbcontext.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+        if (course == null)
+        {
+            ModelState.AddModelError(string.Empty, "Course not found.");
+            return View(model);
+        }
+
+        lesson.CourseId = courseId;
+
+        await this._dbcontext.SaveChangesAsync();
+        return RedirectToAction(nameof(this.Index));
     }
 }
