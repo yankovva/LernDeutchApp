@@ -1,4 +1,5 @@
 using LerningApp.Data;
+using LerningApp.Data.Models;
 using LerningApp.Web.ViewModels.Lesson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -34,5 +35,40 @@ public class LessonController  : BaseController
             .ToListAsync();
         
        return View(lessons);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Content(string id)
+    {
+        Guid lessonId = Guid.Empty;
+
+        bool isIdValid = IsGuidValid(id, ref lessonId);
+
+        if (!isIdValid)
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        
+        Lesson? lesson = await this._dbcontext.Lessons
+            .Include(l => l.Course)
+            .FirstOrDefaultAsync(l => l.Id == lessonId);
+
+        if (lesson == null)
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+
+        LessonContentViewModel model = new LessonContentViewModel()
+        {
+            Id = lesson.Id.ToString(),
+            Name = lesson.Name,
+            CourseId = lesson.CourseId.ToString(),
+            Content = lesson.Content,
+            WordCount = lesson.VocabularyItems.Count(),
+            OrderIndex = lesson.OrderIndex,
+            CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
+        };
+
+        return this.View(model);
     }
 }
