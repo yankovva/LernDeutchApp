@@ -1,5 +1,6 @@
 using LerningApp.Data;
 using LerningApp.Data.Models;
+using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -69,6 +70,42 @@ public class LessonController  : BaseController
             CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
         };
 
+        return this.View(model);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> AddToCourse(string id)
+    {
+        Guid lessonId = Guid.Empty;
+        bool isIdValid = IsGuidValid(id, ref lessonId);
+
+        if (!isIdValid)
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        Lesson? lesson = await this._dbcontext.Lessons
+            .FirstOrDefaultAsync(l => l.Id == lessonId);
+
+        if (lesson == null) 
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+
+        AddLessonToCourseViewModel model = new AddLessonToCourseViewModel()
+        {
+            LessonId = lesson.Id.ToString(),
+            LessonName = lesson.Name,
+            Courses = await this._dbcontext
+                .Courses
+                .Select(c => new CourseCheckBoxItemInputModel()
+                {
+                    CourseId = c.Id.ToString(),
+                    CourseName = c.Name,
+                    IsChecked = c.LessonsForCourse
+                        .Any(cl => cl.Id == lessonId)
+                })
+                .ToListAsync()
+        };
         return this.View(model);
     }
 }
