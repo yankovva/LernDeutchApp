@@ -9,6 +9,9 @@ public static class EntityValidationConstants
         
         public const int ContentMinLength = 300;
         public const int ContentMaxLength = 10000;
+        
+        public const int OrderIndexMin = 1;
+        public const int OrderIndexMax = 1000;
     }
     
     public static class Course
@@ -26,6 +29,7 @@ public static class EntityValidationConstants
         
         public const int DescriptionMinLength = 200;
         public const int DescriptionMaxLength = 1500;
+        
     }
     public static class VocabularyTerm
     {
