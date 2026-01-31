@@ -38,7 +38,6 @@ public class CourseController : BaseController
     public async Task<IActionResult> Details(string id)
     {
         Guid courseId = Guid.Empty;
-
         bool isIdValid = IsGuidValid(id, ref courseId);
 
         if (!isIdValid)
@@ -46,6 +45,7 @@ public class CourseController : BaseController
             return this.RedirectToAction(nameof(this.Index));
         }
 
+        
         Course? course = await this._dbcontext
             .Courses
             .Include(course => course.Level)
@@ -102,14 +102,44 @@ public class CourseController : BaseController
 
             return View(model);
         }
-       
+        
+        Guid levelId = Guid.Empty;
+        if (!string.IsNullOrWhiteSpace(model.LevelId))
+        {
+            bool isLevelIdValid = IsGuidValid(model.LevelId, ref levelId);
+            
+            Level? level = await this._dbcontext.Levels
+                .FirstOrDefaultAsync(l => l.Id == levelId);
+            
+            if (level != null)
+            {
+                levelId = Guid.Parse(model.LevelId);
+            }
+            else
+            {
+                ModelState
+                    .AddModelError(nameof(model.LevelId), "Невалидно Ниво.");
+
+                model.Levels = await _dbcontext.Levels
+                    .AsNoTracking()
+                    .OrderBy(c => c.Name)
+                    .Select(c => new LevelOptionsViewModel
+                    {
+                        Id = c.Id.ToString(),
+                        Name = c.Name
+                    })
+                    .ToListAsync();
+
+                return this.View(model);
+            }
+        }
 
         var course = new Course
         {
             Id = Guid.NewGuid(),
             Name = model.Name,
             Description = model.Description,
-            LevelId = Guid.Parse(model.LevelId!),
+            LevelId = levelId,
             IsPublished = true,
             CreatedAt = DateTime.Now,
         };
