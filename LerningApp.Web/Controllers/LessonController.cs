@@ -158,4 +158,83 @@ public class LessonController  : BaseController
         await this._dbcontext.SaveChangesAsync();
         return RedirectToAction(nameof(this.Index));
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Create()
+    {
+        AddLessonInputModel model = new AddLessonInputModel
+        {
+             Courses = await this._dbcontext
+                 .Courses
+                 .OrderBy(c => c.Name)
+                 .Select(c => new CourseOptionsViewModel
+                 {
+                     Id = c.Id.ToString(),
+                     Name = c.Name,
+                 })   
+                 .ToListAsync()
+        };
+        
+        return this.View(model);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Create(AddLessonInputModel model)
+    {
+        if (!this.ModelState.IsValid)
+        {
+            model.Courses = await _dbcontext.Courses
+                .AsNoTracking()
+                .OrderBy(c => c.Name)
+                .Select(c => new CourseOptionsViewModel
+                {
+                    Id = c.Id.ToString(),
+                    Name = c.Name
+                })
+                .ToListAsync();
+
+            return View(model);
+        }
+        
+        Guid courseId = Guid.Empty;
+        if (!string.IsNullOrWhiteSpace(model.CourseId))
+        {
+            bool isIdValid = IsGuidValid(model.CourseId, ref courseId);
+
+            if (isIdValid)
+            {
+                courseId = Guid.Parse(model.CourseId);
+            }
+            else
+            {
+                ModelState
+                    .AddModelError(nameof(model.CourseId), "Невалиден Course.");
+               
+                model.Courses = await _dbcontext.Courses
+                    .AsNoTracking()
+                    .OrderBy(c => c.Name)
+                    .Select(c => new CourseOptionsViewModel
+                    {
+                        Id = c.Id.ToString(), Name = c.Name
+                    })
+                    .ToListAsync();
+                
+                return this.View(model);
+            }
+        }
+        
+        Lesson lesson = new Lesson
+        {
+            Name = model.Name,
+            Content = model.Content,
+            CourseId = courseId,
+            CreatedAt = DateTime.Now,
+            OrderIndex = model.OrderIndex,
+        };
+        
+        await  _dbcontext.Lessons.AddAsync(lesson);
+        await _dbcontext.SaveChangesAsync();
+        
+        return this.RedirectToAction(nameof(this.Index));
+    }
 }
