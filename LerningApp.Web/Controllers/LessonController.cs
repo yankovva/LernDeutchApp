@@ -199,9 +199,12 @@ public class LessonController  : BaseController
         Guid courseId = Guid.Empty;
         if (!string.IsNullOrWhiteSpace(model.CourseId))
         {
-            bool isIdValid = IsGuidValid(model.CourseId, ref courseId);
+            bool isCourseIdValid = IsGuidValid(model.CourseId, ref courseId);
 
-            if (isIdValid)
+            Course? course = await this._dbcontext.Courses
+                .FirstOrDefaultAsync(c => c.Id == courseId);
+            
+            if (course != null)
             {
                 courseId = Guid.Parse(model.CourseId);
             }

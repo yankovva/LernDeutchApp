@@ -14,7 +14,6 @@ public class Lesson{
     public DateTime CreatedAt { get; set; }
     public Guid? CourseId { get; set; } 
     public Course? Course { get; set; }
-    
     public virtual ICollection<VocabularyItem> VocabularyItems { get; set; }
         = new HashSet<VocabularyItem>();
 
