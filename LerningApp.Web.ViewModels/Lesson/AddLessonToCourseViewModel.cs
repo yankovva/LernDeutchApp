@@ -16,6 +16,6 @@ public class AddLessonToCourseViewModel
     
     public string? SelectedCourseId { get; set; } 
     
-    public List<CourseCheckBoxItemInputModel> Courses { get; set; }
+    public IList<CourseCheckBoxItemInputModel> Courses { get; set; }
         = new List<CourseCheckBoxItemInputModel>();
 }
