@@ -44,7 +44,9 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             return this.RedirectToAction(nameof(this.Index));
         }
         
-        Lesson? lesson = await dbcontext.Lessons
+        Lesson? lesson = await dbcontext
+            .Lessons
+            .AsNoTracking()
             .Include(l => l.Course)
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
@@ -77,7 +79,10 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
         {
             return this.RedirectToAction(nameof(this.Index));
         }
-        Lesson? lesson = await dbcontext.Lessons
+        
+        Lesson? lesson = await dbcontext
+            .Lessons
+            .AsNoTracking()
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
         if (lesson == null) 
@@ -117,7 +122,8 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             return this.RedirectToAction(nameof(this.Index));
         }
         
-        Lesson? lesson = await dbcontext.Lessons
+        Lesson? lesson = await dbcontext.
+            Lessons
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
         if (lesson == null)
@@ -139,7 +145,10 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             return View(model);
         }
 
-        Course? course = await dbcontext.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+        Course? course = await dbcontext
+            .Courses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == courseId);
         if (course == null)
         {
             ModelState.AddModelError(string.Empty, "Course not found.");
@@ -159,6 +168,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
         {
              Courses = await dbcontext
                  .Courses
+                 .AsNoTracking()
                  .OrderBy(c => c.Name)
                  .Select(c => new CourseOptionsViewModel
                  {
@@ -194,7 +204,25 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
         {
             bool isCourseIdValid = IsGuidValid(model.CourseId, ref courseId);
 
-            Course? course = await dbcontext.Courses
+            if (!isCourseIdValid)
+            {
+                ModelState.AddModelError(string.Empty, "Невалиден Course.");
+                model.Courses = await dbcontext.Courses
+                    .AsNoTracking()
+                    .OrderBy(c => c.Name)
+                    .Select(c => new CourseOptionsViewModel
+                    {
+                        Id = c.Id.ToString(),
+                        Name = c.Name
+                    })
+                    .ToListAsync();
+
+                return View(model);
+            }
+            
+            Course? course = await dbcontext
+                .Courses
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == courseId);
             
             if (course != null)
@@ -211,7 +239,8 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
                     .OrderBy(c => c.Name)
                     .Select(c => new CourseOptionsViewModel
                     {
-                        Id = c.Id.ToString(), Name = c.Name
+                        Id = c.Id.ToString(), 
+                        Name = c.Name
                     })
                     .ToListAsync();
                 

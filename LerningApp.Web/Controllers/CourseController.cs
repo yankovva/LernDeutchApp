@@ -15,6 +15,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
     {
          IEnumerable<CourseIndexViewModel> courses = await dbcontext
             .Courses
+            .AsNoTracking()
             .Select(c => new CourseIndexViewModel
             {
                 Id = c.Id.ToString(),
@@ -41,6 +42,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
         
         Course? course = await dbcontext
             .Courses
+            .AsNoTracking()
             .Include(course => course.Level)
             .FirstOrDefaultAsync(c => c.Id == courseId);
 
@@ -68,6 +70,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
         {
              Levels = await dbcontext.Levels
                 .OrderBy(l => l.Name)
+                .AsNoTracking()
                 .Select(l => new LevelOptionsViewModel
                 {
                     Id = l.Id.ToString(),
@@ -85,6 +88,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
         if (!ModelState.IsValid)
         {
             model.Levels = await  dbcontext.Levels
+                .AsNoTracking()
                 .OrderBy(l => l.Name)
                 .Select(l => new LevelOptionsViewModel
                 {
@@ -100,8 +104,26 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
         if (!string.IsNullOrWhiteSpace(model.LevelId))
         {
             bool isLevelIdValid = IsGuidValid(model.LevelId, ref levelId);
+            if (!isLevelIdValid)
+            {
+                ModelState.AddModelError(string.Empty, "Невалидено ниво.");
+
+                model.Levels = await  dbcontext.Levels
+                    .AsNoTracking()
+                    .OrderBy(l => l.Name)
+                    .Select(l => new LevelOptionsViewModel
+                    {
+                        Id = l.Id.ToString(),
+                        Name = l.Name
+                    })
+                    .ToListAsync();
+
+                return View(model);
+            }
             
-            Level? level = await dbcontext.Levels
+            Level? level = await dbcontext
+                .Levels
+                .AsNoTracking()
                 .FirstOrDefaultAsync(l => l.Id == levelId);
             
             if (level != null)
@@ -142,6 +164,4 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
 
         return RedirectToAction(nameof(Index));
     }
-
-    
 }
