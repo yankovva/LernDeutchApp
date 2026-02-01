@@ -25,7 +25,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
             })
             .ToListAsync();
         
-         return   this.View(courses);
+         return this.View(courses);
     }
 
     [HttpGet]
@@ -38,7 +38,6 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
         {
             return this.RedirectToAction(nameof(this.Index));
         }
-
         
         Course? course = await dbcontext
             .Courses
@@ -66,17 +65,9 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
     public async Task<IActionResult> Create()
     {
        
-        var model = new AddCourseViewModel
+        AddCourseViewModel model = new AddCourseViewModel
         {
-             Levels = await dbcontext.Levels
-                .OrderBy(l => l.Name)
-                .AsNoTracking()
-                .Select(l => new LevelOptionsViewModel
-                {
-                    Id = l.Id.ToString(),
-                    Name = l.Name
-                })
-                .ToListAsync()
+             Levels =  await GetAllLevelsFromDbAsync()
         };
 
         return this.View(model);
@@ -87,17 +78,9 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
     {
         if (!ModelState.IsValid)
         {
-            model.Levels = await  dbcontext.Levels
-                .AsNoTracking()
-                .OrderBy(l => l.Name)
-                .Select(l => new LevelOptionsViewModel
-                {
-                    Id = l.Id.ToString(),
-                    Name = l.Name
-                })
-                .ToListAsync();
+            model.Levels = await GetAllLevelsFromDbAsync();
 
-            return View(model);
+            return this.View(model);
         }
         
         Guid levelId = Guid.Empty;
@@ -108,17 +91,9 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
             {
                 ModelState.AddModelError(string.Empty, "Невалидено ниво.");
 
-                model.Levels = await  dbcontext.Levels
-                    .AsNoTracking()
-                    .OrderBy(l => l.Name)
-                    .Select(l => new LevelOptionsViewModel
-                    {
-                        Id = l.Id.ToString(),
-                        Name = l.Name
-                    })
-                    .ToListAsync();
+                model.Levels = await GetAllLevelsFromDbAsync();
 
-                return View(model);
+                return this.View(model);
             }
             
             Level? level = await dbcontext
@@ -135,15 +110,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
                 ModelState
                     .AddModelError(nameof(model.LevelId), "Невалидно Ниво.");
 
-                model.Levels = await dbcontext.Levels
-                    .AsNoTracking()
-                    .OrderBy(c => c.Name)
-                    .Select(c => new LevelOptionsViewModel
-                    {
-                        Id = c.Id.ToString(),
-                        Name = c.Name
-                    })
-                    .ToListAsync();
+                model.Levels = await GetAllLevelsFromDbAsync();
 
                 return this.View(model);
             }
@@ -162,6 +129,20 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
        await dbcontext.Courses.AddAsync(course);
        await  dbcontext.SaveChangesAsync();
 
-        return RedirectToAction(nameof(Index));
+       return RedirectToAction(nameof(Index));
+    }
+    private async Task<List<LevelOptionsViewModel>> GetAllLevelsFromDbAsync()
+    {
+        var levels = await dbcontext.Levels
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .Select(c => new LevelOptionsViewModel
+            {
+                Id = c.Id.ToString(), 
+                Name = c.Name
+            })
+            .ToListAsync();
+        
+        return levels;
     }
 }
