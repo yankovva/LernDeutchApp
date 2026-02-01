@@ -166,18 +166,8 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
     {
         AddLessonInputModel model = new AddLessonInputModel
         {
-             Courses = await dbcontext
-                 .Courses
-                 .AsNoTracking()
-                 .OrderBy(c => c.Name)
-                 .Select(c => new CourseOptionsViewModel
-                 {
-                     Id = c.Id.ToString(),
-                     Name = c.Name,
-                 })   
-                 .ToListAsync()
+            Courses = await GetAllCoursesFromDbAsync()
         };
-        
         return this.View(model);
     }
 
@@ -186,15 +176,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
     {
         if (!this.ModelState.IsValid)
         {
-            model.Courses = await dbcontext.Courses
-                .AsNoTracking()
-                .OrderBy(c => c.Name)
-                .Select(c => new CourseOptionsViewModel
-                {
-                    Id = c.Id.ToString(),
-                    Name = c.Name
-                })
-                .ToListAsync();
+            model.Courses = await GetAllCoursesFromDbAsync();
 
             return View(model);
         }
@@ -207,15 +189,8 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             if (!isCourseIdValid)
             {
                 ModelState.AddModelError(string.Empty, "Невалиден Course.");
-                model.Courses = await dbcontext.Courses
-                    .AsNoTracking()
-                    .OrderBy(c => c.Name)
-                    .Select(c => new CourseOptionsViewModel
-                    {
-                        Id = c.Id.ToString(),
-                        Name = c.Name
-                    })
-                    .ToListAsync();
+                
+                model.Courses = await GetAllCoursesFromDbAsync();;
 
                 return View(model);
             }
@@ -233,17 +208,8 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             {
                 ModelState
                     .AddModelError(nameof(model.CourseId), "Невалиден Course.");
-               
-                model.Courses = await dbcontext.Courses
-                    .AsNoTracking()
-                    .OrderBy(c => c.Name)
-                    .Select(c => new CourseOptionsViewModel
-                    {
-                        Id = c.Id.ToString(), 
-                        Name = c.Name
-                    })
-                    .ToListAsync();
                 
+                model.Courses = await GetAllCoursesFromDbAsync();;
                 return this.View(model);
             }
         }
@@ -261,5 +227,19 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
         await dbcontext.SaveChangesAsync();
         
         return this.RedirectToAction(nameof(this.Index));
+    }
+
+    private async Task<List<CourseOptionsViewModel>> GetAllCoursesFromDbAsync()
+    {
+        var courses = await dbcontext.Courses
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .Select(c => new CourseOptionsViewModel
+            {
+                Id = c.Id.ToString(), 
+                Name = c.Name
+            })
+            .ToListAsync();
+        return courses;
     }
 }
