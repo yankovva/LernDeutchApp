@@ -11,7 +11,6 @@ builder.Services
             options.UseSqlServer(connectionString);
         });
 
-
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
@@ -42,5 +41,6 @@ if (app.Environment.IsDevelopment())
     await DbSeeder.SeedAsync(app.Services);
 }
 
-app.ApplyMigrations();
+await app.ApplyMigrations();
+
 app.Run();
