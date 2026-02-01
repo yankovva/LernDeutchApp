@@ -8,20 +8,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class LessonController  : BaseController
+public class LessonController(LerningAppContext dbcontext) : BaseController
 {
-    private readonly LerningAppContext _dbcontext;
-
-    public LessonController(LerningAppContext dbcontext)
-    {
-        this._dbcontext = dbcontext;
-    }
-    
     [HttpGet]
     public async Task<IActionResult> Index()
     {
         
-        IEnumerable<LessonIndexViewModel> lessons =  await this._dbcontext.Lessons
+        IEnumerable<LessonIndexViewModel> lessons =  await dbcontext.Lessons
             .AsNoTracking()
             .Include(l => l.Course) 
             .OrderBy(l => l.Name)
@@ -51,7 +44,7 @@ public class LessonController  : BaseController
             return this.RedirectToAction(nameof(this.Index));
         }
         
-        Lesson? lesson = await this._dbcontext.Lessons
+        Lesson? lesson = await dbcontext.Lessons
             .Include(l => l.Course)
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
@@ -84,7 +77,7 @@ public class LessonController  : BaseController
         {
             return this.RedirectToAction(nameof(this.Index));
         }
-        Lesson? lesson = await this._dbcontext.Lessons
+        Lesson? lesson = await dbcontext.Lessons
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
         if (lesson == null) 
@@ -97,7 +90,7 @@ public class LessonController  : BaseController
                 LessonId = lesson.Id.ToString(),
                 LessonName = lesson.Name,
                 SelectedCourseId = lesson.CourseId?.ToString().ToLower(),
-                Courses = await this._dbcontext.Courses
+                Courses = await dbcontext.Courses
                     .AsNoTracking()
                     .Select(c => new CourseCheckBoxItemInputModel
                     {
@@ -124,7 +117,7 @@ public class LessonController  : BaseController
             return this.RedirectToAction(nameof(this.Index));
         }
         
-        Lesson? lesson = await this._dbcontext.Lessons
+        Lesson? lesson = await dbcontext.Lessons
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
         if (lesson == null)
@@ -135,7 +128,7 @@ public class LessonController  : BaseController
         if (string.IsNullOrWhiteSpace(model.SelectedCourseId))
         {
             lesson.CourseId = null;
-            await this._dbcontext.SaveChangesAsync();
+            await dbcontext.SaveChangesAsync();
             return RedirectToAction(nameof(this.Index));
         }
            
@@ -146,7 +139,7 @@ public class LessonController  : BaseController
             return View(model);
         }
 
-        Course? course = await this._dbcontext.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
+        Course? course = await dbcontext.Courses.FirstOrDefaultAsync(c => c.Id == courseId);
         if (course == null)
         {
             ModelState.AddModelError(string.Empty, "Course not found.");
@@ -155,7 +148,7 @@ public class LessonController  : BaseController
 
         lesson.CourseId = courseId;
 
-        await this._dbcontext.SaveChangesAsync();
+        await dbcontext.SaveChangesAsync();
         return RedirectToAction(nameof(this.Index));
     }
 
@@ -164,7 +157,7 @@ public class LessonController  : BaseController
     {
         AddLessonInputModel model = new AddLessonInputModel
         {
-             Courses = await this._dbcontext
+             Courses = await dbcontext
                  .Courses
                  .OrderBy(c => c.Name)
                  .Select(c => new CourseOptionsViewModel
@@ -183,7 +176,7 @@ public class LessonController  : BaseController
     {
         if (!this.ModelState.IsValid)
         {
-            model.Courses = await _dbcontext.Courses
+            model.Courses = await dbcontext.Courses
                 .AsNoTracking()
                 .OrderBy(c => c.Name)
                 .Select(c => new CourseOptionsViewModel
@@ -201,7 +194,7 @@ public class LessonController  : BaseController
         {
             bool isCourseIdValid = IsGuidValid(model.CourseId, ref courseId);
 
-            Course? course = await this._dbcontext.Courses
+            Course? course = await dbcontext.Courses
                 .FirstOrDefaultAsync(c => c.Id == courseId);
             
             if (course != null)
@@ -213,7 +206,7 @@ public class LessonController  : BaseController
                 ModelState
                     .AddModelError(nameof(model.CourseId), "Невалиден Course.");
                
-                model.Courses = await _dbcontext.Courses
+                model.Courses = await dbcontext.Courses
                     .AsNoTracking()
                     .OrderBy(c => c.Name)
                     .Select(c => new CourseOptionsViewModel
@@ -235,8 +228,8 @@ public class LessonController  : BaseController
             OrderIndex = model.OrderIndex,
         };
         
-        await  _dbcontext.Lessons.AddAsync(lesson);
-        await _dbcontext.SaveChangesAsync();
+        await  dbcontext.Lessons.AddAsync(lesson);
+        await dbcontext.SaveChangesAsync();
         
         return this.RedirectToAction(nameof(this.Index));
     }

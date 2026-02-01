@@ -8,19 +8,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class CourseController : BaseController
+public class CourseController(LerningAppContext dbcontext) : BaseController
 {
-    private readonly LerningAppContext _dbcontext;
-
-    public CourseController(LerningAppContext dbcontext)
-    {
-        this._dbcontext = dbcontext;
-    }
-
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-         IEnumerable<CourseIndexViewModel> courses = await this._dbcontext
+         IEnumerable<CourseIndexViewModel> courses = await dbcontext
             .Courses
             .Select(c => new CourseIndexViewModel
             {
@@ -46,7 +39,7 @@ public class CourseController : BaseController
         }
 
         
-        Course? course = await this._dbcontext
+        Course? course = await dbcontext
             .Courses
             .Include(course => course.Level)
             .FirstOrDefaultAsync(c => c.Id == courseId);
@@ -73,7 +66,7 @@ public class CourseController : BaseController
        
         var model = new AddCourseViewModel
         {
-             Levels = await this._dbcontext.Levels
+             Levels = await dbcontext.Levels
                 .OrderBy(l => l.Name)
                 .Select(l => new LevelOptionsViewModel
                 {
@@ -91,7 +84,7 @@ public class CourseController : BaseController
     {
         if (!ModelState.IsValid)
         {
-            model.Levels = await  this._dbcontext.Levels
+            model.Levels = await  dbcontext.Levels
                 .OrderBy(l => l.Name)
                 .Select(l => new LevelOptionsViewModel
                 {
@@ -108,7 +101,7 @@ public class CourseController : BaseController
         {
             bool isLevelIdValid = IsGuidValid(model.LevelId, ref levelId);
             
-            Level? level = await this._dbcontext.Levels
+            Level? level = await dbcontext.Levels
                 .FirstOrDefaultAsync(l => l.Id == levelId);
             
             if (level != null)
@@ -120,7 +113,7 @@ public class CourseController : BaseController
                 ModelState
                     .AddModelError(nameof(model.LevelId), "Невалидно Ниво.");
 
-                model.Levels = await _dbcontext.Levels
+                model.Levels = await dbcontext.Levels
                     .AsNoTracking()
                     .OrderBy(c => c.Name)
                     .Select(c => new LevelOptionsViewModel
@@ -144,8 +137,8 @@ public class CourseController : BaseController
             CreatedAt = DateTime.Now,
         };
 
-       await this._dbcontext.Courses.AddAsync(course);
-       await  this._dbcontext.SaveChangesAsync();
+       await dbcontext.Courses.AddAsync(course);
+       await  dbcontext.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
     }
