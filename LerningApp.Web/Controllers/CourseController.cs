@@ -131,6 +131,96 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
 
        return RedirectToAction(nameof(Index));
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(string id)
+    {
+        Guid courseId = Guid.Empty;
+        bool isIdValid = IsGuidValid(id, ref courseId);
+        if (!isIdValid)
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        
+        Course? course = await dbcontext
+            .Courses
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == courseId);
+        
+        if (course == null)
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+
+        CourseEditViewModel model = new CourseEditViewModel()
+        {
+            Id = courseId.ToString(),
+            Name = course.Name,
+            Description = course.Description,
+            Levels = await GetAllLevelsFromDbAsync(),
+            LevelId = course.LevelId.ToString()
+        };
+        
+        return View(model);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(CourseEditViewModel model, string id)
+    {
+        if (!ModelState.IsValid)
+        {
+            model.Levels = await GetAllLevelsFromDbAsync();
+            return this.View(model);
+        }
+        
+        Guid courseId = Guid.Empty;
+        if (!IsGuidValid(id, ref courseId))
+        {
+            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
+            model.Levels = await GetAllLevelsFromDbAsync();
+            return this.View(model);
+        }
+
+        Course? courseToChange = dbcontext
+            .Courses
+            .FirstOrDefault(c => c.Id == courseId);
+        
+        if (courseToChange == null)
+        {
+            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
+            model.Levels = await GetAllLevelsFromDbAsync();
+            return this.View(model);
+        }
+
+        Guid levelId = Guid.Empty;
+       
+            if (!IsGuidValid(model.LevelId, ref levelId))
+            {
+                ModelState.AddModelError(nameof(model.LevelId), "Невалидно ниво.");
+                model.Levels = await GetAllLevelsFromDbAsync();
+                return View(model);
+            }
+            
+            bool levelExists = await dbcontext.Levels
+                .AnyAsync(l => l.Id == levelId);
+
+            if (!levelExists)
+            {
+                ModelState.AddModelError(nameof(model.LevelId), "Избраното ниво не съществува.");
+                model.Levels = await GetAllLevelsFromDbAsync();
+                return View(model);
+            }
+       
+        courseToChange.Name = model.Name;
+        courseToChange.Description = model.Description;
+        courseToChange.IsPublished = true;
+        courseToChange.LevelId = levelId;
+        
+        await  dbcontext.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Details),new {Id = courseId});
+    }
     private async Task<List<LevelOptionsViewModel>> GetAllLevelsFromDbAsync()
     {
         var levels = await dbcontext.Levels
