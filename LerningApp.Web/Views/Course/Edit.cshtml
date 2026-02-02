@@ -1,0 +1,64 @@
+@using LerningApp.Web.ViewModels.Course
+@model  CourseEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Course";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <h1 class="mb-1">✏️ Редактирай курс</h1>
+        <div class="text-muted">Промени име, описание и ниво.</div>
+    </div>
+
+    <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
+        ← Назад
+    </a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form asp-action="Edit" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label">Име</label>
+                        <input asp-for="Name" class="form-control" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label">Описание</label>
+                        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="LevelId" class="form-label">Ниво</label>
+                        <select asp-for="LevelId" class="form-select">
+                            <option value="">-- Избери ниво --</option>
+                            @foreach (var lvl in Model.Levels)
+                            {
+                                <option value="@lvl.Id">@lvl.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="LevelId" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">💾 Запази</button>
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Отказ</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
