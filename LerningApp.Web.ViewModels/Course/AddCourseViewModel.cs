@@ -17,7 +17,7 @@ public class AddCourseViewModel
     public string Description { get; set; } = null!;
     
     [Required(ErrorMessage = CourseLevelValidationMessage)]
-    public string? LevelId { get; set; }  
+    public string LevelId { get; set; } = null!;
 
     public IEnumerable<LevelOptionsViewModel> Levels { get; set; } 
         = new HashSet<LevelOptionsViewModel>();
