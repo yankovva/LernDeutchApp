@@ -21,6 +21,6 @@ public class AddLessonInputModel
     // optional
     public string? CourseId { get; set; }
 
-    public List<CourseOptionsViewModel> Courses { get; set; }
+    public IList<CourseOptionsViewModel> Courses { get; set; }
         = new List<CourseOptionsViewModel>();
 }
