@@ -190,7 +190,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             {
                 ModelState.AddModelError(string.Empty, "Невалиден Course.");
                 
-                model.Courses = await GetAllCoursesFromDbAsync();;
+                model.Courses = await GetAllCoursesFromDbAsync();
 
                 return View(model);
             }
@@ -228,6 +228,98 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
         
         return this.RedirectToAction(nameof(this.Index));
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(string id)
+    {
+        Guid lessonId = Guid.Empty;
+        if (!IsGuidValid(id, ref lessonId))
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        Lesson? lesson = await dbcontext.Lessons
+            .AsNoTracking()
+            .FirstOrDefaultAsync(l => l.Id == lessonId);
+
+        if (lesson == null)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+        
+        var model = new LessonEditInputModel
+        {
+            Id = lesson.Id.ToString(),
+            Name = lesson.Name,
+            Content = lesson.Content,
+            OrderIndex = lesson.OrderIndex,
+            CourseId = lesson.CourseId?.ToString(),
+            Courses = await GetAllCoursesFromDbAsync()
+        };
+
+        return View(model);
+    }
+    
+    [HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
+{
+    if (!ModelState.IsValid)
+    {
+        model.Courses = await GetAllCoursesFromDbAsync();
+        return View(model);
+    }
+
+    Guid lessonId = Guid.Empty;
+    if (!IsGuidValid(id, ref lessonId))
+    {
+        ModelState.AddModelError(string.Empty, "Невалиден урок.");
+        model.Courses = await GetAllCoursesFromDbAsync();
+        return View(model);
+    }
+
+    var lessonToChange = await dbcontext.Lessons
+        .FirstOrDefaultAsync(l => l.Id == lessonId);
+
+    if (lessonToChange == null)
+    {
+        ModelState.AddModelError(string.Empty, "Невалиден урок.");
+        model.Courses = await GetAllCoursesFromDbAsync();
+        return View(model);
+    }
+
+    Guid? courseId = null;
+    if (!string.IsNullOrWhiteSpace(model.CourseId))
+    {
+        Guid parsedCourseId = Guid.Empty;
+        if (!IsGuidValid(model.CourseId, ref parsedCourseId))
+        {
+            ModelState.AddModelError(nameof(LessonEditInputModel.CourseId), "Невалиден курс.");
+            model.Courses = await GetAllCoursesFromDbAsync();
+            return View(model);
+        }
+
+        bool courseExists = await dbcontext.Courses
+            .AnyAsync(c => c.Id == parsedCourseId);
+        if (!courseExists)
+        {
+            ModelState.AddModelError(nameof(LessonEditInputModel.CourseId), "Избраният курс не съществува.");
+            model.Courses = await GetAllCoursesFromDbAsync();
+            return View(model);
+        }
+
+        courseId = parsedCourseId;
+    }
+
+    lessonToChange.Name = model.Name;
+    lessonToChange.Content = model.Content;
+    lessonToChange.OrderIndex = model.OrderIndex;
+    lessonToChange.CourseId = courseId;
+
+    await dbcontext.SaveChangesAsync();
+
+    return RedirectToAction(nameof(Content), new { id = lessonId });
+}
 
     private async Task<List<CourseOptionsViewModel>> GetAllCoursesFromDbAsync()
     {
