@@ -23,6 +23,13 @@ public class DbSeeder
             Name = "A1",
             Description = "Beginner"
         };
+        
+        var a2 = new Level
+        {
+            Id = Guid.NewGuid(),
+            Name = "A2",
+            Description = "Medium"
+        };
 
         var course = new Course
         {
@@ -44,10 +51,17 @@ public class DbSeeder
             Course = course
         };
         
+        var noun = new PartOfSpeech
+        {
+            Id = Guid.NewGuid(),
+            Name = "noun"
+        };
+
         var item1 = new VocabularyItem
         {
             Id = Guid.NewGuid(),
             Lesson = lesson1,
+            PartOfSpeech = noun,
             Terms = new List<VocabularyTerm>
             {
                 new VocabularyTerm
@@ -55,7 +69,7 @@ public class DbSeeder
                     Id = Guid.NewGuid(),
                     Side = "bg",
                     Text = "къща",
-                    IsPrimary = true
+                    IsPrimary = true,
                 },
                 new VocabularyTerm
                 {
@@ -74,10 +88,36 @@ public class DbSeeder
             }
         };
 
+        var item3 = new VocabularyItem
+        {
+            Id = Guid.NewGuid(),
+            Lesson = lesson1,
+            PartOfSpeech = noun,
+            Terms = new List<VocabularyTerm>
+            {
+                new VocabularyTerm
+                {
+                    Id = Guid.NewGuid(),
+                    Side = "bg",
+                    Text = "куче",
+                    IsPrimary = true
+                },
+                new VocabularyTerm
+                {
+                    Id = Guid.NewGuid(),
+                    Side = "de",
+                    Text = "Hund",
+                    IsPrimary = true
+                }
+            }
+        };
+
+
         var item2 = new VocabularyItem
         {
             Id = Guid.NewGuid(),
             Lesson = lesson1,
+            PartOfSpeech = noun,
             Terms = new List<VocabularyTerm>
             {
                 new VocabularyTerm
@@ -97,10 +137,11 @@ public class DbSeeder
             }
         };
 
-        await db.Levels.AddAsync(a1);
+        await db.Levels.AddRangeAsync(a1,a2);
         await db.Courses.AddAsync(course);
         await db.Lessons.AddAsync(lesson1);
-        await db.VocabularyItems.AddRangeAsync(item1, item2);
+        await db.PartsOfSpeech.AddAsync(noun);
+        await db.VocabularyItems.AddRangeAsync(item1, item2, item3);
 
         await db.SaveChangesAsync();
     }
