@@ -107,6 +107,22 @@ namespace LerningApp.Data.Migrations
                     b.ToTable("Levels");
                 });
 
+            modelBuilder.Entity("LerningApp.Data.Models.PartOfSpeech", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PartsOfSpeech");
+                });
+
             modelBuilder.Entity("LerningApp.Data.Models.VocabularyItem", b =>
                 {
                     b.Property<Guid>("Id")
@@ -116,9 +132,14 @@ namespace LerningApp.Data.Migrations
                     b.Property<Guid>("LessonId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("PartOfSpeechId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LessonId");
+
+                    b.HasIndex("PartOfSpeechId");
 
                     b.ToTable("VocabularyItems");
                 });
@@ -181,7 +202,15 @@ namespace LerningApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("LerningApp.Data.Models.PartOfSpeech", "PartOfSpeech")
+                        .WithMany("VocabularyItems")
+                        .HasForeignKey("PartOfSpeechId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.Navigation("Lesson");
+
+                    b.Navigation("PartOfSpeech");
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.VocabularyTerm", b =>
@@ -208,6 +237,11 @@ namespace LerningApp.Data.Migrations
             modelBuilder.Entity("LerningApp.Data.Models.Level", b =>
                 {
                     b.Navigation("CoursesForLevel");
+                });
+
+            modelBuilder.Entity("LerningApp.Data.Models.PartOfSpeech", b =>
+                {
+                    b.Navigation("VocabularyItems");
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.VocabularyItem", b =>

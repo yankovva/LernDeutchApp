@@ -21,6 +21,9 @@ public class LerningAppContext : DbContext
     public virtual DbSet<VocabularyItem> VocabularyItems { get; set; } = null!;
     
     public virtual DbSet<VocabularyTerm> VocabularyTerms { get; set; } = null!;
+    
+    public virtual DbSet<PartOfSpeech> PartsOfSpeech { get; set; } = null!;
+
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
