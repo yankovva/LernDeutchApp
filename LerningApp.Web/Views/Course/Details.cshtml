@@ -20,9 +20,47 @@
                         </div>
                     </div>
 
-                    <a asp-action="Index" class="btn btn-outline-secondary">
-                        ← Назад
-                    </a>
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div class="d-flex gap-2">
+                            <a asp-action="Edit"
+                               asp-route-id="@Model.Id"
+                               class="btn btn-primary">
+                                ✏️ Редактирай
+                            </a>
+
+                            <a asp-action="Index"
+                               class="btn btn-outline-secondary">
+                                ← Всички курсове
+                            </a>
+                        </div>
+
+                        @if (Model.IsActive)
+                        {
+                            <form asp-action="Deactivate"
+                                  asp-route-id="@Model.Id"
+                                  method="post"
+                                  onsubmit="return confirm('Сигурни ли сте, че искате да деактивирате този курс?');">
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="btn btn-outline-danger">
+                                    🗄️ Скрий курса
+                                </button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Restore"
+                                  asp-route-id="@Model.Id"
+                                  method="post">
+                                @Html.AntiForgeryToken()
+
+                                <button type="submit" class="btn btn-outline-success">
+                                    ♻️ Възстанови курса
+                                </button>
+                            </form>
+                        }
+                    </div>
+
                 </div>
 
                 <hr class="my-4" />
