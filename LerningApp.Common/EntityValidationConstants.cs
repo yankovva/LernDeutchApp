@@ -40,4 +40,9 @@ public static class EntityValidationConstants
         public const int SideMaxLength = 5;
         
     }
+
+    public static class PartOfSpeech
+    {
+        public const int PartOfSpeechMinLength = 3;
+        public const int PartOfSpeecheMaxLength = 30;    }
 }
