@@ -43,7 +43,7 @@
                                 @Html.AntiForgeryToken()
 
                                 <button type="submit" class="btn btn-outline-danger">
-                                    🗄️ Скрий курса
+                                    🗄️ Деактивирай
                                 </button>
                             </form>
                         }
@@ -51,7 +51,8 @@
                         {
                             <form asp-action="Restore"
                                   asp-route-id="@Model.Id"
-                                  method="post">
+                                  method="post"
+                                  onsubmit="return confirm('Сигурни ли сте, че искате да активирате този курс?');">
                                 @Html.AntiForgeryToken()
 
                                 <button type="submit" class="btn btn-outline-success">

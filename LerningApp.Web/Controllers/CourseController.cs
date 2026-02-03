@@ -245,6 +245,28 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
 
         return RedirectToAction(nameof(Index));
     }
+    public async Task<IActionResult> Restore(string id)
+    {
+        Guid courseId = Guid.Empty;
+        if (!IsGuidValid(id, ref courseId))
+        {
+            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
+            return RedirectToAction(nameof(Index));
+        }
+        var course = await dbcontext
+            .Courses
+            .FirstOrDefaultAsync(c => c.Id == courseId);
+
+        if (course == null)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        course.IsPublished = true;
+        await dbcontext.SaveChangesAsync();
+
+        return RedirectToAction(nameof(Index));
+    }
     
 
 private async Task<List<LevelOptionsViewModel>> GetAllLevelsFromDbAsync()
