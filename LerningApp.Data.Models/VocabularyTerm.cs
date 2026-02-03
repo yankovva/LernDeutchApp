@@ -11,6 +11,5 @@ public class VocabularyTerm
 
     // "en" oder "de"
     public string Side { get; set; } = null!;
-
     public bool IsPrimary { get; set; }
 }

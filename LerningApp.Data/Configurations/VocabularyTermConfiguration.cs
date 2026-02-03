@@ -19,12 +19,13 @@ public class VocabularyTermConfiguration
         builder.Property(x => x.Side)
             .IsRequired()
             .HasMaxLength(SideMaxLength);
-
+        
         builder.HasOne(x => x.VocabularyItem)
             .WithMany(i => i.Terms)
             .HasForeignKey(x => x.VocabularyItemId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(x => new { x.VocabularyItemId, x.Side });
+        builder
+            .HasIndex(x => new { x.VocabularyItemId, x.Side });
     }
 }
