@@ -1,0 +1,103 @@
+@using LerningApp.Web.ViewModels.VocabularyCard
+@model VocabularyCardDetailsViewModel
+
+<div class="flashcard-detail card shadow-sm p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <span class="badge bg-info text-dark">Част на речта: @Model.PartOfSpeech</span>
+        <a asp-action="Index" asp-route-lessonId="@Model.LessonId" class="btn btn-sm btn-outline-secondary">
+            ← Назад
+        </a>
+    </div>
+
+    <h2 class="display-6 mb-2">@Model.GermanWord</h2>
+    <p class="text-muted mb-4">Урок: @Model.LessonName</p>
+
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="translation-box bg-light">
+                <div class="label">Български</div>
+                <div class="value">@(!string.IsNullOrWhiteSpace(Model.BulgarianTranslation) ? Model.BulgarianTranslation : "—")</div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="translation-box bg-light">
+                <div class="label">English</div>
+                <div class="value">@(!string.IsNullOrWhiteSpace(Model.EnglishTranslation) ? Model.EnglishTranslation : "—")</div>
+            </div>
+        </div>
+    </div>
+    <div class="tr">
+        @if (Model.BulgarianSynonyms.Any())
+        {
+            <div class="synonym-block">
+                <div class="synonym-label">BG синоними</div>
+                <div class="synonym-badges">
+                    @foreach (var s in Model.BulgarianSynonyms)
+                    {
+                        <span class="badge rounded-pill bg-success-subtle text-dark border">@s</span>
+                    }
+                </div>
+            </div>
+        }
+
+        @if (Model.EnglishSynonyms.Any())
+        {
+            <div class="synonym-block">
+                <div class="synonym-label">EN synonyms</div>
+                <div class="synonym-badges">
+                    @foreach (var s in Model.EnglishSynonyms)
+                    {
+                        <span class="badge rounded-pill bg-info-subtle text-dark border">@s</span>
+                    }
+                </div>
+            </div>
+        }
+
+
+    </div>
+</div>
+
+<style>
+    .flashcard-detail {
+        border-radius: 16px;
+        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+    }
+
+    .translation-box {
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .translation-box .label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        color: #6b7280;
+        margin-bottom: 6px;
+    }
+
+    .translation-box .value {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #111827;
+    }
+    .synonym-block {
+        margin-top: 6px;
+    }
+    .synonym-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-bottom: 4px;
+    }
+    .synonym-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .synonym-badges .badge {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+</style>
