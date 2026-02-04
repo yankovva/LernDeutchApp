@@ -1,0 +1,85 @@
+@using LerningApp.Web.ViewModels.VocabularyCard
+@model VocabularyCardsIndexViewModel
+<style>
+    .flashcard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 16px;
+    }
+
+    .flashcard {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 14px;
+        background: #ffecdc;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+    }
+    .flashcard:hover{
+        transform: translateY(-6px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .flashcard-header {
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .pos {
+        font-size: 0.8rem;
+        color: #4b5563;
+        background: #f3f4f6;
+        padding: 4px 8px;
+        border-radius: 999px;
+    }
+
+    .de {
+        font-size: 1.4rem;
+        font-weight: 600;
+        margin: 8px 0;
+    }
+
+    .tr {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        color: #374151;
+    }
+
+    .flashcard-actions {
+        margin-top: 12px;
+    }
+</style>
+
+<h2 class="mb-3">Думи за урок: @Model.LessonName</h2>
+
+<div class="flashcard-grid">
+    @foreach (var c in Model.Cards)
+    {
+        <div class="flashcard">
+            <div class="flashcard-header">
+                <span class="pos">@c.PartOfSpeech</span>
+            </div>
+
+            <div class="flashcard-main">
+                <div class="de">@c.German</div>
+                <div class="tr">
+                    @if (!string.IsNullOrWhiteSpace(c.Bulgarian))
+                    {
+                        <span>BG: @c.Bulgarian</span>
+                    }
+                    @if (!string.IsNullOrWhiteSpace(c.English))
+                    {
+                        <span>EN: @c.English</span>
+                    }
+                </div>
+            </div>
+
+            <div class="flashcard-actions">
+                <a class="btn btn-sm btn-outline-secondary" href="#">Детайли</a>
+            </div>
+        </div>
+    }
+</div>
+
