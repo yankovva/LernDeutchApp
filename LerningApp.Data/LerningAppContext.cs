@@ -1,11 +1,14 @@
 using System.Reflection;
 using LerningApp.Data.Models;
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
+
 
 namespace LerningApp.Data;
 
-public class LerningAppContext : DbContext
+public class LerningAppContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
     public LerningAppContext(DbContextOptions<LerningAppContext> options)
         : base(options)
