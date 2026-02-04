@@ -57,7 +57,7 @@ public class DbSeeder
             Name = "noun"
         };
 
-        var item1 = new VocabularyItem
+        var item1 = new VocabularyCard
         {
             Id = Guid.NewGuid(),
             Lesson = lesson1,
@@ -88,7 +88,7 @@ public class DbSeeder
             }
         };
 
-        var item3 = new VocabularyItem
+        var item3 = new VocabularyCard
         {
             Id = Guid.NewGuid(),
             Lesson = lesson1,
@@ -113,7 +113,7 @@ public class DbSeeder
         };
 
 
-        var item2 = new VocabularyItem
+        var item2 = new VocabularyCard
         {
             Id = Guid.NewGuid(),
             Lesson = lesson1,
@@ -141,7 +141,7 @@ public class DbSeeder
         await db.Courses.AddAsync(course);
         await db.Lessons.AddAsync(lesson1);
         await db.PartsOfSpeech.AddAsync(noun);
-        await db.VocabularyItems.AddRangeAsync(item1, item2, item3);
+        await db.VocabularyCards.AddRangeAsync(item1, item2, item3);
 
         await db.SaveChangesAsync();
     }

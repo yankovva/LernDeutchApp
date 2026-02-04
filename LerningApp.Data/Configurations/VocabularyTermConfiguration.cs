@@ -20,12 +20,12 @@ public class VocabularyTermConfiguration
             .IsRequired()
             .HasMaxLength(SideMaxLength);
         
-        builder.HasOne(x => x.VocabularyItem)
+        builder.HasOne(x => x.VocabularyCard)
             .WithMany(i => i.Terms)
-            .HasForeignKey(x => x.VocabularyItemId)
+            .HasForeignKey(x => x.VocabularyCardId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
-            .HasIndex(x => new { x.VocabularyItemId, x.Side });
+            .HasIndex(x => new { x.VocabularyCardId, x.Side });
     }
 }

@@ -5,8 +5,8 @@ public class VocabularyTerm
   
     public Guid Id { get; set; }= Guid.NewGuid();
     
-    public Guid VocabularyItemId { get; set; }
-    public VocabularyItem VocabularyItem { get; set; } = null!;
+    public Guid VocabularyCardId { get; set; }
+    public VocabularyCard VocabularyCard { get; set; } = null!;
     public string Text { get; set; } = null!;
 
     // "en" oder "de"

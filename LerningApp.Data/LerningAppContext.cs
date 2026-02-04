@@ -18,7 +18,7 @@ public class LerningAppContext : DbContext
     
     public virtual DbSet<Level> Levels { get; set; } = null!;
     
-    public virtual DbSet<VocabularyItem> VocabularyItems { get; set; } = null!;
+    public virtual DbSet<VocabularyCard> VocabularyCards { get; set; } = null!;
     
     public virtual DbSet<VocabularyTerm> VocabularyTerms { get; set; } = null!;
     

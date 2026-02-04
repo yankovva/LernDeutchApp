@@ -10,4 +10,8 @@
       <ProjectReference Include="..\LerningApp.Common\LerningApp.Common.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="VocabularyItem\" />
+    </ItemGroup>
+
 </Project>

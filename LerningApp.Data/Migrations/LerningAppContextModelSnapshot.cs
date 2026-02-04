@@ -123,7 +123,7 @@ namespace LerningApp.Data.Migrations
                     b.ToTable("PartsOfSpeech");
                 });
 
-            modelBuilder.Entity("LerningApp.Data.Models.VocabularyItem", b =>
+            modelBuilder.Entity("LerningApp.Data.Models.VocabularyCard", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -141,7 +141,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("PartOfSpeechId");
 
-                    b.ToTable("VocabularyItems");
+                    b.ToTable("VocabularyCards");
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.VocabularyTerm", b =>
@@ -163,12 +163,12 @@ namespace LerningApp.Data.Migrations
                         .HasMaxLength(150)
                         .HasColumnType("nvarchar(150)");
 
-                    b.Property<Guid>("VocabularyItemId")
+                    b.Property<Guid>("VocabularyCardId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("VocabularyItemId", "Side");
+                    b.HasIndex("VocabularyCardId", "Side");
 
                     b.ToTable("VocabularyTerms");
                 });
@@ -194,16 +194,16 @@ namespace LerningApp.Data.Migrations
                     b.Navigation("Course");
                 });
 
-            modelBuilder.Entity("LerningApp.Data.Models.VocabularyItem", b =>
+            modelBuilder.Entity("LerningApp.Data.Models.VocabularyCard", b =>
                 {
                     b.HasOne("LerningApp.Data.Models.Lesson", "Lesson")
-                        .WithMany("VocabularyItems")
+                        .WithMany("VocabularyCards")
                         .HasForeignKey("LessonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("LerningApp.Data.Models.PartOfSpeech", "PartOfSpeech")
-                        .WithMany("VocabularyItems")
+                        .WithMany("VocabularyCards")
                         .HasForeignKey("PartOfSpeechId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
@@ -215,13 +215,13 @@ namespace LerningApp.Data.Migrations
 
             modelBuilder.Entity("LerningApp.Data.Models.VocabularyTerm", b =>
                 {
-                    b.HasOne("LerningApp.Data.Models.VocabularyItem", "VocabularyItem")
+                    b.HasOne("LerningApp.Data.Models.VocabularyCard", "VocabularyCard")
                         .WithMany("Terms")
-                        .HasForeignKey("VocabularyItemId")
+                        .HasForeignKey("VocabularyCardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("VocabularyItem");
+                    b.Navigation("VocabularyCard");
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.Course", b =>
@@ -231,7 +231,7 @@ namespace LerningApp.Data.Migrations
 
             modelBuilder.Entity("LerningApp.Data.Models.Lesson", b =>
                 {
-                    b.Navigation("VocabularyItems");
+                    b.Navigation("VocabularyCards");
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.Level", b =>
@@ -241,10 +241,10 @@ namespace LerningApp.Data.Migrations
 
             modelBuilder.Entity("LerningApp.Data.Models.PartOfSpeech", b =>
                 {
-                    b.Navigation("VocabularyItems");
+                    b.Navigation("VocabularyCards");
                 });
 
-            modelBuilder.Entity("LerningApp.Data.Models.VocabularyItem", b =>
+            modelBuilder.Entity("LerningApp.Data.Models.VocabularyCard", b =>
                 {
                     b.Navigation("Terms");
                 });

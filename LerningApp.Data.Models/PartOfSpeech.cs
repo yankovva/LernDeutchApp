@@ -6,6 +6,6 @@ public class PartOfSpeech
 
     public string Name { get; set; } = null!;
     
-    public virtual ICollection<VocabularyItem> VocabularyItems { get; set; } 
-        = new HashSet<VocabularyItem>();
+    public virtual ICollection<VocabularyCard> VocabularyCards { get; set; } 
+        = new HashSet<VocabularyCard>();
 }

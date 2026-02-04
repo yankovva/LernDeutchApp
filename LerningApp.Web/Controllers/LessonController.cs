@@ -61,7 +61,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             Name = lesson.Name,
             CourseId = lesson.CourseId.ToString(),
             Content = lesson.Content,
-            WordCount = lesson.VocabularyItems.Count(),
+            WordCount = lesson.VocabularyCards.Count(),
             OrderIndex = lesson.OrderIndex,
             CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
         };
