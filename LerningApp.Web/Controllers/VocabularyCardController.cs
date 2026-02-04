@@ -1,4 +1,5 @@
 using LerningApp.Data;
+using LerningApp.Data.Models;
 using LerningApp.Web.ViewModels.VocabularyCard;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -45,4 +46,46 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
         return View(model);
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Details(string id)
+    {
+        Guid cardId = Guid.Empty;
+        if (!this.IsGuidValid(id, ref cardId))
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+
+        VocabularyCard? card = await dbcontext
+            .VocabularyCards
+            .AsNoTracking()
+            .Include(vc => vc.Lesson)
+            .Include(vc => vc.PartOfSpeech)
+            .Include(vc => vc.Terms)
+            .FirstOrDefaultAsync(vc => vc.Id == cardId);
+
+        if (card == null)
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+
+        VocabularyCardDetailsViewModel model = new VocabularyCardDetailsViewModel
+        {
+            Id = card.Id.ToString(),
+            LessonId = card.LessonId.ToString(),
+            LessonName = card.Lesson?.Name ?? "Урок",
+            GermanWord = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Text ?? "",
+            BulgarianTranslation = card.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)?.Text,
+            EnglishTranslation = card.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)?.Text,
+            PartOfSpeech = card.PartOfSpeech.Name,
+            BulgarianSynonyms = card.Terms.Where(t => t.Side == "bg" && !t.IsPrimary)
+                .Select(t => t.Text)
+                .ToList(),
+            EnglishSynonyms = card.Terms
+                .Where(t => t.Side == "en" && !t.IsPrimary)
+                .Select(t => t.Text)
+                .ToList(),
+        };
+        return this.View(model);
+        
+    }
 }
