@@ -77,7 +77,12 @@
             </div>
 
             <div class="flashcard-actions">
-                <a class="btn btn-sm btn-outline-secondary" href="#">Детайли</a>
+                <a class="btn btn-sm btn-outline-primary"
+                   asp-action="Details"
+                   asp-route-id="@c.Id">
+                    Детайли
+                </a>
+
             </div>
         </div>
     }
