@@ -33,6 +33,12 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Lesson" asp-action="Index">Lessons</a>
                     </li>
+                    @if (this.User?.Identity?.IsAuthenticated ?? false)
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="UsersCourses" asp-action="Index">My Courses</a>
+                        </li> 
+                    }
                 </ul>
 
                 <div class="ms-auto">
