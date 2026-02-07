@@ -1,0 +1,83 @@
+@using LerningApp.Web.ViewModels.UsersCouses
+@model UsersCoursesIndexViewModel
+
+@{
+    ViewData["Title"] = "Моите курсове";
+}
+
+<h2 class="mb-3">Моите курсове</h2>
+
+@if (!Model.Courses.Any())
+{
+    <div class="alert alert-info">Все още нямате записани курсове.</div>
+}
+else
+{
+    <div class="course-grid">
+        @foreach (var c in Model.Courses)
+        {
+            <div class="course-card">
+                <div class="course-head">
+                    <span class="badge bg-warning text-dark">@c.LevelName</span>
+                </div>
+
+                <h5 class="course-title">@c.Name</h5>
+                <p class="course-desc">@c.Description</p>
+
+                <div class="course-meta">
+                        <span>Започнат: @c.StartedAt.ToString("dd.MM.yyyy")</span>
+                    @if (c.CompletedAt.HasValue)
+                    {
+                        <span>Завършен: @c.CompletedAt.Value.ToString("dd.MM.yyyy")</span>
+                    }
+                </div>
+
+                <a asp-controller="Course" asp-action="Details" asp-route-id="@c.Id" class="btn btn-outline-primary btn-sm">
+                    Отвори курс
+                </a>
+            </div>
+        }
+    </div>
+}
+
+<style>
+    .course-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .course-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 16px;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+    }
+
+    .course-head {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+    }
+
+    .course-title {
+        font-weight: 700;
+        margin-bottom: 6px;
+    }
+
+    .course-desc {
+        color: #475569;
+        font-size: 0.95rem;
+        min-height: 40px;
+    }
+
+    .course-meta {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 10px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+</style>
