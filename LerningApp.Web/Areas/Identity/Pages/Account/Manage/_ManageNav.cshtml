@@ -1,15 +1,46 @@
-@inject SignInManager<ApplicationUser> SignInManager
-@{
-    var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
-}
-<ul class="nav nav-pills flex-column">
-    <li class="nav-item"><a class="nav-link @ManageNavPages.IndexNavClass(ViewContext)" id="profile" asp-page="./Index">Profile</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.EmailNavClass(ViewContext)" id="email" asp-page="./Email">Email</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.ChangePasswordNavClass(ViewContext)" id="change-password" asp-page="./ChangePassword">Password</a></li>
-    @if (hasExternalLogins)
-    {
-        <li id="external-logins" class="nav-item"><a id="external-login" class="nav-link @ManageNavPages.ExternalLoginsNavClass(ViewContext)" asp-page="./ExternalLogins">External logins</a></li>
+@using LerningApp.Areas.Identity.Pages.Account.Manage
+
+<div class="manage-nav card shadow-sm">
+    <div class="card-body">
+        <div class="manage-title">Профил</div>
+        <div class="list-group list-group-flush">
+            <a class="list-group-item list-group-item-action @ManageNavPages.IndexNavClass(ViewContext)" asp-page="./Index">
+                Основни данни
+            </a>
+            <a class="list-group-item list-group-item-action @ManageNavPages.ChangePasswordNavClass(ViewContext)" asp-page="./ChangePassword">
+                Смяна на парола
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .manage-nav {
+        border-radius: 14px;
+        border: 1px solid #e5e7eb;
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
     }
-    <li class="nav-item"><a class="nav-link @ManageNavPages.TwoFactorAuthenticationNavClass(ViewContext)" id="two-factor" asp-page="./TwoFactorAuthentication">Two-factor authentication</a></li>
-    <li class="nav-item"><a class="nav-link @ManageNavPages.PersonalDataNavClass(ViewContext)" id="personal-data" asp-page="./PersonalData">Personal data</a></li>
-</ul>
+
+    .manage-title {
+        font-weight: 700;
+        font-size: 0.95rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: #334155;
+        margin-bottom: 10px;
+    }
+
+    .manage-nav .list-group-item {
+        border: 0;
+        border-radius: 10px;
+        margin-bottom: 6px;
+        background: #ffffff;
+    }
+
+    .manage-nav .list-group-item.active,
+    .manage-nav .list-group-item.active:hover {
+        background: #e0f2fe;
+        color: #0f172a;
+        font-weight: 600;
+    }
+</style>
