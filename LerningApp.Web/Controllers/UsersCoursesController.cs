@@ -18,12 +18,7 @@ public class UsersCoursesController(LerningAppContext dbcontext, UserManager<App
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-         var userId =  userManager.GetUserId(User);
-
-         if (string.IsNullOrEmpty(userId))
-         {
-             return this.RedirectToAction("/Identity/Account/Login");
-         }
+         var userId =  userManager.GetUserId(User)!;
 
          List<MyCourseCardViewModel> courses =  await dbcontext.UsersCourses
              .AsNoTracking()
