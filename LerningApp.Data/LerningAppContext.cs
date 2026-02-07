@@ -26,6 +26,9 @@ public class LerningAppContext : IdentityDbContext<ApplicationUser, IdentityRole
     public virtual DbSet<VocabularyTerm> VocabularyTerms { get; set; } = null!;
     
     public virtual DbSet<PartOfSpeech> PartsOfSpeech { get; set; } = null!;
+    
+    public virtual DbSet<UserCourse> UsersCourses { get; set; } = null!;
+
 
 
 
