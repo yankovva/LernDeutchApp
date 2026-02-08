@@ -45,10 +45,11 @@ public class DbSeeder
         {
             Id = Guid.NewGuid(),
             Name = "At home",
-            Content = "Basic home vocabulary",
+            Content = " Das Haus ist groß.Die Tür ist offen.Das Fenster ist klein.",
             OrderIndex = 1,
             CreatedAt = DateTime.UtcNow,
-            Course = course
+            Course = course,
+            Target = "Lern basic home vocabulary"
         };
         
         var noun = new PartOfSpeech

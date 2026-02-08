@@ -10,6 +10,7 @@ namespace LerningApp.Controllers;
 
 public class CourseController(LerningAppContext dbcontext) : BaseController
 {
+    //TODO: Add logic to participate in Course
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -66,8 +67,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
                     LessinId = cl.Id.ToString(),
                     LessonName = cl.Name,
                     WordsInLesson = cl.VocabularyCards.Count() ,
-                    LessonTarget = cl.Content
-
+                    LessonTarget = cl.Target
                 }).ToList()
         };
 

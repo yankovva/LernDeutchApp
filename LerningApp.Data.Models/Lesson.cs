@@ -10,10 +10,13 @@ public class Lesson{
     [Comment("The Name of the Lesson")]
     public string Name { get; set; } = null!;
     
-    [Comment("The Content of the Course")]
+    [Comment("The Target of the Lesson")]
+    public string Target { get; set; } = null!;
+    
+    [Comment("The Content of the Lesson")]
     public string Content { get; set; } = null!;
     
-    [Comment("The OrderIndex of the Course")]
+    [Comment("The OrderIndex of the Lesson")]
     public int OrderIndex { get; set; }
     
     [Comment("The Creation Date of the Lesson")]

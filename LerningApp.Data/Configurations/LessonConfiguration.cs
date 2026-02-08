@@ -25,6 +25,11 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
              .IsRequired();
          
          builder
+             .Property(l => l.Target)
+             .HasMaxLength(TargetMaxLength)
+             .IsRequired();
+         
+         builder
              .HasOne(e => e.Course)
              .WithMany(g => g.LessonsForCourse)
              .HasForeignKey(e => e.CourseId)
