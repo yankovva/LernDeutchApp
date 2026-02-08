@@ -12,13 +12,20 @@ public class VocabularyTermConfiguration
     {
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Text)
+        builder.Property(x => x.Word)
             .IsRequired()
-            .HasMaxLength(NameMaxLength);
+            .HasMaxLength(WordMaxLength);
 
         builder.Property(x => x.Side)
             .IsRequired()
             .HasMaxLength(SideMaxLength);
+        
+        builder.Property(x => x.Gender)
+            .HasMaxLength(GenderMaxLength)
+            .IsFixedLength();
+        
+        builder.Property(x => x.ExampleSentence)
+            .HasMaxLength(ExampleSentenceMaxLenght);
         
         builder.HasOne(x => x.VocabularyCard)
             .WithMany(i => i.Terms)
