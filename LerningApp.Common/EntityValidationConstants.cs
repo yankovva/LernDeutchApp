@@ -33,11 +33,17 @@ public static class EntityValidationConstants
     }
     public static class VocabularyTerm
     {
-        public const int NameMinLength = 1;
-        public const int NameMaxLength = 150;
+        public const int WordMinLength = 1;
+        public const int WordMaxLength = 150;
         
         public const int SideMinLength = 2;
         public const int SideMaxLength = 5;
+        
+        public const int GenderdMinLength = 1;
+        public const int GenderMaxLength = 3;
+        
+        public const int ExampleSentenceMinLenght = 8;
+        public const int ExampleSentenceMaxLenght = 500;
         
     }
 

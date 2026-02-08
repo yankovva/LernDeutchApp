@@ -8,6 +8,7 @@ public class VocabularyCardRowViewModel
     
     public string? Bulgarian { get; set; }
     
+    public string Gender { get; set; } = null!;
     public string? English { get; set; }
     
     public string PartOfSpeech { get; set; } = null!;

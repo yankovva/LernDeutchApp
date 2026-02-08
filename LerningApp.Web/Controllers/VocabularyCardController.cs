@@ -11,12 +11,15 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
     [HttpGet]
     public async Task<IActionResult> Index(string lessonId)
     {
-        if (!Guid.TryParse(lessonId, out var id))
-            return RedirectToAction("Index", "Lesson");
-
+        Guid lessonGuidId = Guid.Empty;
+        if (!this.IsGuidValid(lessonId, ref lessonGuidId))
+        {
+            return this.RedirectToAction(nameof(this.Index));
+        }
+        
         var lesson = await dbcontext.Lessons
             .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.Id == id);
+            .FirstOrDefaultAsync(l => l.Id == lessonGuidId);
 
         if (lesson == null)
             return RedirectToAction("Index", "Lesson");
@@ -25,14 +28,15 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
             .AsNoTracking()
             .Include(v => v.PartOfSpeech)
             .Include(v => v.Terms)
-            .Where(v => v.LessonId == id)
+            .Where(v => v.LessonId == lessonGuidId)
             .Select(v => new VocabularyCardRowViewModel
             {
                 Id = v.Id.ToString(),
-                German = v.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)!.Text,
-                Bulgarian = v.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)!.Text,
-                English = v.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)!.Text,
-                PartOfSpeech = v.PartOfSpeech.Name
+                German = v.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)!.Word,
+                Bulgarian = v.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)!.Word,
+                English = v.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)!.Word,
+                PartOfSpeech = v.PartOfSpeech.Name,
+                Gender = v.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)!.Gender ?? "-",
             })
             .ToListAsync();
 
@@ -73,16 +77,16 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
             Id = card.Id.ToString(),
             LessonId = card.LessonId.ToString(),
             LessonName = card.Lesson?.Name ?? "Урок",
-            GermanWord = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Text ?? "",
-            BulgarianTranslation = card.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)?.Text,
-            EnglishTranslation = card.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)?.Text,
+            GermanWord = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Word ?? "",
+            BulgarianTranslation = card.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)?.Word,
+            EnglishTranslation = card.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)?.Word,
             PartOfSpeech = card.PartOfSpeech.Name,
             BulgarianSynonyms = card.Terms.Where(t => t.Side == "bg" && !t.IsPrimary)
-                .Select(t => t.Text)
+                .Select(t => t.Word)
                 .ToList(),
             EnglishSynonyms = card.Terms
                 .Where(t => t.Side == "en" && !t.IsPrimary)
-                .Select(t => t.Text)
+                .Select(t => t.Word)
                 .ToList(),
         };
         return this.View(model);
