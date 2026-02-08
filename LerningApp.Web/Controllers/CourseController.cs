@@ -245,6 +245,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
         return RedirectToAction(nameof(Details), new { Id = courseId });
     }
 
+    [HttpPost]
     public async Task<IActionResult> Deactivate(string id)
     {
         Guid courseId = Guid.Empty;
@@ -267,6 +268,8 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
 
         return RedirectToAction(nameof(Index));
     }
+    
+    [HttpPost]
     public async Task<IActionResult> Restore(string id)
     {
         Guid courseId = Guid.Empty;
@@ -294,14 +297,23 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
     [HttpPost]
     public async Task<IActionResult> Enroll(string courseId)
     { 
+        var userId = Guid.Parse(userManager.GetUserId(User)!);
+        
         Guid courseGuidId = Guid.Empty;
         if (!IsGuidValid(courseId, ref courseGuidId))
         {
             return RedirectToAction(nameof(Index));
         }
-        
-        var userId = Guid.Parse(userManager.GetUserId(User)!);
 
+        bool course = await dbcontext
+            .Courses
+            .AnyAsync(c => c.Id == courseGuidId && c.IsPublished == true);
+
+        if (!course)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+        
         bool alreadyEnrolled = await dbcontext.UsersCourses
             .AnyAsync(uc => uc.UserId == userId && uc.CourseId == courseGuidId);
 
