@@ -9,6 +9,6 @@ public class ApplicationUser : IdentityUser<Guid>
         this.Id = Guid.NewGuid();
     }
     
-    public virtual IEnumerable<UserCourse> UserCourses { get; set; } = new HashSet<UserCourse>();
+    public virtual ICollection<UserCourse> UserCourses { get; set; } = new HashSet<UserCourse>();
 
 }

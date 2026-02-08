@@ -32,5 +32,5 @@ public class Course
     public virtual ICollection<Lesson> LessonsForCourse { get; set; } = new HashSet<Lesson>();
     
     [Comment("Users in this course")]
-    public virtual IEnumerable<UserCourse> CourseParticipants { get; set; } = new HashSet<UserCourse>();
+    public virtual ICollection<UserCourse> CourseParticipants { get; set; } = new HashSet<UserCourse>();
 }
