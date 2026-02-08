@@ -68,23 +68,26 @@ public class DbSeeder
                 {
                     Id = Guid.NewGuid(),
                     Side = "bg",
-                    Text = "къща",
+                    Word = "къща",
                     IsPrimary = true,
                 },
                 new VocabularyTerm
                 {
                     Id = Guid.NewGuid(),
                     Side = "bg",
-                    Text = "дом",
+                    Word = "дом",
                     IsPrimary = false
                 },
                 new VocabularyTerm
                 {
                     Id = Guid.NewGuid(),
                     Side = "de",
-                    Text = "Haus",
-                    IsPrimary = true
+                    Word = "Haus",
+                    IsPrimary = true,
+                    Gender = "das",
+                    ExampleSentence = "Das Haus ist groß."
                 }
+
             }
         };
 
@@ -99,16 +102,19 @@ public class DbSeeder
                 {
                     Id = Guid.NewGuid(),
                     Side = "bg",
-                    Text = "куче",
+                    Word = "куче",
                     IsPrimary = true
                 },
                 new VocabularyTerm
                 {
                     Id = Guid.NewGuid(),
                     Side = "de",
-                    Text = "Hund",
-                    IsPrimary = true
+                    Word = "Hund",
+                    IsPrimary = true,
+                    Gender = "der",
+                    ExampleSentence = "Der Hund ist freundlich."
                 }
+
             }
         };
 
@@ -124,16 +130,19 @@ public class DbSeeder
                 {
                     Id = Guid.NewGuid(),
                     Side = "bg",
-                    Text = "врата",
+                    Word = "врата",
                     IsPrimary = true
                 },
                 new VocabularyTerm
                 {
                     Id = Guid.NewGuid(),
                     Side = "de",
-                    Text = "Tür",
-                    IsPrimary = true
+                    Word = "Tür",
+                    IsPrimary = true,
+                    Gender = "die",
+                    ExampleSentence = "Die Tür ist offen."
                 }
+
             }
         };
 
