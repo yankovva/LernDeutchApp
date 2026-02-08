@@ -2,13 +2,15 @@ using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Level;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class CourseController(LerningAppContext dbcontext) : BaseController
+public class CourseController(LerningAppContext dbcontext, UserManager<ApplicationUser> userManager) : BaseController
 {
     //TODO: Add logic to participate in Course
     [HttpGet]
@@ -23,7 +25,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
                 Name = c.Name,
                 LessonsCount = c.LessonsForCourse.Count,
                 CourseLevel = c.Level.Name,
-                IsActive = c.IsPublished
+                IsActive = c.IsPublished,
             })
             .ToListAsync();
 
@@ -35,6 +37,8 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
     {
         Guid courseId = Guid.Empty;
         bool isIdValid = IsGuidValid(id, ref courseId);
+        
+        string? userId = userManager.GetUserId(User);
 
         if (!isIdValid)
         {
@@ -46,7 +50,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
             .AsNoTracking()
             .Include(course => course.Level)
             .Include(course => course.LessonsForCourse)
-            .ThenInclude(lesson => lesson.VocabularyCards)
+            .ThenInclude(lesson => lesson.VocabularyCards).Include(course => course.CourseParticipants)
             .FirstOrDefaultAsync(c => c.Id == courseId);
 
         if (course == null)
@@ -54,7 +58,7 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
             return this.RedirectToAction(nameof(this.Index));
         }
 
-        CourseDetailsViewModel detailsViewModel =  new CourseDetailsViewModel()
+        CourseDetailsViewModel model =  new CourseDetailsViewModel()
         {
             Id = course.Id.ToString(),
             Name = course.Name,
@@ -70,8 +74,15 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
                     LessonTarget = cl.Target
                 }).ToList()
         };
-
-        return this.View(detailsViewModel);
+        
+        if (userId != null)
+        {
+            model.IsEnrolled = await dbcontext
+                .UsersCourses
+                .AnyAsync(uc => uc.UserId == Guid.Parse(userId) && uc.CourseId == courseId);
+        }
+        
+        return this.View(model);
     }
 
     [HttpGet]
@@ -277,6 +288,37 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
         await dbcontext.SaveChangesAsync();
 
         return RedirectToAction(nameof(Index));
+    }
+  
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> Enroll(string courseId)
+    { 
+        Guid courseGuidId = Guid.Empty;
+        if (!IsGuidValid(courseId, ref courseGuidId))
+        {
+            return RedirectToAction(nameof(Index));
+        }
+        
+        var userId = Guid.Parse(userManager.GetUserId(User)!);
+
+        bool alreadyEnrolled = await dbcontext.UsersCourses
+            .AnyAsync(uc => uc.UserId == userId && uc.CourseId == courseGuidId);
+
+        if (alreadyEnrolled)
+            return RedirectToAction("Details", new { id = courseId });
+
+        UserCourse newUserCourse = new UserCourse
+        {
+            UserId = userId,
+            CourseId = courseGuidId,
+            StartedAt = DateTime.UtcNow
+        };
+
+        dbcontext.UsersCourses.Add(newUserCourse);
+        await dbcontext.SaveChangesAsync();
+
+        return RedirectToAction("Details", new { id = courseId });
     }
     
 

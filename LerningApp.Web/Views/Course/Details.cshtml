@@ -32,6 +32,17 @@
                                class="btn btn-outline-secondary">
                                 ← Всички курсове
                             </a>
+                            @if (Model.IsEnrolled == false)
+                            {
+                                <form asp-action="Enroll" method="post" class="d-inline">
+                                    <input type="hidden" name="courseId" value="@Model.Id"/>
+                                    <button type="submit" class="btn btn-primary">Запиши се</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Записан</span>
+                            }
                         </div>
 
                         @if (Model.IsActive)

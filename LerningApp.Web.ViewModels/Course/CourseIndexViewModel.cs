@@ -11,5 +11,5 @@ public class CourseIndexViewModel
    public string CourseLevel { get; set; } = null!;
    
    public bool IsActive { get; set; }
-
+   
 }
