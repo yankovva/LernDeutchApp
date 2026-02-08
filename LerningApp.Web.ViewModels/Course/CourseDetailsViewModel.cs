@@ -11,5 +11,8 @@ public class CourseDetailsViewModel
     public string LevelName { get; set; } = null!;
     
     public bool IsActive { get; set; }
-    
+
+    public virtual IList<CourseLessonsViewModel> CourseLessons { get; set; } =
+        new List<CourseLessonsViewModel>();
+
 }

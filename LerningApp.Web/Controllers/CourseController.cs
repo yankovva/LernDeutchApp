@@ -44,6 +44,8 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
             .Courses
             .AsNoTracking()
             .Include(course => course.Level)
+            .Include(course => course.LessonsForCourse)
+            .ThenInclude(lesson => lesson.VocabularyCards)
             .FirstOrDefaultAsync(c => c.Id == courseId);
 
         if (course == null)
@@ -51,13 +53,22 @@ public class CourseController(LerningAppContext dbcontext) : BaseController
             return this.RedirectToAction(nameof(this.Index));
         }
 
-        CourseDetailsViewModel detailsViewModel = new CourseDetailsViewModel()
+        CourseDetailsViewModel detailsViewModel =  new CourseDetailsViewModel()
         {
             Id = course.Id.ToString(),
             Name = course.Name,
             Description = course.Description,
             LevelName = course.Level.Name,
             IsActive = course.IsPublished,
+            CourseLessons = course.LessonsForCourse
+                .Select(cl=>  new CourseLessonsViewModel()
+                {
+                    LessinId = cl.Id.ToString(),
+                    LessonName = cl.Name,
+                    WordsInLesson = cl.VocabularyCards.Count() ,
+                    LessonTarget = cl.Content
+
+                }).ToList()
         };
 
         return this.View(detailsViewModel);

@@ -78,17 +78,68 @@
                 }
 
                 <hr class="my-4" />
+                
+                <h4 class="mt-4 mb-3">Уроци в курса</h4>
 
-                <div class="d-flex flex-wrap gap-2">
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">
-                        ✏️ Редактирай
-                    </a>
+                @if (!Model.CourseLessons.Any())
+                {
+                    <div class="alert alert-info">Все още няма уроци в този курс.</div>
+                }
+                else
+                {
+                    <div class="lesson-grid">
+                        @foreach (var lesson in Model.CourseLessons)
+                        {
+                            <div class="lesson-card">
+                                <div class="lesson-title">@lesson.LessonName</div>
+                                <div class="lesson-desc">@lesson.LessonTarget</div>
+                                <div class="lesson-meta">@lesson.WordsInLesson думи</div>
 
-                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">
-                        🗑️ Изтрий
-                    </a>
-                </div>
+                                <a asp-controller="Lesson"
+                                   asp-action="Content"
+                                   asp-route-id="@lesson.LessinId"
+                                   class="btn btn-outline-primary btn-sm">
+                                    Отвори урок
+                                </a>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
+           
         </div>
     </div>
 </div>
+<style>
+    .lesson-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 14px;
+    }
+
+    .lesson-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+    }
+
+    .lesson-title {
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
+
+    .lesson-desc {
+        color: #475569;
+        font-size: 0.95rem;
+        min-height: 38px;
+        margin-bottom: 8px;
+    }
+
+    .lesson-meta {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
+</style>
