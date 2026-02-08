@@ -1,31 +1,47 @@
 @using LerningApp.Web.ViewModels.VocabularyCard
 @model VocabularyCardDetailsViewModel
 
-<div class="flashcard-detail card shadow-sm p-4">
+<div class="flashcard-detail card p-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <span class="badge bg-info text-dark">Част на речта: @Model.PartOfSpeech</span>
+        <div class="meta-row">
+            <span class="badge-pos">Част на речта: @Model.PartOfSpeech</span>
+            @if (!string.IsNullOrWhiteSpace(Model.Gender))
+            {
+                <span class="gender-chip">Род: @Model.Gender</span>
+            }
+        </div>
+
         <a asp-action="Index" asp-route-lessonId="@Model.LessonId" class="btn btn-sm btn-outline-secondary">
             ← Назад
         </a>
     </div>
 
-    <h2 class="display-6 mb-2">@Model.GermanWord</h2>
-    <p class="text-muted mb-4">Урок: @Model.LessonName</p>
+    <h2 class="word-title">@Model.GermanWord</h2>
+    <p class="lesson-line">Урок: @Model.LessonName</p>
 
     <div class="row g-3">
         <div class="col-md-6">
-            <div class="translation-box bg-light">
+            <div class="translation-box">
                 <div class="label">Български</div>
                 <div class="value">@(!string.IsNullOrWhiteSpace(Model.BulgarianTranslation) ? Model.BulgarianTranslation : "—")</div>
             </div>
         </div>
         <div class="col-md-6">
-            <div class="translation-box bg-light">
+            <div class="translation-box">
                 <div class="label">English</div>
                 <div class="value">@(!string.IsNullOrWhiteSpace(Model.EnglishTranslation) ? Model.EnglishTranslation : "—")</div>
             </div>
         </div>
     </div>
+
+    @if (!string.IsNullOrWhiteSpace(Model.ExampleSentence))
+    {
+        <div class="example-box">
+            <div class="label">Примерно изречение (DE)</div>
+            <div class="value">@Model.ExampleSentence</div>
+        </div>
+    }
+
     <div class="tr">
         @if (Model.BulgarianSynonyms.Any())
         {
@@ -34,7 +50,7 @@
                 <div class="synonym-badges">
                     @foreach (var s in Model.BulgarianSynonyms)
                     {
-                        <span class="badge rounded-pill bg-success-subtle text-dark border">@s</span>
+                        <span class="badge rounded-pill">@s</span>
                     }
                 </div>
             </div>
@@ -47,57 +63,123 @@
                 <div class="synonym-badges">
                     @foreach (var s in Model.EnglishSynonyms)
                     {
-                        <span class="badge rounded-pill bg-info-subtle text-dark border">@s</span>
+                        <span class="badge rounded-pill">@s</span>
                     }
                 </div>
             </div>
         }
-
-
     </div>
 </div>
 
 <style>
-    .flashcard-detail {
-        border-radius: 16px;
-        background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
-    }
+.flashcard-detail {
+    border-radius: 18px;
+    border: 1px solid #e7ecf2;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
 
-    .translation-box {
-        border-radius: 12px;
-        padding: 16px;
-        border: 1px solid #e5e7eb;
-    }
+.meta-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+}
 
-    .translation-box .label {
-        font-size: 0.8rem;
-        text-transform: uppercase;
-        color: #6b7280;
-        margin-bottom: 6px;
-    }
+.badge-pos {
+    background: #e0f2fe;
+    color: #0c4a6e;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+}
 
-    .translation-box .value {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #111827;
-    }
-    .synonym-block {
-        margin-top: 6px;
-    }
-    .synonym-label {
-        font-size: 0.75rem;
-        color: #6b7280;
-        text-transform: uppercase;
-        letter-spacing: 0.04em;
-        margin-bottom: 4px;
-    }
-    .synonym-badges {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px;
-    }
-    .synonym-badges .badge {
-        font-size: 0.8rem;
-        padding: 6px 10px;
-    }
+.gender-chip {
+    background: #fef3c7;
+    color: #92400e;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+}
+
+.word-title {
+    font-size: 2.1rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.lesson-line {
+    color: #6b7280;
+    margin-bottom: 18px;
+}
+
+.translation-box {
+    border-radius: 14px;
+    padding: 16px;
+    border: 1px solid #e5e7eb;
+    background: #f8fafc;
+}
+
+.translation-box .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #64748b;
+    letter-spacing: .05em;
+    margin-bottom: 6px;
+}
+
+.translation-box .value {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #0f172a;
+}
+
+.example-box {
+    margin-top: 16px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+
+.example-box .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: #1d4ed8;
+    letter-spacing: .05em;
+    margin-bottom: 6px;
+}
+
+.example-box .value {
+    font-size: 1.05rem;
+    color: #0f172a;
+}
+
+.synonym-block {
+    margin-top: 12px;
+}
+
+.synonym-label {
+    font-size: 0.7rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+}
+
+.synonym-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.synonym-badges .badge {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+    font-size: 0.8rem;
+    padding: 6px 10px;
+}
 </style>

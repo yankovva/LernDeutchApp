@@ -88,6 +88,8 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
                 .Where(t => t.Side == "en" && !t.IsPrimary)
                 .Select(t => t.Word)
                 .ToList(),
+            Gender = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Gender ?? "-",
+            ExampleSentence = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.ExampleSentence ?? "-",
         };
         return this.View(model);
         

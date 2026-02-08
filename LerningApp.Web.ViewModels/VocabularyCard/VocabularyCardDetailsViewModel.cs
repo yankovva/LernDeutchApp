@@ -7,6 +7,8 @@ public class VocabularyCardDetailsViewModel
     public string LessonId { get; set; } = null!;
     public string LessonName { get; set; } = null!;
     public string GermanWord { get; set; } = null!;
+    public string Gender { get; set; } = null!;
+    public string ExampleSentence { get; set; } = null!;
     public string? BulgarianTranslation { get; set; }
     public string? EnglishTranslation { get; set; }
     public string PartOfSpeech { get; set; } = null!;
