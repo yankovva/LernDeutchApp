@@ -12,4 +12,5 @@ public class CourseIndexViewModel
    
    public bool IsActive { get; set; }
    
+   public bool IsEnrolled { get; set; }
 }

@@ -16,6 +16,13 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
     [HttpGet]
     public async Task<IActionResult> Index()
     {
+        var userId = userManager.GetUserId(this.User);
+        Guid? userGuidId = null;
+        if (!string.IsNullOrWhiteSpace(userId))
+        {
+            userGuidId = Guid.Parse(userId);
+        }
+
         IEnumerable<CourseIndexViewModel> courses = await dbcontext
             .Courses
             .AsNoTracking()
@@ -26,9 +33,13 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
                 LessonsCount = c.LessonsForCourse.Count,
                 CourseLevel = c.Level.Name,
                 IsActive = c.IsPublished,
+                IsEnrolled = userId != null && dbcontext
+                    .UsersCourses
+                    .Any(c => c.UserId == userGuidId && c.CourseId == c.CourseId)
             })
             .ToListAsync();
 
+       
         return this.View(courses);
     }
 
@@ -327,7 +338,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
             StartedAt = DateTime.UtcNow
         };
 
-        dbcontext.UsersCourses.Add(newUserCourse);
+        await dbcontext.UsersCourses.AddAsync(newUserCourse);
         await dbcontext.SaveChangesAsync();
 
         return RedirectToAction("Details", new { id = courseId });

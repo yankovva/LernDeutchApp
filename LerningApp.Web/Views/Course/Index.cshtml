@@ -80,6 +80,10 @@ else
                             <span class="badge bg-light text-dark">
                                 📘 @course.LessonsCount уроци
                             </span>
+                            @if (course.IsEnrolled)
+                            {
+                                <span class="badge bg-success ms-2">Записан</span>
+                            }
                         </div>
 
                         <div class="mt-auto">
