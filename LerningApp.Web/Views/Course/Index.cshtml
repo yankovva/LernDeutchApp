@@ -5,42 +5,14 @@
     ViewData["Title"] = "Courses";
 }
 
-<style>
-    .course-card {
-        background-color: rgba(255, 212, 143, 0.6);
-        border: none;
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-
-    .course-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    .course-meta {
-        font-size: 0.9rem;
-    }
-    .course-card.inactive {
-        background-color: #f1f1f1;
-        opacity: 0.75;
-    }
-
-    .course-card.inactive .btn {
-        background-color: #adb5bd;
-        border-color: #adb5bd;
-    }
-
-    .course-card.inactive .card-title {
-        color: #6c757d;
-    }
-
-</style>
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h1 class="mb-0">📚 Всички курсове</h1>
-
-    <a asp-action="Create" class="btn btn-outline-secondary">
-        ➕ Нов курс
+<div class="courses-header">
+    <div>
+        <div class="eyebrow">Каталог</div>
+        <h1 class="title">Всички курсове</h1>
+        <div class="subtitle">Избери курс и започни да учиш.</div>
+    </div>
+    <a asp-action="Create" class="btn btn-outline-primary btn-pill">
+        + Нов курс
     </a>
 </div>
 
@@ -52,50 +24,148 @@
 }
 else
 {
-    <div class="row">
+    <div class="course-grid">
         @foreach (var course in Model)
         {
             var isInactive = !course.IsActive;
 
-            <div class="col-md-4 mb-4">
-                <div class="card course-card h-100 @(isInactive ? "inactive" : "")">
-                    <div class="card-body d-flex flex-column">
+            <div class="course-card @(isInactive ? "inactive" : "")">
+                <div class="course-top">
+                    <span class="badge badge-level">@course.CourseLevel</span>
+                    @if (course.IsEnrolled)
+                    {
+                        <span class="badge badge-enrolled">Записан</span>
+                    }
+                    @if (isInactive)
+                    {
+                        <span class="badge badge-inactive">Неактивен</span>
+                    }
+                </div>
 
-                        <div class="d-flex justify-content-between align-items-start mb-2">
-                            <h5 class="card-title mb-0">@course.Name</h5>
+                <div class="course-name">@course.Name</div>
+                <div class="course-meta">
+                    <span>📘 @course.LessonsCount уроци</span>
+                </div>
 
-                            @if (isInactive)
-                            {
-                                <span class="badge bg-secondary">
-                                    🚫 Деактивиран
-                                </span>
-                            }
-                        </div>
-
-                        <div class="course-meta text-muted mb-3">
-                            <span class="badge bg-secondary me-2">
-                                @course.CourseLevel
-                            </span>
-
-                            <span class="badge bg-light text-dark">
-                                📘 @course.LessonsCount уроци
-                            </span>
-                            @if (course.IsEnrolled)
-                            {
-                                <span class="badge bg-success ms-2">Записан</span>
-                            }
-                        </div>
-
-                        <div class="mt-auto">
-                            <a asp-action="Details"
-                               asp-route-id="@course.Id"
-                               class="btn btn-primary w-100">
-                                Виж курса →
-                            </a>
-                        </div>
-                    </div>
+                <div class="course-actions">
+                    <a asp-action="Details"
+                       asp-route-id="@course.Id"
+                       class="btn btn-primary btn-pill w-100">
+                        Виж курса →
+                    </a>
                 </div>
             </div>
         }
     </div>
 }
+
+<style>
+    .courses-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 22px;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+
+    .eyebrow {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+
+    .title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 4px 0;
+    }
+
+    .subtitle {
+        color: #6b7280;
+    }
+
+    .btn-pill {
+        border-radius: 999px;
+        padding: 8px 16px;
+    }
+
+    .course-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .course-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: 0 8px 22px rgba(15, 23, 42, 0.06);
+        transition: transform .2s ease, box-shadow .2s ease;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .course-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.10);
+    }
+
+    .course-card.inactive {
+        opacity: 0.75;
+        filter: grayscale(0.15);
+    }
+
+    .course-top {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .badge {
+        border-radius: 999px;
+        padding: 4px 10px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .badge-level {
+        background: #e0f2fe;
+        color: #0c4a6e;
+    }
+
+    .badge-enrolled {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+    }
+
+    .badge-inactive {
+        background: #f3f4f6;
+        color: #6b7280;
+        border: 1px solid #e5e7eb;
+    }
+
+    .course-name {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 6px;
+    }
+
+    .course-meta {
+        color: #64748b;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+
+    .course-actions {
+        margin-top: auto;
+    }
+</style>
