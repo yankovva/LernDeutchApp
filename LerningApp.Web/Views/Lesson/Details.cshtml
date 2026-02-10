@@ -14,10 +14,30 @@
         font-size: 0.9rem;
     }
 
+    .lesson-section {
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 16px;
+        background: #fff;
+        margin-bottom: 16px;
+    }
+
+    .lesson-section h5 {
+        margin-bottom: 10px;
+    }
+
     .lesson-content {
-        white-space: pre-wrap; 
+        white-space: pre-wrap;
         line-height: 1.7;
         font-size: 1rem;
+    }
+
+    .section-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #6b7280;
+        letter-spacing: 0.04em;
+        margin-bottom: 6px;
     }
 </style>
 
@@ -54,7 +74,7 @@
         <a asp-action="Index" class="btn btn-outline-secondary">
             ← Назад
         </a>
-        
+
         <a asp-controller="VocabularyCard" asp-action="Index" asp-route-lessonId="@Model.Id"
            class="btn btn-outline-primary">
             Flashcards
@@ -62,17 +82,38 @@
     </div>
 </div>
 
-<div class="card shadow-sm">
-    <div class="card-body p-4">
-        <h5 class="mb-3">Съдържание</h5>
+<div class="lesson-section">
+    <div class="section-label">Цел на урока</div>
+    @if (string.IsNullOrWhiteSpace(Model.Target))
+    {
+        <p class="text-muted mb-0 fst-italic">Няма зададена цел за този урок.</p>
+    }
+    else
+    {
+        <div class="lesson-content">@Model.Target</div>
+    }
+</div>
 
-        @if (string.IsNullOrWhiteSpace(Model.Content))
-        {
-            <p class="text-muted mb-0 fst-italic">Няма съдържание за този урок.</p>
-        }
-        else
-        {
-            <div class="lesson-content">@Model.Content</div>
-        }
-    </div>
+<div class="lesson-section">
+    <div class="section-label">Граматика</div>
+    @if (string.IsNullOrWhiteSpace(Model.Grammatik))
+    {
+        <p class="text-muted mb-0 fst-italic">Няма граматика за този урок.</p>
+    }
+    else
+    {
+        <div class="lesson-content">@Model.Grammatik</div>
+    }
+</div>
+
+<div class="lesson-section">
+    <div class="section-label">Съдържание</div>
+    @if (string.IsNullOrWhiteSpace(Model.Content))
+    {
+        <p class="text-muted mb-0 fst-italic">Няма съдържание за този урок.</p>
+    }
+    else
+    {
+        <div class="lesson-content">@Model.Content</div>
+    }
 </div>
