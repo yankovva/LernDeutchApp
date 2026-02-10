@@ -223,6 +223,8 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             CourseId = courseId,
             CreatedAt = DateTime.Now,
             OrderIndex = model.OrderIndex,
+            Gramatic = model.Grammar,
+            Target = model.Target,
         };
         
         await  dbcontext.Lessons.AddAsync(lesson);
@@ -256,6 +258,8 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             Content = lesson.Content,
             OrderIndex = lesson.OrderIndex,
             CourseId = lesson.CourseId?.ToString(),
+            Grammar = lesson.Gramatic,
+            Target = lesson.Target,
             Courses = await GetAllCoursesFromDbAsync()
         };
 
@@ -263,7 +267,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
     }
     
     [HttpPost]
-[ValidateAntiForgeryToken]
+    [ValidateAntiForgeryToken]
 public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
 {
     if (!ModelState.IsValid)
@@ -317,6 +321,8 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     lessonToChange.Content = model.Content;
     lessonToChange.OrderIndex = model.OrderIndex;
     lessonToChange.CourseId = courseId;
+    lessonToChange.Target = model.Target;
+    lessonToChange.Gramatic = model.Grammar;
 
     await dbcontext.SaveChangesAsync();
 

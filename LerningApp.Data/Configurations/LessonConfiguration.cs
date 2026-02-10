@@ -26,7 +26,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
          
          builder
              .Property(l => l.Gramatic)
-             .HasMaxLength(GramaticMaxLenght)
+             .HasMaxLength(GrammarMaxLenght)
              .IsRequired();
          
          builder

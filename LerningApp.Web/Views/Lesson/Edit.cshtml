@@ -51,7 +51,18 @@
                             <span asp-validation-for="CourseId" class="text-danger"></span>
                         </div>
                     </div>
-
+                    <div class="mb-3">
+                        <label asp-for="Target" class="form-label">Цел на урока</label>
+                        <textarea asp-for="Target" class="form-control" rows="3"
+                                  placeholder="Пример: Да можеш да описваш дома си."></textarea>
+                        <span asp-validation-for="Target" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Grammar" class="form-label">Граматика</label>
+                        <textarea asp-for="Grammar" class="form-control" rows="5"
+                                  placeholder="Пример: der/die/das + примери..."></textarea>
+                        <span asp-validation-for="Grammar" class="text-danger"></span>
+                    </div>
                     <div class="mb-3 mt-3">
                         <label asp-for="Content" class="form-label">Съдържание</label>
                         <textarea asp-for="Content" class="form-control" rows="12"></textarea>
