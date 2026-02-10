@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LerningApp.Controllers;
@@ -18,4 +19,12 @@ public class BaseController : Controller
        
         return isIdValid;
     }
+
+    protected Guid? GetCurrentUserIdOrNull()
+    {
+        var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        return Guid.TryParse(id, out var userId) ? userId : null;
+    }
+
+
 }
