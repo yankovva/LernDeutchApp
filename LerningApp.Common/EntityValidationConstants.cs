@@ -8,10 +8,13 @@ public static class EntityValidationConstants
         public const int NameMaxLength = 100;
         
         public const int ContentMinLength = 300;
-        public const int ContentMaxLength = 10000;
+        public const int ContentMaxLength = 500;
         
         public const int TargetMinLength = 10;
         public const int TargetMaxLength = 400;
+        
+        public const int GramaticMinLenght = 10;
+        public const int GramaticMaxLenght = 5000;
         
         public const int OrderIndexMin = 1;
         public const int OrderIndexMax = 1000;

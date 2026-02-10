@@ -16,6 +16,9 @@ public class Lesson{
     [Comment("The Content of the Lesson")]
     public string Content { get; set; } = null!;
     
+    [Comment("The Gramatic part of the Lesson")]
+    public string Gramatic { get; set; } = null!;
+    
     [Comment("The OrderIndex of the Lesson")]
     public int OrderIndex { get; set; }
     

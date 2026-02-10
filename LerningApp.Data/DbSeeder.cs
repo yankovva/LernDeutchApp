@@ -49,7 +49,8 @@ public class DbSeeder
             OrderIndex = 1,
             CreatedAt = DateTime.UtcNow,
             Course = course,
-            Target = "Lern basic home vocabulary"
+            Target = "Lern basic home vocabulary",
+            Gramatic = "German has more endings for verbs in the present tense than English. You\ntake the stem of a verb and then add the required ending. The stem is the\nform of the infinitive without -en or -n"
         };
         
         var noun = new PartOfSpeech
