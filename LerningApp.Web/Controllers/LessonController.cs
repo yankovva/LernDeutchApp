@@ -33,7 +33,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
     }
 
     [HttpGet]
-    public async Task<IActionResult> Content(string id)
+    public async Task<IActionResult> Details(string id)
     {
         Guid lessonId = Guid.Empty;
 
