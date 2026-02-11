@@ -1,3 +1,5 @@
+using LerningApp.Web.ViewModels.LessonSection;
+
 namespace LerningApp.Web.ViewModels.Lesson;
 
 public class LessonContentViewModel
@@ -18,4 +20,6 @@ public class LessonContentViewModel
     
     public string Target { get; set; } = null!;
     
+    public  IList<LessonSectionViewModel> LessonSections { get; set; } 
+        = new List<LessonSectionViewModel>();
 }

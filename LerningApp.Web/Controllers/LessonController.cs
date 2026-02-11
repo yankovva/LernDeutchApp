@@ -3,6 +3,7 @@ using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
+using LerningApp.Web.ViewModels.LessonSection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,9 +38,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
     {
         Guid lessonId = Guid.Empty;
 
-        bool isIdValid = IsGuidValid(id, ref lessonId);
-
-        if (!isIdValid)
+        if (!IsGuidValid(id, ref lessonId))
         {
             return this.RedirectToAction(nameof(this.Index));
         }
@@ -48,6 +47,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             .Lessons
             .AsNoTracking()
             .Include(l => l.Course)
+            .Include(lesson => lesson.VocabularyCards)
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
         if (lesson == null)
@@ -65,6 +65,16 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             OrderIndex = lesson.OrderIndex,
             CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
             Target = lesson.Target,
+            LessonSections = await dbcontext.LessonsSections
+                .Where(ls => ls.LessonId == lessonId)
+                .OrderBy(ls => ls.OrderIndex)
+                .Select(ls => new LessonSectionViewModel()
+                {
+                    Type = ls.Type,
+                    OrderIndex = ls.OrderIndex,
+                    Content = ls.Content,
+                })
+                .ToListAsync()
         };
 
         return this.View(model);

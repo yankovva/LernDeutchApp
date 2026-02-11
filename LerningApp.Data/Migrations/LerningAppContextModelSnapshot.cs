@@ -201,7 +201,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("LessonId", "OrderIndex");
 
-                    b.ToTable("LessonSection");
+                    b.ToTable("LessonsSections");
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.Level", b =>
