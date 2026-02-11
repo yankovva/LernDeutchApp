@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/LerningApp.Web.styles.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
 </head>
 <body>
 <header>
@@ -48,26 +49,6 @@
         </div>
     </nav>
 </header>
-@if (TempData["Error"] != null)
-{
-    <div class="container mt-3">
-        <div class="alert alert-danger alert-sm d-flex align-items-center justify-content-between">
-            <span>@TempData["Error"]</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    </div>
-}
-
-@if (TempData["Success"] != null)
-{
-    <div class="container mt-3">
-        <div class="alert alert-success alert-sm d-flex align-items-center justify-content-between">
-            <span>@TempData["Success"]</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    </div>
-}
-
 <div class="container">
     <main role="main" class="pb-3">
         @RenderBody()
@@ -82,7 +63,12 @@
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
 @await RenderSectionAsync("Scripts", required: false)
+
+<partial name="_NotificationsPartial" />
+
 </body>
 </html>
 <style>
