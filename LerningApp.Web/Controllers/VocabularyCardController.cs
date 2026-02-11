@@ -33,8 +33,6 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
             {
                 Id = v.Id.ToString(),
                 German = v.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)!.Word,
-                Bulgarian = v.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)!.Word,
-                English = v.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)!.Word,
                 PartOfSpeech = v.PartOfSpeech.Name,
                 Gender = v.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)!.Gender ?? "-",
             })

@@ -16,20 +16,51 @@
         </a>
     </div>
 
-    <h2 class="word-title">@Model.GermanWord</h2>
+    <div class="de-word">
+        <img src="~/images/flags/de.png" class="flag" />
+        @Model.Gender @Model.GermanWord
+    </div>
     <p class="lesson-line">Урок: @Model.LessonName</p>
 
     <div class="row g-3">
         <div class="col-md-6">
             <div class="translation-box">
                 <div class="label">Български</div>
-                <div class="value">@(!string.IsNullOrWhiteSpace(Model.BulgarianTranslation) ? Model.BulgarianTranslation : "—")</div>
+                <div class="value">
+                    @if (!string.IsNullOrWhiteSpace(Model.BulgarianTranslation))
+                    {
+                        <div class="translation">
+                            <img src="~/images/flags/bg.png" class="flag" />
+                            @Model.BulgarianTranslation
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="translation">
+                            <img src="~/images/flags/bg.png" class="flag" />
+                            "No translation available"
+                            </div>
+                    }
+                </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="translation-box">
                 <div class="label">English</div>
-                <div class="value">@(!string.IsNullOrWhiteSpace(Model.EnglishTranslation) ? Model.EnglishTranslation : "—")</div>
+                @if(!string.IsNullOrWhiteSpace(Model.EnglishTranslation))
+                {
+                    <div class="translation">
+                        <img src="~/images/flags/en.png" class="flag" />
+                        @Model.EnglishTranslation
+                    </div>
+                }else
+                {
+                    <div class="translation">
+                        <img src="~/images/flags/en.png" class="flag" />
+                        "No translation available"
+                    </div>
+                }
+                     
             </div>
         </div>
     </div>
@@ -182,4 +213,12 @@
     font-size: 0.8rem;
     padding: 6px 10px;
 }
+.flag {
+    width: 22px;
+    height: 22px;
+    margin-right: 6px;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+}
+
 </style>

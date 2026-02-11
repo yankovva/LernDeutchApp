@@ -11,7 +11,7 @@
         border: 1px solid #e5e7eb;
         border-radius: 12px;
         padding: 14px;
-        background: #ffecdc;
+        background: #fff;
         box-shadow: 0 6px 18px rgba(0,0,0,0.04);
         transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
@@ -64,16 +64,6 @@
 
             <div class="flashcard-main">
                 <div class="de">@c.Gender @c.German</div>
-                <div class="tr">
-                    @if (!string.IsNullOrWhiteSpace(c.Bulgarian))
-                    {
-                        <span>BG: @c.Bulgarian</span>
-                    }
-                    @if (!string.IsNullOrWhiteSpace(c.English))
-                    {
-                        <span>EN: @c.English</span>
-                    }
-                </div>
             </div>
 
             <div class="flashcard-actions">
