@@ -14,6 +14,14 @@ public class AddLessonInputModel
     [MinLength(ContentMinLength)]
     [MaxLength(ContentMaxLength)]
     public string Content { get; set; } = null!;
+    [Required]
+    [MinLength(GrammarMinLength)]
+    [MaxLength(GrammarMaxLength)]
+    public string Grammar { get; set; } = null!;
+    [Required]
+    [MinLength(ExerciseMinLength)]
+    [MaxLength(ExerciseMaxLength)]
+    public string Exercise { get; set; } = null!;
     
     [Required]
     [MinLength(TargetMinLength)]
