@@ -47,14 +47,13 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
     {
         Guid courseId = Guid.Empty;
         bool isIdValid = IsGuidValid(id, ref courseId);
-        
-        string? userId = userManager.GetUserId(User);
 
         if (!isIdValid)
         {
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
-
+        
         Course? course = await dbcontext
             .Courses
             .AsNoTracking()
@@ -65,6 +64,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
 
         if (course == null)
         {
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
 
@@ -85,6 +85,8 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
                 }).ToList()
         };
         
+        string? userId = userManager.GetUserId(User);
+
         if (userId != null)
         {
             model.IsEnrolled = await dbcontext
