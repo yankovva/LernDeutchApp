@@ -18,18 +18,13 @@ public class LerningAppContext : IdentityDbContext<ApplicationUser, IdentityRole
     public virtual DbSet<Lesson> Lessons { get; set; } = null!;
     
     public virtual DbSet<Course> Courses { get; set; } = null!;
-    
     public virtual DbSet<Level> Levels { get; set; } = null!;
-    
     public virtual DbSet<VocabularyCard> VocabularyCards { get; set; } = null!;
     
     public virtual DbSet<VocabularyTerm> VocabularyTerms { get; set; } = null!;
-    
     public virtual DbSet<PartOfSpeech> PartsOfSpeech { get; set; } = null!;
-    
     public virtual DbSet<UserCourse> UsersCourses { get; set; } = null!;
-
-
+    public virtual DbSet<LessonSection> LessonsSections { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
