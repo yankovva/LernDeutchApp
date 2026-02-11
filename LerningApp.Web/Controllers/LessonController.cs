@@ -40,6 +40,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
 
         if (!IsGuidValid(id, ref lessonId))
         {
+            TempData["ErrorMessage"] = "Урокът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
         
@@ -52,6 +53,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
 
         if (lesson == null)
         {
+            TempData["ErrorMessage"] = "Урокът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
 
@@ -88,6 +90,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
 
         if (!isIdValid)
         {
+            TempData["ErrorMessage"] = "Урокът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
         
@@ -98,6 +101,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
 
         if (lesson == null) 
         {
+            TempData["ErrorMessage"] = "Урокът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
 
@@ -130,6 +134,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
 
         if (!this.IsGuidValid(model.LessonId, ref lessonId))
         {
+            TempData["ErrorMessage"] = "Урокът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
         
@@ -139,6 +144,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
 
         if (lesson == null)
         {
+            TempData["ErrorMessage"] = "Урокът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
         
@@ -152,7 +158,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
         Guid courseId = Guid.Empty;
         if (!this.IsGuidValid(model.SelectedCourseId, ref courseId))
         {
-            ModelState.AddModelError(string.Empty, "Invalid course ID.");
+            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
             return View(model);
         }
 
@@ -162,13 +168,15 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             .FirstOrDefaultAsync(c => c.Id == courseId);
         if (course == null)
         {
-            ModelState.AddModelError(string.Empty, "Course not found.");
+            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
             return View(model);
         }
 
         lesson.CourseId = courseId;
 
         await dbcontext.SaveChangesAsync();
+        TempData["SuccessMessage"] = $"Успешно добавихте {lesson.Name}  към курс {course.Name}.";
+
         return RedirectToAction(nameof(this.Index));
     }
 
@@ -199,7 +207,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
 
             if (!isCourseIdValid)
             {
-                ModelState.AddModelError(string.Empty, "Невалиден Course.");
+                ModelState.AddModelError(string.Empty, "Невалиден Курс.");
                 
                 model.Courses = await GetAllCoursesFromDbAsync();
 
@@ -218,7 +226,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             else
             {
                 ModelState
-                    .AddModelError(nameof(model.CourseId), "Невалиден Course.");
+                    .AddModelError(nameof(model.CourseId), "Невалиден Курс.");
                 
                 model.Courses = await GetAllCoursesFromDbAsync();;
                 return this.View(model);
@@ -238,6 +246,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
         await  dbcontext.Lessons.AddAsync(lesson);
         await dbcontext.SaveChangesAsync();
         
+        TempData["SuccessMessage"] = $"Успешно създадохте {lesson.Name}.";
         return this.RedirectToAction(nameof(this.Index));
     }
 
@@ -247,6 +256,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
         Guid lessonId = Guid.Empty;
         if (!IsGuidValid(id, ref lessonId))
         {
+            TempData["ErrorMessage"] = "Невалиден урок.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -256,6 +266,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
 
         if (lesson == null)
         {
+            TempData["ErrorMessage"] = "Невалиден урок.";
             return RedirectToAction(nameof(Index));
         }
         
@@ -291,7 +302,8 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
         return View(model);
     }
 
-    var lessonToChange = await dbcontext.Lessons
+    Lesson? lessonToChange = await dbcontext
+        .Lessons
         .FirstOrDefaultAsync(l => l.Id == lessonId);
 
     if (lessonToChange == null)
@@ -331,6 +343,7 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     lessonToChange.Target = model.Target;
     
     await dbcontext.SaveChangesAsync();
+    TempData["SuccessMessage"] = $"Успешно редактирахте {lessonToChange.Name}.";
 
     return RedirectToAction(nameof(Content), new { id = lessonId });
 }
