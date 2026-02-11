@@ -12,7 +12,6 @@ namespace LerningApp.Controllers;
 
 public class CourseController(LerningAppContext dbcontext, UserManager<ApplicationUser> userManager) : BaseController
 {
-    //TODO: Add logic to participate in Course
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -142,8 +141,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
             }
             else
             {
-                ModelState
-                    .AddModelError(nameof(model.LevelId), "Невалидно Ниво.");
+                ModelState.AddModelError(nameof(model.LevelId), "Невалидно Ниво.");
 
                 model.Levels = await GetAllLevelsFromDbAsync();
 
@@ -163,7 +161,8 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
 
         await dbcontext.Courses.AddAsync(course);
         await dbcontext.SaveChangesAsync();
-
+        
+        TempData["SuccessMessage"] = "Успешно създадохте курс.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -174,6 +173,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
         bool isIdValid = IsGuidValid(id, ref courseId);
         if (!isIdValid)
         {
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
 
@@ -184,6 +184,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
 
         if (course == null)
         {
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
 
@@ -212,7 +213,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
         Guid courseId = Guid.Empty;
         if (!IsGuidValid(id, ref courseId))
         {
-            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             model.Levels = await GetAllLevelsFromDbAsync();
             return this.View(model);
         }
@@ -223,7 +224,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
 
         if (courseToChange == null)
         {
-            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
+            TempData["ErrorMessage"] = "Курсът не е намерен.";          
             model.Levels = await GetAllLevelsFromDbAsync();
             return this.View(model);
         }
@@ -253,6 +254,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
 
         await dbcontext.SaveChangesAsync();
 
+        TempData["SuccessMessage"] = "Успешно редактирахте курса.";
         return RedirectToAction(nameof(Details), new { Id = courseId });
     }
 
@@ -262,7 +264,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
         Guid courseId = Guid.Empty;
         if (!IsGuidValid(id, ref courseId))
         {
-            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return RedirectToAction(nameof(Index));
         }
         var course = await dbcontext
@@ -271,6 +273,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
 
         if (course == null)
         {
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -286,7 +289,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
         Guid courseId = Guid.Empty;
         if (!IsGuidValid(id, ref courseId))
         {
-            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return RedirectToAction(nameof(Index));
         }
         var course = await dbcontext
@@ -295,11 +298,14 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
 
         if (course == null)
         {
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return RedirectToAction(nameof(Index));
         }
 
         course.IsPublished = true;
         await dbcontext.SaveChangesAsync();
+        
+        TempData["SuccessMessage"] = "Успешно деактивирахте курса.";
 
         return RedirectToAction(nameof(Index));
     }
@@ -313,15 +319,17 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
         Guid courseGuidId = Guid.Empty;
         if (!IsGuidValid(courseId, ref courseGuidId))
         {
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return RedirectToAction(nameof(Index));
         }
 
-        bool course = await dbcontext
+        Course? course = await dbcontext
             .Courses
-            .AnyAsync(c => c.Id == courseGuidId && c.IsPublished == true);
+            .FirstOrDefaultAsync(c => c.Id == courseGuidId && c.IsPublished == true);
 
-        if (!course)
+        if (course == null)
         {
+            TempData["ErrorMessage"] = "Курсът не е намерен.";
             return RedirectToAction(nameof(Index));
         }
         
@@ -329,7 +337,10 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
             .AnyAsync(uc => uc.UserId == userId && uc.CourseId == courseGuidId);
 
         if (alreadyEnrolled)
+        {
+            TempData["InfoMessage"] = "Вече сте записани за този курс.";
             return RedirectToAction("Details", new { id = courseId });
+        }
 
         UserCourse newUserCourse = new UserCourse
         {
@@ -340,7 +351,8 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
 
         await dbcontext.UsersCourses.AddAsync(newUserCourse);
         await dbcontext.SaveChangesAsync();
-
+        
+        TempData["SuccessMessage"] = $"Успешно се запизахте за курс {course.Name}.";
         return RedirectToAction("Details", new { id = courseId });
     }
     
