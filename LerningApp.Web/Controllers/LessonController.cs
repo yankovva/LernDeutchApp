@@ -242,6 +242,23 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             OrderIndex = model.OrderIndex,
             Target = model.Target,
         };
+        List<LessonSection> sections = new List<LessonSection>()
+        {
+            new LessonSection()
+            {
+                Content = model.Grammar,
+                Type = "grammar",
+                OrderIndex = 1
+            },
+            new LessonSection()
+            {
+                Content = model.Exercise,
+                Type = "exercise",
+                OrderIndex = 2
+            }
+        };
+        
+        lesson.LessonSections = sections;
         
         await  dbcontext.Lessons.AddAsync(lesson);
         await dbcontext.SaveChangesAsync();
