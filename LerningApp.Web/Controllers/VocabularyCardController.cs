@@ -14,6 +14,7 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
         Guid lessonGuidId = Guid.Empty;
         if (!this.IsGuidValid(lessonId, ref lessonGuidId))
         {
+            TempData["ErrorMessage"] = "Урокът не е намерен.";
             return this.RedirectToAction(nameof(this.Index));
         }
         
@@ -22,7 +23,11 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
             .FirstOrDefaultAsync(l => l.Id == lessonGuidId);
 
         if (lesson == null)
+        {
+            TempData["ErrorMessage"] = "Урокът не е намерен.";
             return RedirectToAction("Index", "Lesson");
+        }
+           
 
         var cards = await dbcontext.VocabularyCards
             .AsNoTracking()
@@ -54,6 +59,7 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
         Guid cardId = Guid.Empty;
         if (!this.IsGuidValid(id, ref cardId))
         {
+            TempData["ErrorMessage"] = "Картата не е намерена.";
             return this.RedirectToAction(nameof(this.Index));
         }
 
@@ -67,6 +73,7 @@ public class VocabularyCardController(LerningAppContext dbcontext) :BaseControll
 
         if (card == null)
         {
+            TempData["ErrorMessage"] = "Картата не е намерена.";
             return this.RedirectToAction(nameof(this.Index));
         }
 
