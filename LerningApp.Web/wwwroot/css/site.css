@@ -32,3 +32,8 @@ body {
 main[role="main"] {
   margin-top: 18px;
 }
+.alert-sm {
+  padding: 8px 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}

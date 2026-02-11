@@ -47,8 +47,27 @@
             </div>
         </div>
     </nav>
-
 </header>
+@if (TempData["Error"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-danger alert-sm d-flex align-items-center justify-content-between">
+            <span>@TempData["Error"]</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+
+@if (TempData["Success"] != null)
+{
+    <div class="container mt-3">
+        <div class="alert alert-success alert-sm d-flex align-items-center justify-content-between">
+            <span>@TempData["Success"]</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    </div>
+}
+
 <div class="container">
     <main role="main" class="pb-3">
         @RenderBody()
