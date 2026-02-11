@@ -39,6 +39,47 @@
         letter-spacing: 0.04em;
         margin-bottom: 6px;
     }
+    .lesson-sections {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 16px;
+    }
+
+    .section-card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 14px;
+        background: #ffffff;
+    }
+
+    .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .section-type {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.75rem;
+        letter-spacing: 0.05em;
+        color: #334155;
+        background: #f1f5f9;
+        padding: 4px 8px;
+        border-radius: 999px;
+    }
+
+    .section-order {
+        font-size: 0.75rem;
+        color: #94a3b8;
+    }
+
+    .section-content {
+        white-space: pre-wrap;
+        line-height: 1.6;
+    }
 </style>
 
 <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
@@ -106,3 +147,24 @@
         <div class="lesson-content">@Model.Content</div>
     }
 </div>
+@if (Model.LessonSections != null && Model.LessonSections.Any())
+{
+    <div class="lesson-sections">
+        @foreach (var s in Model.LessonSections.OrderBy(s => s.OrderIndex))
+        {
+            <div class="section-card">
+                <div class="section-head">
+                    <span class="section-type">@s.Type</span>
+                    <span class="section-order">#@s.OrderIndex</span>
+                </div>
+                <div class="section-content">
+                    @s.Content
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-muted fst-italic">Няма секции за този урок.</p>
+}
