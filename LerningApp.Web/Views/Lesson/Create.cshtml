@@ -62,9 +62,21 @@
 
                     <div class="mb-3 mt-3">
                         <label asp-for="Content" class="form-label">Съдържание</label>
-                        <textarea asp-for="Content" class="form-control" rows="10"
+                        <textarea asp-for="Content" class="form-control" rows="5"
                                   placeholder="Напиши съдържанието на урока..."></textarea>
                         <span asp-validation-for="Content" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label asp-for="Grammar" class="form-label">Граматика</label>
+                        <textarea asp-for="Grammar" class="form-control" rows="10"
+                                  placeholder="Напиши граматиката на урока..."></textarea>
+                        <span asp-validation-for="Grammar" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3 mt-3">
+                        <label asp-for="Exercise" class="form-label">Упражнения</label>
+                        <textarea asp-for="Exercise" class="form-control" rows="10"
+                                  placeholder="Напиши упражненията към урока..."></textarea>
+                        <span asp-validation-for="Exercise" class="text-danger"></span>
                     </div>
 
                     <div class="d-flex gap-2 mt-4">
