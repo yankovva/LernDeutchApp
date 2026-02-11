@@ -12,12 +12,10 @@ public static class EntityValidationConstants
         
         public const int TargetMinLength = 10;
         public const int TargetMaxLength = 400;
-        
-        public const int GrammarMinLenght = 10;
-        public const int GrammarMaxLenght = 5000;
-        
+      
         public const int OrderIndexMin = 1;
         public const int OrderIndexMax = 1000;
+        
     }
     
     public static class Course
@@ -56,5 +54,17 @@ public static class EntityValidationConstants
     public static class PartOfSpeech
     {
         public const int PartOfSpeechMinLength = 3;
-        public const int PartOfSpeecheMaxLength = 30;    }
+        public const int PartOfSpeecheMaxLength = 30;
+        
+    }
+
+    public static class LessonSection
+    {
+        public const int TypeMinLength = 5;
+        public const int TypeMaxLength = 20;
+        
+        public const int ContentMinLength = 5;
+        public const int ContentMaxLength = 7000;
+        
+    }
 }

@@ -16,9 +16,6 @@ public class Lesson{
     [Comment("The Content of the Lesson")]
     public string Content { get; set; } = null!;
     
-    [Comment("The Gramatic part of the Lesson")]
-    public string Gramatic { get; set; } = null!;
-    
     [Comment("The OrderIndex of the Lesson")]
     public int OrderIndex { get; set; }
     
@@ -30,8 +27,8 @@ public class Lesson{
     
     [Comment("Course Reference")]
     public Course? Course { get; set; }
-    
-    [Comment("VocabularyCards in this Lesson")]
+    public virtual ICollection<LessonSection>? LessonSections { get; set; }
+        = new List<LessonSection>();
     public virtual ICollection<VocabularyCard> VocabularyCards { get; set; }
         = new HashSet<VocabularyCard>();
 

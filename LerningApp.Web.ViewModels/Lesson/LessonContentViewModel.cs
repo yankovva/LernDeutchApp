@@ -18,6 +18,4 @@ public class LessonContentViewModel
     
     public string Target { get; set; } = null!;
     
-    public string Grammatik { get; set; } = null!;
-    
 }

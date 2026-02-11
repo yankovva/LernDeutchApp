@@ -45,13 +45,30 @@ public class DbSeeder
         {
             Id = Guid.NewGuid(),
             Name = "At home",
-            Content = " Das Haus ist groß.Die Tür ist offen.Das Fenster ist klein.",
+            Content = "Das Haus ist groß. Die Tür ist offen. Das Fenster ist klein.",
             OrderIndex = 1,
             CreatedAt = DateTime.UtcNow,
             Course = course,
-            Target = "Lern basic home vocabulary",
-            Gramatic = "German has more endings for verbs in the present tense than English. You\ntake the stem of a verb and then add the required ending. The stem is the\nform of the infinitive without -en or -n"
+            Target = "Learn basic home vocabulary",
+            LessonSections = new List<LessonSection>
+            {
+                new LessonSection
+                {
+                    Id = Guid.NewGuid(),
+                    Type = "grammar",
+                    OrderIndex = 1,
+                    Content = "der/die/das – определителен член: der (m), die (f), das (n).",
+                },
+                new LessonSection
+                {
+                    Id = Guid.NewGuid(),
+                    Type = "exercise",
+                    OrderIndex = 2,
+                    Content = "Попълни члена: ___ Haus, ___ Tür, ___ Fenster."
+                }
+            }
         };
+
         
         var noun = new PartOfSpeech
         {

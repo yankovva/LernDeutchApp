@@ -65,7 +65,6 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             OrderIndex = lesson.OrderIndex,
             CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
             Target = lesson.Target,
-            Grammatik = lesson.Gramatic
         };
 
         return this.View(model);
@@ -223,7 +222,6 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             CourseId = courseId,
             CreatedAt = DateTime.Now,
             OrderIndex = model.OrderIndex,
-            Gramatic = model.Grammar,
             Target = model.Target,
         };
         
@@ -258,7 +256,6 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             Content = lesson.Content,
             OrderIndex = lesson.OrderIndex,
             CourseId = lesson.CourseId?.ToString(),
-            Grammar = lesson.Gramatic,
             Target = lesson.Target,
             Courses = await GetAllCoursesFromDbAsync()
         };
@@ -322,8 +319,7 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     lessonToChange.OrderIndex = model.OrderIndex;
     lessonToChange.CourseId = courseId;
     lessonToChange.Target = model.Target;
-    lessonToChange.Gramatic = model.Grammar;
-
+    
     await dbcontext.SaveChangesAsync();
 
     return RedirectToAction(nameof(Content), new { id = lessonId });
