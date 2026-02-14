@@ -19,6 +19,7 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
              .Property(l => l.Name)
              .HasMaxLength(NameMaxLength)
              .IsRequired();
+         
          builder
              .Property(l => l.Content)
              .HasMaxLength(ContentMaxLength)

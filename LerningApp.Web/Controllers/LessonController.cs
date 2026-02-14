@@ -279,6 +279,7 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
 
         Lesson? lesson = await dbcontext.Lessons
             .AsNoTracking()
+            .Include(lesson => lesson.LessonSections)
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
         if (lesson == null)
@@ -295,9 +296,13 @@ public class LessonController(LerningAppContext dbcontext) : BaseController
             OrderIndex = lesson.OrderIndex,
             CourseId = lesson.CourseId?.ToString(),
             Target = lesson.Target,
+            Grammar = lesson.LessonSections?
+                .FirstOrDefault(ls => ls.Type == "grammar")?.Content ?? "Add new grammar",
+            Exercise = lesson.LessonSections?
+            .FirstOrDefault(ls => ls.Type == "exercise")?.Content ?? "Add new exercise" ,
             Courses = await GetAllCoursesFromDbAsync()
         };
-
+            
         return View(model);
     }
     
@@ -321,6 +326,7 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
 
     Lesson? lessonToChange = await dbcontext
         .Lessons
+        .Include(lesson => lesson.LessonSections)
         .FirstOrDefaultAsync(l => l.Id == lessonId);
 
     if (lessonToChange == null)
@@ -359,10 +365,41 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     lessonToChange.CourseId = courseId;
     lessonToChange.Target = model.Target;
     
-    await dbcontext.SaveChangesAsync();
-    TempData["SuccessMessage"] = $"Успешно редактирахте {lessonToChange.Name}.";
+    var grammar = lessonToChange.LessonSections
+        .FirstOrDefault(ls => ls.Type == "grammar");
+    if (grammar == null)
+    {
+        lessonToChange.LessonSections
+            .Add(new LessonSection
+            {
+                Type = "grammar",
+                Content = model.Grammar,
+                OrderIndex = 1
+            });
+    }
+    else
+        grammar.Content = model.Grammar;
+    
+    var exercise = lessonToChange.LessonSections
+        .FirstOrDefault(ls => ls.Type == "exercise");
 
-    return RedirectToAction(nameof(Content), new { id = lessonId });
+    if (exercise == null)
+    {
+        lessonToChange.LessonSections
+            .Add(new LessonSection
+            {
+                Type = "exercise",
+                Content = model.Exercise,
+                OrderIndex = 2
+            });
+    }
+    else
+        exercise.Content = model.Exercise;
+    
+    await dbcontext.SaveChangesAsync();
+    
+    TempData["SuccessMessage"] = $"Успешно редактирахте {lessonToChange.Name}.";
+    return RedirectToAction(nameof(Details), new { id = lessonId });
 }
 
     private async Task<List<CourseOptionsViewModel>> GetAllCoursesFromDbAsync()
