@@ -1,11 +1,14 @@
+using LerningApp.Common;
 using LerningApp.Data;
-
+using LerningApp.Data.Models;
+using LerningApp.Data.Repository;
+using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
-
+using NuGet.Protocol.Core.Types;
 using ApplicationUser = LerningApp.Data.Models.ApplicationUser;
 using LerningAppContext = LerningApp.Data.LerningAppContext;
 using NoOpEmailSender = LerningApp.Web.Infrastructure.NoOpEmailSender;
@@ -38,6 +41,16 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
+
+builder.Services.AddScoped<IRepository<Course, Guid>, Repository<Course, Guid>>();
+builder.Services.AddScoped<IRepository<Lesson, Guid>, Repository<Lesson, Guid>>();
+builder.Services.AddScoped<IRepository<VocabularyCard, Guid>, Repository<VocabularyCard, Guid>>();
+builder.Services.AddScoped<IRepository<UserCourse, object>, Repository<UserCourse, object>>();
+builder.Services.AddScoped<IRepository<Level, Guid>, Repository<Level, Guid>>();
+builder.Services.AddScoped<IRepository<PartOfSpeech, Guid>, Repository<PartOfSpeech, Guid>>();
+builder.Services.AddScoped<IRepository<VocabularyTerm, Guid>, Repository<VocabularyTerm, Guid>>();
+builder.Services.AddScoped<IRepository<LessonSection, Guid>, Repository<LessonSection, Guid>>();
+
 
 var app = builder.Build();
 
