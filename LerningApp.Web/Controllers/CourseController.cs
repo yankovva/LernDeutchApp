@@ -1,5 +1,6 @@
 using LerningApp.Data;
 using LerningApp.Data.Models;
+using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Level;
 using Microsoft.AspNetCore.Authorization;
@@ -10,34 +11,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class CourseController(LerningAppContext dbcontext, UserManager<ApplicationUser> userManager) : BaseController
+public class CourseController(LerningAppContext dbcontext,
+    UserManager<ApplicationUser> userManager,
+    ICourseService courseService ) : BaseController
 {
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var userId = userManager.GetUserId(this.User);
-        Guid? userGuidId = null;
-        if (!string.IsNullOrWhiteSpace(userId))
-        {
-            userGuidId = Guid.Parse(userId);
-        }
+        var userId = userManager.GetUserId(User);
+        Guid? userGuidId = Guid.TryParse(userId, out var parsed)
+            ? parsed
+            : null;
 
-        IEnumerable<CourseIndexViewModel> courses = await dbcontext
-            .Courses
-            .AsNoTracking()
-            .OrderBy(c=>c.CreatedAt)
-            .Select(c => new CourseIndexViewModel
-            {
-                Id = c.Id.ToString(),
-                Name = c.Name,
-                LessonsCount = c.LessonsForCourse.Count,
-                CourseLevel = c.Level.Name,
-                IsActive = c.IsPublished,
-                IsEnrolled = userId != null && dbcontext
-                    .UsersCourses
-                    .Any(c => c.UserId == userGuidId && c.CourseId == c.CourseId)
-            })
-            .ToListAsync();
+
+        IEnumerable<CourseIndexViewModel> courses = await courseService
+            .IndexGetCoursesAsync(userGuidId);
        
         return this.View(courses);
     }
