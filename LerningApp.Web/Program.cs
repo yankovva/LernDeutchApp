@@ -45,6 +45,7 @@ builder.Services.AddRazorPages();
 builder.Services.RegisterRepositories();
 
 builder.Services.AddScoped<ICourseService, CourseService>();
+builder.Services.AddScoped<ILevelService, LevelService>();
 
 builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
 
