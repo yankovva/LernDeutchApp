@@ -25,6 +25,7 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
         IEnumerable<CourseIndexViewModel> courses = await dbcontext
             .Courses
             .AsNoTracking()
+            .OrderBy(c=>c.CreatedAt)
             .Select(c => new CourseIndexViewModel
             {
                 Id = c.Id.ToString(),
@@ -37,7 +38,6 @@ public class CourseController(LerningAppContext dbcontext, UserManager<Applicati
                     .Any(c => c.UserId == userGuidId && c.CourseId == c.CourseId)
             })
             .ToListAsync();
-
        
         return this.View(courses);
     }

@@ -9,7 +9,6 @@ public class CourseIndexViewModel
    public int LessonsCount { get; set; }
    
    public string CourseLevel { get; set; } = null!;
-   
    public bool IsActive { get; set; }
    
    public bool IsEnrolled { get; set; }
