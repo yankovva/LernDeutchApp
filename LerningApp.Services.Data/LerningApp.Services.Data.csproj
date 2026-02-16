@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\LerningApp.Data\LerningApp.Data.csproj" />
+      <ProjectReference Include="..\LerningApp.Web.ViewModels\LerningApp.Web.ViewModels.csproj" />
+    </ItemGroup>
+
 </Project>

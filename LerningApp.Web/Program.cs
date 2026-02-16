@@ -3,6 +3,8 @@ using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository;
 using LerningApp.Data.Repository.Interfaces;
+using LerningApp.Services.Data;
+using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 
 using Microsoft.AspNetCore.Identity;
@@ -41,6 +43,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
 builder.Services.RegisterRepositories();
+
+builder.Services.AddScoped<ICourseService, CourseService>();
 
 builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
 
