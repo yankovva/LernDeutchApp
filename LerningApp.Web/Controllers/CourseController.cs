@@ -72,9 +72,15 @@ public class CourseController(LerningAppContext dbcontext,
         var result = await courseService.AddCourseAsync(model);
         if (result.Result == false)
         {
-            ModelState.AddModelError(result.Field ?? "", result.Message!);
+            if (string.IsNullOrWhiteSpace(result.Field))
+            {
+                TempData["ErrorMessage"] = result.Message;
+            }
+            else
+            {
+                ModelState.AddModelError(result.Field ?? "", result.Message!);
+            }
             model.Levels = await levelService.GetAllLevelsFromDbAsLevelOptionsAsync();
-            TempData["ErrorMessage"] = $"{result.Message}";
             return this.View(model);
         }     
         
@@ -112,8 +118,15 @@ public class CourseController(LerningAppContext dbcontext,
         var result = await courseService.PostEditCourseAsync(model, id);
         if (result.Result == false)
         {
+            if (string.IsNullOrWhiteSpace(result.Field))
+            {
+                TempData["ErrorMessage"] = result.Message;
+            }
+            else
+            {
+                ModelState.AddModelError(result.Field ?? "", result.Message!);
+            }
             model.Levels = await GetAllLevelsFromDbAsync();
-            TempData["ErrorMessage"] = $"{result.Message}";
             return this.View(model);
         }
 
@@ -170,7 +183,7 @@ public class CourseController(LerningAppContext dbcontext,
         course.IsPublished = true;
         await dbcontext.SaveChangesAsync();
         
-        TempData["SuccessMessage"] = "Успешно деактивирахте курса.";
+        TempData["SuccessMessage"] = "Успешно активирахте курса.";
 
         return RedirectToAction(nameof(Index));
     }

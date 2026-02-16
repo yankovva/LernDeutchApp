@@ -35,7 +35,7 @@ public class CourseService(IRepository<Course, Guid> courseRepository,
     {
         if (string.IsNullOrWhiteSpace(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
         {
-            return ServiceResult.Fail("Невалидено ниво.", nameof(model.LevelId));
+            return ServiceResult.Fail("Невалидно ниво.");
         }
          
         Level? level = await levelRepository
@@ -45,7 +45,7 @@ public class CourseService(IRepository<Course, Guid> courseRepository,
          
         if (level == null)
         {
-            return ServiceResult.Fail("Невалидено ниво.", nameof(model.LevelId));
+            return ServiceResult.Fail("Невалидно ниво.");
         }
 
         var course = new Course
@@ -80,7 +80,7 @@ public class CourseService(IRepository<Course, Guid> courseRepository,
 
         if (course == null)
         {
-            return ServiceResultT<CourseDetailsViewModel>.Fail(("Невалиден курс."));
+            return ServiceResultT<CourseDetailsViewModel>.Fail(("Курсът не е намерен."));
         }
 
         CourseDetailsViewModel model =  new CourseDetailsViewModel()
