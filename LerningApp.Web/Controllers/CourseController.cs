@@ -1,3 +1,4 @@
+using LerningApp.Common;
 using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
@@ -13,7 +14,8 @@ namespace LerningApp.Controllers;
 
 public class CourseController(LerningAppContext dbcontext,
     UserManager<ApplicationUser> userManager,
-    ICourseService courseService ) : BaseController
+    ICourseService courseService,
+    ILevelService levelService) : BaseController
 {
     [HttpGet]
     public async Task<IActionResult> Index()
@@ -22,7 +24,6 @@ public class CourseController(LerningAppContext dbcontext,
         Guid? userGuidId = Guid.TryParse(userId, out var parsed)
             ? parsed
             : null;
-
 
         IEnumerable<CourseIndexViewModel> courses = await courseService
             .IndexGetCoursesAsync(userGuidId);
@@ -102,55 +103,17 @@ public class CourseController(LerningAppContext dbcontext,
     {
         if (!ModelState.IsValid)
         {
-            model.Levels = await GetAllLevelsFromDbAsync();
-
+            model.Levels = await levelService.GetAllLevelsFromDbAsync();
             return this.View(model);
         }
 
-        Guid levelId = Guid.Empty;
-        if (!string.IsNullOrWhiteSpace(model.LevelId))
+        var result = await courseService.AddCourseAsync(model);
+        if (result.Result == false)
         {
-            bool isLevelIdValid = IsGuidValid(model.LevelId, ref levelId);
-            if (!isLevelIdValid)
-            {
-                ModelState.AddModelError(string.Empty, "Невалидено ниво.");
-
-                model.Levels = await GetAllLevelsFromDbAsync();
-
-                return this.View(model);
-            }
-
-            Level? level = await dbcontext
-                .Levels
-                .AsNoTracking()
-                .FirstOrDefaultAsync(l => l.Id == levelId);
-
-            if (level != null)
-            {
-                levelId = Guid.Parse(model.LevelId);
-            }
-            else
-            {
-                ModelState.AddModelError(nameof(model.LevelId), "Невалидно Ниво.");
-
-                model.Levels = await GetAllLevelsFromDbAsync();
-
-                return this.View(model);
-            }
-        }
-
-        var course = new Course
-        {
-            Id = Guid.NewGuid(),
-            Name = model.Name,
-            Description = model.Description,
-            LevelId = levelId,
-            IsPublished = true,
-            CreatedAt = DateTime.Now,
-        };
-
-        await dbcontext.Courses.AddAsync(course);
-        await dbcontext.SaveChangesAsync();
+            ModelState.AddModelError(result.Field ?? "", result.Message!);
+            model.Levels = await levelService.GetAllLevelsFromDbAsync();
+            return this.View(model);
+        }     
         
         TempData["SuccessMessage"] = "Успешно създадохте курс.";
         return RedirectToAction(nameof(Index));
