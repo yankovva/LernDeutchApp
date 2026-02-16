@@ -25,6 +25,4 @@ public class BaseController : Controller
         var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
         return Guid.TryParse(id, out var userId) ? userId : null;
     }
-
-
 }
