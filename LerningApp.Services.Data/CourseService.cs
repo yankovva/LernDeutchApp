@@ -109,4 +109,32 @@ public class CourseService(IRepository<Course, Guid> courseRepository,
         
         return ServiceResultT<CourseDetailsViewModel>.Success(model);;
     }
+
+    public async Task<ServiceResultT<CourseEditViewModel>> GetCourseEditByIdAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
+        {
+           return ServiceResultT<CourseEditViewModel>.Fail("Невалиден курс."); 
+        }
+
+        Course? course = await courseRepository
+            .GetAllAttached()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == courseId);
+
+        if (course == null)
+        {
+            return ServiceResultT<CourseEditViewModel>.Fail("Курсът не е намерен."); 
+        }
+
+        CourseEditViewModel model = new CourseEditViewModel()
+        {
+            Id = courseId.ToString(),
+            Name = course.Name,
+            Description = course.Description,
+            LevelId = course.LevelId.ToString()
+        };
+        
+        return ServiceResultT<CourseEditViewModel>.Success(model);
+    }
 }
