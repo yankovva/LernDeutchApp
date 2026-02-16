@@ -9,7 +9,7 @@ public class ServiceResultT<T> : ServiceResult
         return new ServiceResultT<T> { Result = true, Data = data };
     }
 
-    public new static ServiceResultT<T> Fail(string message, string? field = null)
+    public static ServiceResultT<T> Fail(string message)
     {
         return new ServiceResultT<T> { Result = false, Message = message};
     }

@@ -13,7 +13,7 @@ public class ServiceResult
 
     public static ServiceResult Fail(string message, string? field = null)
     {
-        return new ServiceResult { Result = false, Field = message, Message = field };
+        return new ServiceResult { Result = false, Field = field, Message = message };
     }
     
 }
