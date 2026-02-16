@@ -1,12 +1,13 @@
+using LerningApp.Common;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
 using Microsoft.EntityFrameworkCore;
-
 namespace LerningApp.Services.Data;
 
-public class CourseService(IRepository<Course, Guid> courseRepository) : ICourseService
+public class CourseService(IRepository<Course, Guid> courseRepository,
+    IRepository<Level, Guid> levelRepository) : ICourseService
 {
     public async Task<IEnumerable<CourseIndexViewModel>> IndexGetCoursesAsync(Guid? userId)
     {
@@ -29,9 +30,36 @@ public class CourseService(IRepository<Course, Guid> courseRepository) : ICourse
         return courses;
     }
 
-    public Task AddCourseAsync(AddCourseViewModel model)
+    public async Task<ServiceResult> AddCourseAsync(AddCourseViewModel model)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
+        {
+            return ServiceResult.Fail("Невалидено ниво.", nameof(model.LevelId));
+        }
+         
+        Level? level = await levelRepository
+            .GetAllAttached()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(l => l.Id == levelId);
+         
+        if (level == null)
+        {
+            return ServiceResult.Fail("Невалидено ниво.", nameof(model.LevelId));
+        }
+
+        var course = new Course
+        {
+            Id = Guid.NewGuid(),
+            Name = model.Name,
+            Description = model.Description,
+            LevelId = levelId,
+            IsPublished = true,
+            CreatedAt = DateTime.Now,
+        };
+
+        await courseRepository.AddAsync(course);
+    
+        return ServiceResult.Success();
     }
 
     public Task<CourseDetailsViewModel> GetCourseDetailsByIdAsync(Guid id)
