@@ -46,6 +46,7 @@ public class CourseController(LerningAppContext dbcontext,
         return View(result.Data);
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> Create()
     {
@@ -56,13 +57,14 @@ public class CourseController(LerningAppContext dbcontext,
 
         return this.View(model);
     }
-
+    
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(AddCourseViewModel model)
     {
         if (!ModelState.IsValid)
         {
-            model.Levels = await levelService.GetAllLevelsFromDbAsync();
+            model.Levels = await levelService.GetAllLevelsFromDbAsLevelOptionsAsync();
             return this.View(model);
         }
 
@@ -70,7 +72,7 @@ public class CourseController(LerningAppContext dbcontext,
         if (result.Result == false)
         {
             ModelState.AddModelError(result.Field ?? "", result.Message!);
-            model.Levels = await levelService.GetAllLevelsFromDbAsync();
+            model.Levels = await levelService.GetAllLevelsFromDbAsLevelOptionsAsync();
             return this.View(model);
         }     
         
@@ -78,40 +80,23 @@ public class CourseController(LerningAppContext dbcontext,
         return RedirectToAction(nameof(Index));
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> Edit(string id)
     {
-        Guid courseId = Guid.Empty;
-        bool isIdValid = IsGuidValid(id, ref courseId);
-        if (!isIdValid)
+        var result = await  courseService.GetCourseEditByIdAsync(id);
+     
+        if (result.Result == false)
         {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
+            return RedirectToAction(nameof(Index));
         }
 
-        Course? course = await dbcontext
-            .Courses
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == courseId);
-
-        if (course == null)
-        {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
-        }
-
-        CourseEditViewModel model = new CourseEditViewModel()
-        {
-            Id = courseId.ToString(),
-            Name = course.Name,
-            Description = course.Description,
-            Levels = await GetAllLevelsFromDbAsync(),
-            LevelId = course.LevelId.ToString()
-        };
-
-        return View(model);
+        result.Data.Levels = await levelService.GetAllLevelsFromDbAsLevelOptionsAsync();
+       
+        return View(result.Data);
     }
 
+    [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(CourseEditViewModel model, string id)
@@ -170,6 +155,7 @@ public class CourseController(LerningAppContext dbcontext,
         return RedirectToAction(nameof(Details), new { Id = courseId });
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Deactivate(string id)
     {
@@ -195,6 +181,7 @@ public class CourseController(LerningAppContext dbcontext,
         return RedirectToAction(nameof(Index));
     }
     
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Restore(string id)
     {
