@@ -58,7 +58,7 @@ public class CourseService(IRepository<Course, Guid> courseRepository,
             CreatedAt = DateTime.Now,
         };
 
-       await courseRepository.AddAsync(course);
+        await courseRepository.AddAsync(course);
     
         return ServiceResult.Success();
     }
@@ -67,7 +67,7 @@ public class CourseService(IRepository<Course, Guid> courseRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResultT<CourseDetailsViewModel>.Fail(("Невалидено ниво."));
+            return ServiceResultT<CourseDetailsViewModel>.Fail(("Невалиден курс."));
         }
         
         Course? course = await courseRepository
@@ -80,7 +80,7 @@ public class CourseService(IRepository<Course, Guid> courseRepository,
 
         if (course == null)
         {
-            return ServiceResultT<CourseDetailsViewModel>.Fail(("Невалидено ниво."));
+            return ServiceResultT<CourseDetailsViewModel>.Fail(("Невалиден курс."));
         }
 
         CourseDetailsViewModel model =  new CourseDetailsViewModel()
@@ -136,5 +136,44 @@ public class CourseService(IRepository<Course, Guid> courseRepository,
         };
         
         return ServiceResultT<CourseEditViewModel>.Success(model);
+    }
+
+    public async Task<ServiceResult> PostEditCourseAsync(CourseEditViewModel model, string id)
+    {
+        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid courseId))
+        {
+            return ServiceResult.Fail("Невалиден курс.", nameof(id));
+        }
+
+        Course? courseToChange = courseRepository
+            .GetAllAttached()
+            .FirstOrDefault(c => c.Id == courseId);
+
+        if (courseToChange == null)
+        {
+            return ServiceResult.Fail("Курсът не е намерен.", nameof(id));
+        }
+
+        if (string.IsNullOrEmpty(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
+        {
+            return ServiceResult.Fail("Невалидно ниво.", nameof(model.LevelId));
+        }
+        
+        bool levelExists = await levelRepository
+            .GetAllAttached()
+            .AnyAsync(l => l.Id == levelId);
+
+        if (!levelExists)
+        {
+            return ServiceResult.Fail("Избраното ниво не съществува.", nameof(model.LevelId));
+        }
+
+        courseToChange.Name = model.Name;
+        courseToChange.Description = model.Description;
+        courseToChange.LevelId = levelId;
+
+        await courseRepository.SaveChangesAsync();
+        
+        return ServiceResult.Success();
     }
 }
