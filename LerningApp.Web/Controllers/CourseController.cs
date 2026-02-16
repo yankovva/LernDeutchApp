@@ -40,6 +40,7 @@ public class CourseController(LerningAppContext dbcontext,
 
         if (result.Result == false)
         {
+            TempData["ErrorMessage"] = $"{result.Message}";
             return RedirectToAction(nameof(Index));
         }
 
@@ -73,6 +74,7 @@ public class CourseController(LerningAppContext dbcontext,
         {
             ModelState.AddModelError(result.Field ?? "", result.Message!);
             model.Levels = await levelService.GetAllLevelsFromDbAsLevelOptionsAsync();
+            TempData["ErrorMessage"] = $"{result.Message}";
             return this.View(model);
         }     
         
@@ -88,11 +90,11 @@ public class CourseController(LerningAppContext dbcontext,
      
         if (result.Result == false)
         {
+            TempData["ErrorMessage"] = $"{result.Message}";
             return RedirectToAction(nameof(Index));
         }
-
+        
         result.Data.Levels = await levelService.GetAllLevelsFromDbAsLevelOptionsAsync();
-       
         return View(result.Data);
     }
 
@@ -107,52 +109,16 @@ public class CourseController(LerningAppContext dbcontext,
             return this.View(model);
         }
 
-        Guid courseId = Guid.Empty;
-        if (!IsGuidValid(id, ref courseId))
+        var result = await courseService.PostEditCourseAsync(model, id);
+        if (result.Result == false)
         {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
             model.Levels = await GetAllLevelsFromDbAsync();
+            TempData["ErrorMessage"] = $"{result.Message}";
             return this.View(model);
         }
-
-        Course? courseToChange = dbcontext
-            .Courses
-            .FirstOrDefault(c => c.Id == courseId);
-
-        if (courseToChange == null)
-        {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";          
-            model.Levels = await GetAllLevelsFromDbAsync();
-            return this.View(model);
-        }
-
-        Guid levelId = Guid.Empty;
-
-        if (!IsGuidValid(model.LevelId, ref levelId))
-        {
-            ModelState.AddModelError(nameof(model.LevelId), "Невалидно ниво.");
-            model.Levels = await GetAllLevelsFromDbAsync();
-            return View(model);
-        }
-
-        bool levelExists = await dbcontext.Levels
-            .AnyAsync(l => l.Id == levelId);
-
-        if (!levelExists)
-        {
-            ModelState.AddModelError(nameof(model.LevelId), "Избраното ниво не съществува.");
-            model.Levels = await GetAllLevelsFromDbAsync();
-            return View(model);
-        }
-
-        courseToChange.Name = model.Name;
-        courseToChange.Description = model.Description;
-        courseToChange.LevelId = levelId;
-
-        await dbcontext.SaveChangesAsync();
 
         TempData["SuccessMessage"] = "Успешно редактирахте курса.";
-        return RedirectToAction(nameof(Details), new { Id = courseId });
+        return RedirectToAction(nameof(Details), new { Id = id });
     }
 
     [Authorize]
