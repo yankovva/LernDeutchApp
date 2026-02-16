@@ -4,5 +4,5 @@ namespace LerningApp.Services.Data.Interfaces;
 
 public interface ILevelService
 {
-    Task<List<LevelOptionsViewModel>> GetAllLevelsFromDbAsync();
+    Task<List<LevelOptionsViewModel>> GetAllLevelsFromDbAsLevelOptionsAsync();
 }
