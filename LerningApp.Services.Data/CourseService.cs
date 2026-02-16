@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 namespace LerningApp.Services.Data;
 
 public class CourseService(IRepository<Course, Guid> courseRepository,
-    IRepository<Level, Guid> levelRepository) : ICourseService
+    IRepository<Level, Guid> levelRepository,
+    IRepository<UserCourse, object > userCourseRepository) : ICourseService
 {
     public async Task<IEnumerable<CourseIndexViewModel>> IndexGetCoursesAsync(Guid? userId)
     {
@@ -57,13 +58,55 @@ public class CourseService(IRepository<Course, Guid> courseRepository,
             CreatedAt = DateTime.Now,
         };
 
-        await courseRepository.AddAsync(course);
+       await courseRepository.AddAsync(course);
     
         return ServiceResult.Success();
     }
 
-    public Task<CourseDetailsViewModel> GetCourseDetailsByIdAsync(Guid id)
+    public async Task<ServiceResultT<CourseDetailsViewModel>> GetCourseDetailsByIdAsync(string id, string? userId)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
+        {
+            return ServiceResultT<CourseDetailsViewModel>.Fail(("Невалидено ниво."));
+        }
+        
+        Course? course = await courseRepository
+            .GetAllAttached()
+            .AsNoTracking()
+            .Include(course => course.Level)
+            .Include(course => course.LessonsForCourse)
+            .ThenInclude(lesson => lesson.VocabularyCards).Include(course => course.CourseParticipants)
+            .FirstOrDefaultAsync(c => c.Id == courseId);
+
+        if (course == null)
+        {
+            return ServiceResultT<CourseDetailsViewModel>.Fail(("Невалидено ниво."));
+        }
+
+        CourseDetailsViewModel model =  new CourseDetailsViewModel()
+        {
+            Id = course.Id.ToString(),
+            Name = course.Name,
+            Description = course.Description,
+            LevelName = course.Level.Name,
+            IsActive = course.IsPublished,
+            CourseLessons = course.LessonsForCourse
+                .Select(cl=>  new CourseLessonsViewModel()
+                {
+                    LessinId = cl.Id.ToString(),
+                    LessonName = cl.Name,
+                    WordsInLesson = cl.VocabularyCards.Count() ,
+                    LessonTarget = cl.Target
+                }).ToList()
+        };
+        
+        if (userId != null)
+        {
+            model.IsEnrolled = await userCourseRepository
+                .GetAllAttached()
+                .AnyAsync(uc => uc.UserId == Guid.Parse(userId) && uc.CourseId == courseId);
+        }
+        
+        return ServiceResultT<CourseDetailsViewModel>.Success(model);;
     }
 }

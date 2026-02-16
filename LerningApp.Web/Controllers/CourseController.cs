@@ -34,62 +34,21 @@ public class CourseController(LerningAppContext dbcontext,
     [HttpGet]
     public async Task<IActionResult> Details(string id)
     {
-        Guid courseId = Guid.Empty;
-        bool isIdValid = IsGuidValid(id, ref courseId);
-
-        if (!isIdValid)
-        {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
-        }
-        
-        Course? course = await dbcontext
-            .Courses
-            .AsNoTracking()
-            .Include(course => course.Level)
-            .Include(course => course.LessonsForCourse)
-            .ThenInclude(lesson => lesson.VocabularyCards).Include(course => course.CourseParticipants)
-            .FirstOrDefaultAsync(c => c.Id == courseId);
-
-        if (course == null)
-        {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
-        }
-
-        CourseDetailsViewModel model =  new CourseDetailsViewModel()
-        {
-            Id = course.Id.ToString(),
-            Name = course.Name,
-            Description = course.Description,
-            LevelName = course.Level.Name,
-            IsActive = course.IsPublished,
-            CourseLessons = course.LessonsForCourse
-                .Select(cl=>  new CourseLessonsViewModel()
-                {
-                    LessinId = cl.Id.ToString(),
-                    LessonName = cl.Name,
-                    WordsInLesson = cl.VocabularyCards.Count() ,
-                    LessonTarget = cl.Target
-                }).ToList()
-        };
-        
         string? userId = userManager.GetUserId(User);
-
-        if (userId != null)
-        {
-            model.IsEnrolled = await dbcontext
-                .UsersCourses
-                .AnyAsync(uc => uc.UserId == Guid.Parse(userId) && uc.CourseId == courseId);
-        }
         
-        return this.View(model);
+        var result = await courseService.GetCourseDetailsByIdAsync(id, userId);
+
+        if (result.Result == false)
+        {
+            return RedirectToAction(nameof(Index));
+        }
+
+        return View(result.Data);
     }
 
     [HttpGet]
     public async Task<IActionResult> Create()
     {
-
         AddCourseViewModel model = new AddCourseViewModel
         {
             Levels = await GetAllLevelsFromDbAsync()

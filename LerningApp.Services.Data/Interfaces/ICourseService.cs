@@ -9,5 +9,5 @@ public interface ICourseService
     
     Task<ServiceResult> AddCourseAsync(AddCourseViewModel model);
     
-    Task<CourseDetailsViewModel> GetCourseDetailsByIdAsync(Guid id);
+    Task<ServiceResultT<CourseDetailsViewModel>> GetCourseDetailsByIdAsync(string id, string? userId);
 }
