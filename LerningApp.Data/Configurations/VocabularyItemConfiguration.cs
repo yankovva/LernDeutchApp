@@ -23,6 +23,5 @@ public class VocabularyItemConfiguration: IEntityTypeConfiguration<VocabularyCar
         
         builder.HasIndex(x => x.LessonId);
         builder.HasIndex(x => x.PartOfSpeechId);
-
     }
 }

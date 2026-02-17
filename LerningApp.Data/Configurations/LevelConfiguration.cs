@@ -18,7 +18,5 @@ public class LevelConfiguration: IEntityTypeConfiguration<Level>
         builder.Property(x => x.Description)
             .IsRequired()
             .HasMaxLength(DescriptionMaxLength);
-        
-       
     }
 }

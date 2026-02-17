@@ -17,6 +17,5 @@ public class UserCourseConfiguration : IEntityTypeConfiguration<UserCourse>
         builder.HasOne(x => x.Course)
             .WithMany(l => l.CourseParticipants)
             .HasForeignKey(x => x.CourseId);
-
     }
 }
