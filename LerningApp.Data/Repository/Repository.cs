@@ -16,7 +16,7 @@ public class Repository<TType, TId>
         this.dbSet = this.dbContext.Set<TType>();
 
     }
-    public TType GetById(TId id)
+    public TType? GetById(TId id)
     {
         TType? entity = this.dbSet
             .Find(id);
@@ -47,16 +47,16 @@ public class Repository<TType, TId>
         return dbSet.AsQueryable();
     }
     
-    public TType FirstorDefault(Func<TType, bool> predicate)
+    public TType? FirstorDefault(Func<TType, bool> predicate)
     {
-        TType entity = this.dbSet
+        TType? entity = this.dbSet
             .FirstOrDefault(predicate)!;
 
         return entity;
     }
-    public async Task<TType> FirstorDefaultAsync(Expression<Func<TType, bool>> predicate)
+    public async Task<TType?> FirstorDefaultAsync(Expression<Func<TType, bool>> predicate)
     {
-        TType entity = await this.dbSet
+        TType? entity = await this.dbSet
             .FirstOrDefaultAsync(predicate);
 
         return entity;
@@ -81,7 +81,7 @@ public class Repository<TType, TId>
 
     public bool Delete(TId id)
     {
-        TType entity = GetById(id);
+        TType? entity = GetById(id);
         if (entity == null)
         {
             return false;
@@ -94,7 +94,7 @@ public class Repository<TType, TId>
 	
     public async Task<bool> DeleteAsync(TId id)
     {
-        TType entity = await GetByIdAsync(id);
+        TType? entity = await GetByIdAsync(id);
         if (entity == null)
         {
             return false;
