@@ -11,9 +11,12 @@
         <h1 class="title">Всички курсове</h1>
         <div class="subtitle">Избери курс и започни да учиш.</div>
     </div>
-    <a asp-action="Create" class="btn btn-outline-primary btn-pill">
-        + Нов курс
-    </a>
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <a asp-action="Create" class="btn btn-outline-primary btn-pill">
+            + Нов курс
+        </a>
+    }
 </div>
 
 @if (!Model.Any())

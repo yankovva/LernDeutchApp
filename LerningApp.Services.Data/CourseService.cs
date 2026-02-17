@@ -32,7 +32,7 @@ public class CourseService(
         return courses;
     }
 
-    public async Task<ServiceResult> AddCourseAsync(AddCourseViewModel model)
+    public async Task<ServiceResult> AddCourseAsync(AddCourseViewModel model, Guid userId)
     {
         if (string.IsNullOrWhiteSpace(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
         {
@@ -57,6 +57,7 @@ public class CourseService(
             LevelId = levelId,
             IsPublished = true,
             CreatedAt = DateTime.Now,
+            PublisherId = userId
         };
 
         await courseRepository.AddAsync(course);

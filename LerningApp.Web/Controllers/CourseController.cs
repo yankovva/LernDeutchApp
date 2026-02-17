@@ -69,8 +69,10 @@ public class CourseController(
             model.Levels = await levelService.GetAllLevelOptionsAsync();
             return this.View(model);
         }
-
-        var result = await courseService.AddCourseAsync(model);
+        
+        var userId = Guid.Parse(userManager.GetUserId(User)!);
+        var result = await courseService.AddCourseAsync(model, userId);
+        
         if (result.Result == false)
         {
             if (string.IsNullOrWhiteSpace(result.Field))
