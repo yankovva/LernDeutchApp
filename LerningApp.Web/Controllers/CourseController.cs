@@ -138,53 +138,29 @@ public class CourseController(LerningAppContext dbcontext,
     [HttpPost]
     public async Task<IActionResult> Deactivate(string id)
     {
-        Guid courseId = Guid.Empty;
-        if (!IsGuidValid(id, ref courseId))
-        {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
-            return RedirectToAction(nameof(Index));
-        }
-        var course = await dbcontext
-            .Courses
-            .FirstOrDefaultAsync(c => c.Id == courseId);
-
-        if (course == null)
-        {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        course.IsPublished = false;
-        await dbcontext.SaveChangesAsync();
-
-        return RedirectToAction(nameof(Index));
+       var result = await courseService.DeactivateCourseAsync(id);
+       if (result.Result == false)
+       {
+           TempData["ErrorMessage"] = result.Message;
+           return RedirectToAction(nameof(Index));
+       }
+       
+       TempData["SuccessMessage"] = "Успешно деактивирахте курса.";
+       return RedirectToAction(nameof(Index));
     }
     
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Restore(string id)
     {
-        Guid courseId = Guid.Empty;
-        if (!IsGuidValid(id, ref courseId))
-        {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
-            return RedirectToAction(nameof(Index));
-        }
-        var course = await dbcontext
-            .Courses
-            .FirstOrDefaultAsync(c => c.Id == courseId);
-
-        if (course == null)
-        {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        course.IsPublished = true;
-        await dbcontext.SaveChangesAsync();
+       var result = await courseService.RestoreCourseAsync(id);
+       if (result.Result == false)
+       {
+           TempData["ErrorMessage"] = result.Message;
+           return RedirectToAction(nameof(Index));
+       }
         
         TempData["SuccessMessage"] = "Успешно активирахте курса.";
-
         return RedirectToAction(nameof(Index));
     }
   

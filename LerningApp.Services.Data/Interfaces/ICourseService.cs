@@ -14,4 +14,8 @@ public interface ICourseService
     Task<ServiceResultT<CourseEditViewModel>> GetCourseEditByIdAsync(string id);
     
     Task<ServiceResult> PostEditCourseAsync(CourseEditViewModel model, string id);
+    
+    Task<ServiceResult> DeactivateCourseAsync(string id);
+    
+    Task<ServiceResult> RestoreCourseAsync(string id);
 }
