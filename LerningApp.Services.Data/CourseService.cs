@@ -109,7 +109,6 @@ public class CourseService(
         }
 
         return ServiceResultT<CourseDetailsViewModel>.Success(model);
-        ;
     }
 
     public async Task<ServiceResultT<CourseEditViewModel>> GetCourseEditByIdAsync(string id)
@@ -223,4 +222,41 @@ public class CourseService(
         return ServiceResult.Success();
     }
 
+    public async Task<ServiceResult> EnrollInCourseAsync(string id, Guid userId)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
+        {
+            return ServiceResult.Fail("Невалиден курс.");
+        }
+
+        Course? course = await courseRepository
+            .GetAllAttached()
+            .FirstOrDefaultAsync(c => c.Id == courseId && c.IsPublished == true);
+
+        if (course == null)
+        {
+            return ServiceResult.Fail("Курсът не е намерен.");
+        }
+        
+        bool alreadyEnrolled = await userCourseRepository
+            .GetAllAttached()
+            .AnyAsync(uc => uc.UserId == userId && uc.CourseId == courseId);
+
+        if (alreadyEnrolled)
+        {
+            return ServiceResult.Fail("Вече сте записани за този курс.");
+        }
+
+        UserCourse newUserCourse = new UserCourse
+        {
+            UserId = userId,
+            CourseId = courseId,
+            StartedAt = DateTime.UtcNow
+        };
+
+        await userCourseRepository.AddAsync(newUserCourse);
+        await userCourseRepository.SaveChangesAsync();
+
+        return ServiceResult.Success();
+    }
 }

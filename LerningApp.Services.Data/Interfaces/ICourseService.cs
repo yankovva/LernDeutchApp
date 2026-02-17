@@ -18,4 +18,5 @@ public interface ICourseService
     Task<ServiceResult> DeactivateCourseAsync(string id);
     
     Task<ServiceResult> RestoreCourseAsync(string id);
+    Task<ServiceResult> EnrollInCourseAsync(string id, Guid userId);
 }

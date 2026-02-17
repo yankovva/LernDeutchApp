@@ -169,44 +169,14 @@ public class CourseController(LerningAppContext dbcontext,
     public async Task<IActionResult> Enroll(string courseId)
     { 
         var userId = Guid.Parse(userManager.GetUserId(User)!);
-        
-        Guid courseGuidId = Guid.Empty;
-        if (!IsGuidValid(courseId, ref courseGuidId))
+        var result = await courseService.EnrollInCourseAsync(courseId, userId);
+        if (result.Result == false)
         {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
-            return RedirectToAction(nameof(Index));
-        }
-
-        Course? course = await dbcontext
-            .Courses
-            .FirstOrDefaultAsync(c => c.Id == courseGuidId && c.IsPublished == true);
-
-        if (course == null)
-        {
-            TempData["ErrorMessage"] = "Курсът не е намерен.";
+            TempData["ErrorMessage"] = result.Message;
             return RedirectToAction(nameof(Index));
         }
         
-        bool alreadyEnrolled = await dbcontext.UsersCourses
-            .AnyAsync(uc => uc.UserId == userId && uc.CourseId == courseGuidId);
-
-        if (alreadyEnrolled)
-        {
-            TempData["InfoMessage"] = "Вече сте записани за този курс.";
-            return RedirectToAction("Details", new { id = courseId });
-        }
-
-        UserCourse newUserCourse = new UserCourse
-        {
-            UserId = userId,
-            CourseId = courseGuidId,
-            StartedAt = DateTime.UtcNow
-        };
-
-        await dbcontext.UsersCourses.AddAsync(newUserCourse);
-        await dbcontext.SaveChangesAsync();
-        
-        TempData["SuccessMessage"] = $"Успешно се запизахте за курс {course.Name}.";
+        TempData["SuccessMessage"] = $"Успешно се запизахте за курсa.";
         return RedirectToAction("Details", new { id = courseId });
     }
     
