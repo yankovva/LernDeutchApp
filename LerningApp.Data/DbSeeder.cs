@@ -1,4 +1,5 @@
 using LerningApp.Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -6,16 +7,38 @@ namespace LerningApp.Data;
 
 public class DbSeeder
 {
-    public static async Task SeedAsync(IServiceProvider services)
+   public static async Task SeedAsync(IServiceProvider services)
     {
         using IServiceScope scope = services.CreateScope();
-        var db = scope.ServiceProvider
-            .GetRequiredService<LerningAppContext>();
+
+        var db = scope.ServiceProvider.GetRequiredService<LerningAppContext>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 
         await db.Database.MigrateAsync();
 
         if (await db.Levels.AnyAsync())
             return;
+
+        var seedEmail = "seed.user@gmail.com";
+        var seedUser = await userManager.FindByEmailAsync(seedEmail);
+
+        if (seedUser == null)
+        {
+            seedUser = new ApplicationUser
+            {
+                UserName = seedEmail,
+                Email = seedEmail,
+                EmailConfirmed = true
+            };
+
+            var createResult = await userManager.CreateAsync(seedUser, "User123!");
+            if (!createResult.Succeeded)
+            {
+                throw new InvalidOperationException(
+                    "Failed to create seed user: " +
+                    string.Join(", ", createResult.Errors.Select(e => e.Description)));
+            }
+        }
 
         var a1 = new Level
         {
@@ -23,7 +46,7 @@ public class DbSeeder
             Name = "A1",
             Description = "Beginner"
         };
-        
+
         var a2 = new Level
         {
             Id = Guid.NewGuid(),
@@ -38,7 +61,8 @@ public class DbSeeder
             Description = "First steps in German",
             IsPublished = true,
             CreatedAt = DateTime.UtcNow,
-            Level = a1
+            Level = a1,
+            PublisherId = seedUser.Id
         };
 
         var lesson1 = new Lesson
@@ -69,7 +93,6 @@ public class DbSeeder
             }
         };
 
-        
         var noun = new PartOfSpeech
         {
             Id = Guid.NewGuid(),
@@ -106,7 +129,6 @@ public class DbSeeder
                     Gender = "das",
                     ExampleSentence = "Das Haus ist groß."
                 }
-
             }
         };
 
@@ -133,10 +155,8 @@ public class DbSeeder
                     Gender = "der",
                     ExampleSentence = "Der Hund ist freundlich."
                 }
-
             }
         };
-
 
         var item2 = new VocabularyCard
         {
@@ -161,11 +181,10 @@ public class DbSeeder
                     Gender = "die",
                     ExampleSentence = "Die Tür ist offen."
                 }
-
             }
         };
 
-        await db.Levels.AddRangeAsync(a1,a2);
+        await db.Levels.AddRangeAsync(a1, a2);
         await db.Courses.AddAsync(course);
         await db.Lessons.AddAsync(lesson1);
         await db.PartsOfSpeech.AddAsync(noun);
