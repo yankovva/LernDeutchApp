@@ -9,7 +9,7 @@ namespace LerningApp.Services.Data;
 
 public class LevelService(IRepository<Level, Guid>levelRepository) : ILevelService
 {
-    public async Task<List<LevelOptionsViewModel>> GetAllLevelsFromDbAsLevelOptionsAsync()
+    public async Task<List<LevelOptionsViewModel>> GetAllLevelOptionsAsync()
     {
         var levels = await levelRepository
             .GetAllAttached()

@@ -12,7 +12,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class CourseController(LerningAppContext dbcontext,
+public class CourseController(
+    LerningAppContext dbcontext,
     UserManager<ApplicationUser> userManager,
     ICourseService courseService,
     ILevelService levelService) : BaseController
@@ -27,7 +28,7 @@ public class CourseController(LerningAppContext dbcontext,
 
         IEnumerable<CourseIndexViewModel> courses = await courseService
             .IndexGetCoursesAsync(userGuidId);
-       
+
         return this.View(courses);
     }
 
@@ -35,7 +36,7 @@ public class CourseController(LerningAppContext dbcontext,
     public async Task<IActionResult> Details(string id)
     {
         string? userId = userManager.GetUserId(User);
-        
+
         var result = await courseService.GetCourseDetailsByIdAsync(id, userId);
 
         if (result.Result == false)
@@ -53,19 +54,19 @@ public class CourseController(LerningAppContext dbcontext,
     {
         AddCourseViewModel model = new AddCourseViewModel
         {
-            Levels = await GetAllLevelsFromDbAsync()
+            Levels =  await levelService.GetAllLevelOptionsAsync()
         };
 
         return this.View(model);
     }
-    
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(AddCourseViewModel model)
     {
         if (!ModelState.IsValid)
         {
-            model.Levels = await levelService.GetAllLevelsFromDbAsLevelOptionsAsync();
+            model.Levels = await levelService.GetAllLevelOptionsAsync();
             return this.View(model);
         }
 
@@ -80,10 +81,11 @@ public class CourseController(LerningAppContext dbcontext,
             {
                 ModelState.AddModelError(result.Field ?? "", result.Message!);
             }
-            model.Levels = await levelService.GetAllLevelsFromDbAsLevelOptionsAsync();
+
+            model.Levels = await levelService.GetAllLevelOptionsAsync();
             return this.View(model);
-        }     
-        
+        }
+
         TempData["SuccessMessage"] = "Успешно създадохте курс.";
         return RedirectToAction(nameof(Index));
     }
@@ -92,15 +94,15 @@ public class CourseController(LerningAppContext dbcontext,
     [HttpGet]
     public async Task<IActionResult> Edit(string id)
     {
-        var result = await  courseService.GetCourseEditByIdAsync(id);
-     
+        var result = await courseService.GetCourseEditByIdAsync(id);
+
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = $"{result.Message}";
             return RedirectToAction(nameof(Index));
         }
-        
-        result.Data.Levels = await levelService.GetAllLevelsFromDbAsLevelOptionsAsync();
+
+        result.Data.Levels = await levelService.GetAllLevelOptionsAsync();
         return View(result.Data);
     }
 
@@ -111,7 +113,7 @@ public class CourseController(LerningAppContext dbcontext,
     {
         if (!ModelState.IsValid)
         {
-            model.Levels = await GetAllLevelsFromDbAsync();
+            model.Levels = await levelService.GetAllLevelOptionsAsync();
             return this.View(model);
         }
 
@@ -126,7 +128,8 @@ public class CourseController(LerningAppContext dbcontext,
             {
                 ModelState.AddModelError(result.Field ?? "", result.Message!);
             }
-            model.Levels = await GetAllLevelsFromDbAsync();
+
+            model.Levels =  await levelService.GetAllLevelOptionsAsync();
             return this.View(model);
         }
 
@@ -138,36 +141,36 @@ public class CourseController(LerningAppContext dbcontext,
     [HttpPost]
     public async Task<IActionResult> Deactivate(string id)
     {
-       var result = await courseService.DeactivateCourseAsync(id);
-       if (result.Result == false)
-       {
-           TempData["ErrorMessage"] = result.Message;
-           return RedirectToAction(nameof(Index));
-       }
-       
-       TempData["SuccessMessage"] = "Успешно деактивирахте курса.";
-       return RedirectToAction(nameof(Index));
+        var result = await courseService.DeactivateCourseAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
+        }
+
+        TempData["SuccessMessage"] = "Успешно деактивирахте курса.";
+        return RedirectToAction(nameof(Index));
     }
-    
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Restore(string id)
     {
-       var result = await courseService.RestoreCourseAsync(id);
-       if (result.Result == false)
-       {
-           TempData["ErrorMessage"] = result.Message;
-           return RedirectToAction(nameof(Index));
-       }
-        
+        var result = await courseService.RestoreCourseAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
+        }
+
         TempData["SuccessMessage"] = "Успешно активирахте курса.";
         return RedirectToAction(nameof(Index));
     }
-  
+
     [Authorize]
     [HttpPost]
     public async Task<IActionResult> Enroll(string courseId)
-    { 
+    {
         var userId = Guid.Parse(userManager.GetUserId(User)!);
         var result = await courseService.EnrollInCourseAsync(courseId, userId);
         if (result.Result == false)
@@ -175,24 +178,8 @@ public class CourseController(LerningAppContext dbcontext,
             TempData["ErrorMessage"] = result.Message;
             return RedirectToAction(nameof(Index));
         }
-        
-        TempData["SuccessMessage"] = $"Успешно се запизахте за курсa.";
-        return RedirectToAction("Details", new { id = courseId });
-    }
-    
 
-private async Task<List<LevelOptionsViewModel>> GetAllLevelsFromDbAsync()
-    {
-        var levels = await dbcontext.Levels
-            .AsNoTracking()
-            .OrderBy(c => c.Name)
-            .Select(c => new LevelOptionsViewModel
-            {
-                Id = c.Id.ToString(), 
-                Name = c.Name
-            })
-            .ToListAsync();
-        
-        return levels;
+        TempData["SuccessMessage"] = $"Успешно се запизахте за курса.";
+        return RedirectToAction("Details", new { id = courseId });
     }
 }
