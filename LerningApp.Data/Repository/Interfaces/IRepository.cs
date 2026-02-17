@@ -5,7 +5,7 @@ namespace LerningApp.Data.Repository.Interfaces;
 public interface IRepository<TType, TId> 
 {
     TType GetById(TId id);
-    Task<TType> GetByIdAsync(TId id);
+    Task<TType?> GetByIdAsync(TId id);
 
     IEnumerable<TType> GetAll();
     Task<IEnumerable<TType>> GetAllAsync();

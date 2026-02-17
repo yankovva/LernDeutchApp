@@ -17,6 +17,7 @@ public class CourseService(
             .GetAllAttached()
             .AsNoTracking()
             .OrderBy(c => c.CreatedAt)
+            .Where(c=>c.IsPublished)
             .Select(c => new CourseIndexViewModel
             {
                 Id = c.Id.ToString(),
@@ -40,9 +41,7 @@ public class CourseService(
         }
 
         Level? level = await levelRepository
-            .GetAllAttached()
-            .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.Id == levelId);
+            .GetByIdAsync(levelId);
 
         if (level == null)
         {
@@ -74,7 +73,6 @@ public class CourseService(
 
         Course? course = await courseRepository
             .GetAllAttached()
-            .AsNoTracking()
             .Include(course => course.Level)
             .Include(course => course.LessonsForCourse)
             .ThenInclude(lesson => lesson.VocabularyCards).Include(course => course.CourseParticipants)
@@ -103,11 +101,11 @@ public class CourseService(
                 }).ToList()
         };
 
-        if (userId != null)
+        if (Guid.TryParse(userId, out var userGuidId))
         {
             model.IsEnrolled = await userCourseRepository
                 .GetAllAttached()
-                .AnyAsync(uc => uc.UserId == Guid.Parse(userId) && uc.CourseId == courseId);
+                .AnyAsync(uc => uc.UserId == userGuidId && uc.CourseId == courseId);
         }
 
         return ServiceResultT<CourseDetailsViewModel>.Success(model);
@@ -121,9 +119,7 @@ public class CourseService(
         }
 
         Course? course = await courseRepository
-            .GetAllAttached()
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == courseId);
+            .GetByIdAsync(courseId);
 
         if (course == null)
         {
@@ -148,9 +144,8 @@ public class CourseService(
             return ServiceResult.Fail("Невалиден курс.", nameof(id));
         }
 
-        Course? courseToChange = courseRepository
-            .GetAllAttached()
-            .FirstOrDefault(c => c.Id == courseId);
+        Course? courseToChange = await courseRepository
+            .GetByIdAsync(courseId);
 
         if (courseToChange == null)
         {
@@ -162,11 +157,10 @@ public class CourseService(
             return ServiceResult.Fail("Невалидно ниво.", nameof(model.LevelId));
         }
 
-        bool levelExists = await levelRepository
-            .GetAllAttached()
-            .AnyAsync(l => l.Id == levelId);
+        var levelExists = await levelRepository
+            .GetByIdAsync(levelId);
 
-        if (!levelExists)
+        if (levelExists == null)
         {
             return ServiceResult.Fail("Избраното ниво не съществува.", nameof(model.LevelId));
         }
@@ -188,8 +182,7 @@ public class CourseService(
         }
 
         var course = await courseRepository
-            .GetAllAttached()
-            .FirstOrDefaultAsync(c => c.Id == courseId);
+           .GetByIdAsync(courseId);
 
         if (course == null)
         {
@@ -210,8 +203,7 @@ public class CourseService(
         }
 
         var course = await courseRepository
-            .GetAllAttached()
-            .FirstOrDefaultAsync(c => c.Id == courseId);
+            .GetByIdAsync(courseId);
 
         if (course == null)
         {
@@ -232,8 +224,7 @@ public class CourseService(
         }
 
         Course? course = await courseRepository
-            .GetAllAttached()
-            .FirstOrDefaultAsync(c => c.Id == courseId && c.IsPublished == true);
+            .FirstorDefaultAsync(c => c.Id == courseId && c.IsPublished == true);
 
         if (course == null)
         {
@@ -257,7 +248,6 @@ public class CourseService(
         };
 
         await userCourseRepository.AddAsync(newUserCourse);
-        await userCourseRepository.SaveChangesAsync();
 
         return ServiceResult.Success();
     }

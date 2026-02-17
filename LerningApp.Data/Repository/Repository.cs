@@ -24,7 +24,7 @@ public class Repository<TType, TId>
         return entity;
     }
 
-    public async Task<TType> GetByIdAsync(TId id)
+    public async Task<TType?> GetByIdAsync(TId id)
     {
         TType? entity = await this.dbSet
             .FindAsync(id);
