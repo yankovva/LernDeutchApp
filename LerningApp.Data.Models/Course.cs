@@ -22,6 +22,12 @@ public class Course
     [Comment("The Creation Date of the Course")]
     public DateTime CreatedAt { get; set; }
     
+    [Comment("The Publisher of the Course")]
+    public Guid PublisherId { get; set; }
+    
+    [Comment("Publisher Reference")]
+    public ApplicationUser Publisher { get; set; } = null!;
+    
     [Comment("Foreign key to Level")]
     public Guid LevelId { get; set; } 
     
