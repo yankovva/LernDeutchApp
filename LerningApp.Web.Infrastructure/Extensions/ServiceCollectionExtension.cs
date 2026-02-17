@@ -29,4 +29,30 @@ public static class ServiceCollectionExtension
             services.AddScoped(repoInterface, repoImpl);
         }
     }
+    public static void RegisterUserDefinedServices(this IServiceCollection services, Assembly serviceAssembly)
+    {
+        var serviceInterfaceTypes = serviceAssembly
+            .GetTypes()
+            .Where(t => t.IsInterface && t.Name.EndsWith("Service"))
+            .ToArray();
+
+        var serviceTypes = serviceAssembly
+            .GetTypes()
+            .Where(t => !t.IsInterface && !t.IsAbstract && t.Name.EndsWith("Service"))
+            .ToArray();
+
+        foreach (var serviceInterfaceType in serviceInterfaceTypes)
+        {
+            var serviceType = serviceTypes
+                .SingleOrDefault(t => "I" + t.Name == serviceInterfaceType.Name);
+
+            if (serviceType == null)
+            {
+                throw new InvalidOperationException($"Service implementation not found for {serviceInterfaceType.Name}");
+            }
+
+            services.AddScoped(serviceInterfaceType, serviceType);
+        }
+    }
+
 }
