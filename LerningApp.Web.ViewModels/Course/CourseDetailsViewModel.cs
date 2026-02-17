@@ -13,6 +13,8 @@ public class CourseDetailsViewModel
     public bool IsActive { get; set; }
     
     public bool IsEnrolled { get; set; }
+    
+    public string PublisherId { get; set; } = null!;
 
     public virtual IList<CourseLessonsViewModel> CourseLessons { get; set; } =
         new List<CourseLessonsViewModel>();

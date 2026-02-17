@@ -91,6 +91,7 @@ public class CourseService(
             Name = course.Name,
             Description = course.Description,
             LevelName = course.Level.Name,
+            PublisherId = course.PublisherId.ToString(),
             IsActive = course.IsPublished,
             CourseLessons = course.LessonsForCourse
                 .Select(cl => new CourseLessonsViewModel()
