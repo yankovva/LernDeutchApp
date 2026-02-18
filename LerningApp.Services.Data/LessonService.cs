@@ -3,11 +3,12 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Lesson;
+using LerningApp.Web.ViewModels.LessonSection;
 using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Services.Data;
 
-public class LessonService(IRepository<Lesson, Guid> lessonRepository) : ILessonService
+public class LessonService(IRepository<Lesson, Guid> lessonRepository, IRepository<LessonSection, Guid> lessonSectionRepository) : ILessonService
 {
     public async Task<IEnumerable<LessonIndexViewModel>> IndexGetLessonsAsync()
     {
@@ -28,5 +29,50 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository) : ILesson
             .ToListAsync();
         
         return lessons;
+    }
+
+    public async Task<ServiceResultT<LessonContentViewModel>> GetLessonDetailsAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id) || Guid.TryParse(id, out Guid lessonId))
+        {
+            return ServiceResultT<LessonContentViewModel>.Fail("Урокът не е намерен.");
+        }
+        
+        Lesson? lesson = await lessonRepository
+            .GetAllAttached()
+            .AsNoTracking()
+            .Include(l => l.Course)
+            .Include(lesson => lesson.VocabularyCards)
+            .FirstOrDefaultAsync(l => l.Id == lessonId);
+
+        if (lesson == null)
+        {
+            return ServiceResultT<LessonContentViewModel>.Fail("Урокът не е намерен.");
+        }
+
+        LessonContentViewModel model = new LessonContentViewModel()
+        {
+            Id = lesson.Id.ToString(),
+            Name = lesson.Name,
+            CourseId = lesson.CourseId.ToString(),
+            Content = lesson.Content,
+            WordCount = lesson.VocabularyCards.Count(),
+            OrderIndex = lesson.OrderIndex,
+            CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
+            Target = lesson.Target,
+            LessonSections = await lessonSectionRepository
+                .GetAllAttached()
+                .Where(ls => ls.LessonId == lessonId)
+                .OrderBy(ls => ls.OrderIndex)
+                .Select(ls => new LessonSectionViewModel()
+                {
+                    Type = ls.Type,
+                    OrderIndex = ls.OrderIndex,
+                    Content = ls.Content,
+                })
+                .ToListAsync()
+        };
+        
+        return ServiceResultT<LessonContentViewModel>.Success(model);
     }
 }
