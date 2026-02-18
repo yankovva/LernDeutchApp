@@ -37,42 +37,14 @@ public class LessonController(LerningAppContext dbcontext, ILessonService lesson
     [HttpGet]
     public async Task<IActionResult> AddToCourse(string id)
     {
-        Guid lessonId = Guid.Empty;
-        bool isIdValid = IsGuidValid(id, ref lessonId);
-
-        if (!isIdValid)
+        var result = await lessonService.GetAddLessonToCourseByIdAsync(id);
+        if (result.Result == false)
         {
-            TempData["ErrorMessage"] = "Урокът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
         }
         
-        Lesson? lesson = await dbcontext
-            .Lessons
-            .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.Id == lessonId);
-
-        if (lesson == null) 
-        {
-            TempData["ErrorMessage"] = "Урокът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
-        }
-
-            AddLessonToCourseViewModel model = new AddLessonToCourseViewModel()
-            {
-                LessonId = lesson.Id.ToString(),
-                LessonName = lesson.Name,
-                SelectedCourseId = lesson.CourseId?.ToString().ToLower(),
-                Courses = await dbcontext.Courses
-                    .AsNoTracking()
-                    .Select(c => new CourseCheckBoxItemInputModel
-                    {
-                        CourseId = c.Id.ToString().ToLower(),
-                        CourseName = c.Name,
-                    })
-                    .ToListAsync()
-            };
-     
-        return this.View(model);
+        return this.View(result.Data);
     }
 
     [HttpPost]
@@ -82,53 +54,22 @@ public class LessonController(LerningAppContext dbcontext, ILessonService lesson
         {
             return this.View(model);
         }
-        Guid lessonId = Guid.Empty;
-
-        if (!this.IsGuidValid(model.LessonId, ref lessonId))
-        {
-            TempData["ErrorMessage"] = "Урокът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
-        }
         
-        Lesson? lesson = await dbcontext.
-            Lessons
-            .FirstOrDefaultAsync(l => l.Id == lessonId);
-
-        if (lesson == null)
+        var result = await lessonService.AddLessonToCourseAsync(model);
+        if (result.Result == false)
         {
-            TempData["ErrorMessage"] = "Урокът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
+            if (result.Field != null)
+                ModelState.AddModelError(string.Empty, result.Message);
+            else
+                TempData["ErrorMessage"] = result.Message;
+            
+            return this.View(model);
         }
-        
+        // TODO: consider enum for result action
         if (string.IsNullOrWhiteSpace(model.SelectedCourseId))
-        {
-            lesson.CourseId = null;
-            await dbcontext.SaveChangesAsync();
-            return RedirectToAction(nameof(this.Index));
-        }
-           
-        Guid courseId = Guid.Empty;
-        if (!this.IsGuidValid(model.SelectedCourseId, ref courseId))
-        {
-            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
-            return View(model);
-        }
-
-        Course? course = await dbcontext
-            .Courses
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == courseId);
-        if (course == null)
-        {
-            ModelState.AddModelError(string.Empty, "Невалиден Курс.");
-            return View(model);
-        }
-
-        lesson.CourseId = courseId;
-
-        await dbcontext.SaveChangesAsync();
-        TempData["SuccessMessage"] = $"Успешно добавихте {lesson.Name}  към курс {course.Name}.";
-
+            TempData["SuccessMessage"] = "Урокът беше премахнат от курса.";
+        else
+            TempData["SuccessMessage"] = "Урокът беше добавен към курса.";
         return RedirectToAction(nameof(this.Index));
     }
 
