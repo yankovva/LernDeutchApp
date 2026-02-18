@@ -27,7 +27,7 @@ public class Lesson{
     
     [Comment("Course Reference")]
     public Course? Course { get; set; }
-    public virtual ICollection<LessonSection>? LessonSections { get; set; }
+    public virtual ICollection<LessonSection> LessonSections { get; set; }
         = new List<LessonSection>();
     public virtual ICollection<VocabularyCard> VocabularyCards { get; set; }
         = new HashSet<VocabularyCard>();
