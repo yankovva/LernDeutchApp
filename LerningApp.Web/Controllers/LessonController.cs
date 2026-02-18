@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using LerningApp.Common;
 using LerningApp.Data;
 using LerningApp.Data.Models;
@@ -112,43 +113,20 @@ public class LessonController(LerningAppContext dbcontext,
         return this.RedirectToAction(nameof(this.Index));
     }
 
+    [Authorize]
     [HttpGet]
     public async Task<IActionResult> Edit(string id)
     {
-        Guid lessonId = Guid.Empty;
-        if (!IsGuidValid(id, ref lessonId))
-        {
-            TempData["ErrorMessage"] = "Невалиден урок.";
-            return RedirectToAction(nameof(Index));
-        }
+       var result = await lessonService.GetLessonEditInputModelAsync(id);
+       if (result.Result == false)
+       {
+           TempData["ErrorMessage"] = result.Message;
+           return RedirectToAction(nameof(Index));
+       }
 
-        Lesson? lesson = await dbcontext.Lessons
-            .AsNoTracking()
-            .Include(lesson => lesson.LessonSections)
-            .FirstOrDefaultAsync(l => l.Id == lessonId);
+       result.Data.Courses = await courseService.GetCourseOptionsAsync();
 
-        if (lesson == null)
-        {
-            TempData["ErrorMessage"] = "Невалиден урок.";
-            return RedirectToAction(nameof(Index));
-        }
-        
-        var model = new LessonEditInputModel
-        {
-            Id = lesson.Id.ToString(),
-            Name = lesson.Name,
-            Content = lesson.Content,
-            OrderIndex = lesson.OrderIndex,
-            CourseId = lesson.CourseId?.ToString(),
-            Target = lesson.Target,
-            Grammar = lesson.LessonSections?
-                .FirstOrDefault(ls => ls.Type == "grammar")?.Content ?? "Add new grammar",
-            Exercise = lesson.LessonSections?
-            .FirstOrDefault(ls => ls.Type == "exercise")?.Content ?? "Add new exercise" ,
-            Courses = await courseService.GetCourseOptionsAsync()
-        };
-            
-        return View(model);
+       return View(result.Data);
     }
     
     [HttpPost]
