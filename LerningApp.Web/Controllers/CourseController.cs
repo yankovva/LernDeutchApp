@@ -13,7 +13,6 @@ using Microsoft.EntityFrameworkCore;
 namespace LerningApp.Controllers;
 
 public class CourseController(
-    LerningAppContext dbcontext,
     UserManager<ApplicationUser> userManager,
     ICourseService courseService,
     ILevelService levelService) : BaseController
