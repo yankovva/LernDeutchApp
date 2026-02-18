@@ -14,6 +14,7 @@ namespace LerningApp.Controllers;
 
 public class LessonController(LerningAppContext dbcontext, 
     ILessonService lessonService,
+    ICourseService courseService,
     UserManager<ApplicationUser> userManager) : BaseController
 {
     
@@ -82,7 +83,7 @@ public class LessonController(LerningAppContext dbcontext,
     {
         AddLessonInputModel model = new AddLessonInputModel
         {
-            Courses = await GetAllCoursesFromDbAsync()
+            Courses = await courseService.GetCourseOptionsAsync()
         };
         return this.View(model);
     }
@@ -95,7 +96,7 @@ public class LessonController(LerningAppContext dbcontext,
         
         if (!this.ModelState.IsValid)
         {
-            model.Courses = await GetAllCoursesFromDbAsync();
+            model.Courses = await courseService.GetCourseOptionsAsync();
             return View(model);
         }
 
@@ -103,7 +104,7 @@ public class LessonController(LerningAppContext dbcontext,
         if (result.Result == false)
         {
             ModelState.AddModelError(string.Empty, result.Message);
-            model.Courses = await GetAllCoursesFromDbAsync();
+            model.Courses = await courseService.GetCourseOptionsAsync();
             return View(model);
         }
         
@@ -144,7 +145,7 @@ public class LessonController(LerningAppContext dbcontext,
                 .FirstOrDefault(ls => ls.Type == "grammar")?.Content ?? "Add new grammar",
             Exercise = lesson.LessonSections?
             .FirstOrDefault(ls => ls.Type == "exercise")?.Content ?? "Add new exercise" ,
-            Courses = await GetAllCoursesFromDbAsync()
+            Courses = await courseService.GetCourseOptionsAsync()
         };
             
         return View(model);
@@ -156,7 +157,7 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
 {
     if (!ModelState.IsValid)
     {
-        model.Courses = await GetAllCoursesFromDbAsync();
+        model.Courses = await courseService.GetCourseOptionsAsync();
         return View(model);
     }
 
@@ -164,7 +165,7 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     if (!IsGuidValid(id, ref lessonId))
     {
         ModelState.AddModelError(string.Empty, "Невалиден урок.");
-        model.Courses = await GetAllCoursesFromDbAsync();
+        model.Courses = await courseService.GetCourseOptionsAsync();
         return View(model);
     }
 
@@ -176,7 +177,7 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     if (lessonToChange == null)
     {
         ModelState.AddModelError(string.Empty, "Невалиден урок.");
-        model.Courses = await GetAllCoursesFromDbAsync();
+        model.Courses = await courseService.GetCourseOptionsAsync();
         return View(model);
     }
 
@@ -187,7 +188,7 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
         if (!IsGuidValid(model.CourseId, ref parsedCourseId))
         {
             ModelState.AddModelError(nameof(LessonEditInputModel.CourseId), "Невалиден курс.");
-            model.Courses = await GetAllCoursesFromDbAsync();
+            model.Courses = await courseService.GetCourseOptionsAsync();
             return View(model);
         }
 
@@ -196,7 +197,7 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
         if (!courseExists)
         {
             ModelState.AddModelError(nameof(LessonEditInputModel.CourseId), "Избраният курс не съществува.");
-            model.Courses = await GetAllCoursesFromDbAsync();
+            model.Courses = await courseService.GetCourseOptionsAsync();
             return View(model);
         }
 
@@ -247,17 +248,4 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     return RedirectToAction(nameof(Details), new { id = lessonId });
 }
 
-    private async Task<List<CourseOptionsViewModel>> GetAllCoursesFromDbAsync()
-    {
-        var courses = await dbcontext.Courses
-            .AsNoTracking()
-            .OrderBy(c => c.Name)
-            .Select(c => new CourseOptionsViewModel
-            {
-                Id = c.Id.ToString(), 
-                Name = c.Name
-            })
-            .ToListAsync();
-        return courses;
-    }
 }
