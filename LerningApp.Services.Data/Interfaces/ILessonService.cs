@@ -12,5 +12,6 @@ public interface ILessonService
     Task<ServiceResultT<AddLessonToCourseViewModel>> GetAddLessonToCourseByIdAsync(string id);
     
     Task<ServiceResult> AddLessonToCourseAsync(AddLessonToCourseViewModel model);
+    Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, Guid userId);
 
 }
