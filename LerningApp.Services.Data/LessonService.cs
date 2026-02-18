@@ -2,13 +2,16 @@ using LerningApp.Common;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
+using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.LessonSection;
 using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Services.Data;
 
-public class LessonService(IRepository<Lesson, Guid> lessonRepository, IRepository<LessonSection, Guid> lessonSectionRepository) : ILessonService
+public class LessonService(IRepository<Lesson, Guid> lessonRepository,
+    IRepository<LessonSection, Guid> lessonSectionRepository,
+    IRepository<Course, Guid> courseRepository) : ILessonService
 {
     public async Task<IEnumerable<LessonIndexViewModel>> IndexGetLessonsAsync()
     {
@@ -33,9 +36,9 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository, IReposito
 
     public async Task<ServiceResultT<LessonContentViewModel>> GetLessonDetailsAsync(string id)
     {
-        if (string.IsNullOrEmpty(id) || Guid.TryParse(id, out Guid lessonId))
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResultT<LessonContentViewModel>.Fail("Урокът не е намерен.");
+            return ServiceResultT<LessonContentViewModel>.Fail("Невалиден урок.");
         }
         
         Lesson? lesson = await lessonRepository
@@ -74,5 +77,79 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository, IReposito
         };
         
         return ServiceResultT<LessonContentViewModel>.Success(model);
+    }
+
+    public async Task<ServiceResultT<AddLessonToCourseViewModel>> GetAddLessonToCourseByIdAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
+        {
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail("Невалиден урок.");
+        }
+
+        Lesson? lesson = await lessonRepository
+            .GetByIdAsync(lessonId);
+
+        if (lesson == null) 
+        {
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail("Урокът не е намерен.");
+        }
+
+        AddLessonToCourseViewModel model = new AddLessonToCourseViewModel()
+        {
+            LessonId = lesson.Id.ToString(),
+            LessonName = lesson.Name,
+            SelectedCourseId = lesson.CourseId?.ToString().ToLower(),
+            Courses = await courseRepository
+                .GetAllAttached()
+                .Select(c => new CourseCheckBoxItemInputModel
+                {
+                    CourseId = c.Id.ToString().ToLower(),
+                    CourseName = c.Name,
+                })
+                .ToListAsync()
+        };
+        return ServiceResultT<AddLessonToCourseViewModel>.Success(model);
+    }
+
+    public async Task<ServiceResult> AddLessonToCourseAsync(AddLessonToCourseViewModel model)
+    {
+        if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
+        {
+            return ServiceResult.Fail("Урокът не е намерен.");
+        }
+
+        Lesson? lesson = await lessonRepository
+            .GetByIdAsync(lessonId);
+
+        if (lesson == null)
+        {
+            return ServiceResult.Fail("Урокът не е намерен.");
+        }
+        
+        if (string.IsNullOrWhiteSpace(model.SelectedCourseId))
+        {
+            lesson.CourseId = null;
+            await lessonRepository.SaveChangesAsync();
+            return ServiceResult.Success();
+        }
+           
+        if (string.IsNullOrEmpty(model.SelectedCourseId) || !Guid.TryParse(model.SelectedCourseId, out Guid courseId))
+        {
+            return ServiceResult.Fail("Невалиден Курс.", nameof(model.SelectedCourseId));
+        }
+
+        Course? course = await courseRepository
+            .GetByIdAsync(courseId);
+        
+        if (course == null)
+        {
+            return ServiceResult.Fail("Невалиден Курс.",nameof(model.SelectedCourseId));
+        }
+
+        lesson.CourseId = courseId;
+
+        await lessonRepository.SaveChangesAsync();
+        
+        return ServiceResult.Success();
     }
 }
