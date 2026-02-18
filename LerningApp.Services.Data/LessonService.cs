@@ -211,4 +211,39 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         
         return ServiceResult.Success();
     }
+
+    public async Task<ServiceResultT<LessonEditInputModel>> GetLessonEditInputModelAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
+        {
+            return ServiceResultT<LessonEditInputModel>.Fail("Урокът не е намерен.");
+        }
+
+        Lesson? lesson = await lessonRepository
+            .GetAllAttached()
+            .Include(l => l.LessonSections)
+            .FirstOrDefaultAsync(l => l.Id == lessonId);
+
+        if (lesson == null)
+        {
+            return ServiceResultT<LessonEditInputModel>.Fail("Урокът не е намерен.");
+        }
+        
+        var model = new LessonEditInputModel
+        {
+            Id = lesson.Id.ToString(),
+            Name = lesson.Name,
+            Content = lesson.Content,
+            OrderIndex = lesson.OrderIndex,
+            CourseId = lesson.CourseId?.ToString(),
+            Target = lesson.Target,
+            Grammar = lesson.LessonSections?
+                .FirstOrDefault(ls => ls.Type == "grammar")?.Content ?? "Add new grammar",
+            Exercise = lesson.LessonSections?
+                .FirstOrDefault(ls => ls.Type == "exercise")?.Content ?? "Add new exercise" ,
+            Courses = new List <CourseOptionsViewModel>{}
+        };
+        
+        return ServiceResultT<LessonEditInputModel>.Success(model);
+    }
 }
