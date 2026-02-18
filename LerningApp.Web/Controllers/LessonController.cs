@@ -366,7 +366,8 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     lessonToChange.Target = model.Target;
     
     var grammar = lessonToChange.LessonSections
-        .FirstOrDefault(ls => ls.Type == "grammar");
+        .FirstOrDefault(ls => ls.Type == "grammar") ;
+    
     if (grammar == null)
     {
         lessonToChange.LessonSections

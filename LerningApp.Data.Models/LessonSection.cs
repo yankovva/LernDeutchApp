@@ -9,7 +9,6 @@ public class LessonSection
     
     [Comment("Foreign key to Lesson")]
     public Guid LessonId { get; set; }
-    
     public Lesson Lesson { get; set; }
     
     [Comment("The Type of the LessonSection - grammar/exercise")]
