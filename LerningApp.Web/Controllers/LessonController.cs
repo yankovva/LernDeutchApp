@@ -5,12 +5,16 @@ using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.LessonSection;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class LessonController(LerningAppContext dbcontext, ILessonService lessonService) : BaseController
+public class LessonController(LerningAppContext dbcontext, 
+    ILessonService lessonService,
+    UserManager<ApplicationUser> userManager) : BaseController
 {
     
     [HttpGet]
@@ -83,80 +87,27 @@ public class LessonController(LerningAppContext dbcontext, ILessonService lesson
         return this.View(model);
     }
 
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Create(AddLessonInputModel model)
     {
+        Guid userId = Guid.Parse(userManager.GetUserId(User)!);
+        
         if (!this.ModelState.IsValid)
         {
             model.Courses = await GetAllCoursesFromDbAsync();
+            return View(model);
+        }
 
+        var result = await  lessonService.AddLessonAsync(model, userId);
+        if (result.Result == false)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+            model.Courses = await GetAllCoursesFromDbAsync();
             return View(model);
         }
         
-        Guid courseId = Guid.Empty;
-        if (!string.IsNullOrWhiteSpace(model.CourseId))
-        {
-            bool isCourseIdValid = IsGuidValid(model.CourseId, ref courseId);
-
-            if (!isCourseIdValid)
-            {
-                ModelState.AddModelError(string.Empty, "Невалиден Курс.");
-                
-                model.Courses = await GetAllCoursesFromDbAsync();
-
-                return View(model);
-            }
-            
-            Course? course = await dbcontext
-                .Courses
-                .AsNoTracking()
-                .FirstOrDefaultAsync(c => c.Id == courseId);
-            
-            if (course != null)
-            {
-                courseId = Guid.Parse(model.CourseId);
-            }
-            else
-            {
-                ModelState
-                    .AddModelError(nameof(model.CourseId), "Невалиден Курс.");
-                
-                model.Courses = await GetAllCoursesFromDbAsync();;
-                return this.View(model);
-            }
-        }
-        
-        Lesson lesson = new Lesson
-        {
-            Name = model.Name,
-            Content = model.Content,
-            CourseId = courseId,
-            CreatedAt = DateTime.Now,
-            OrderIndex = model.OrderIndex,
-            Target = model.Target,
-        };
-        List<LessonSection> sections = new List<LessonSection>()
-        {
-            new LessonSection()
-            {
-                Content = model.Grammar,
-                Type = "grammar",
-                OrderIndex = 1
-            },
-            new LessonSection()
-            {
-                Content = model.Exercise,
-                Type = "exercise",
-                OrderIndex = 2
-            }
-        };
-        
-        lesson.LessonSections = sections;
-        
-        await  dbcontext.Lessons.AddAsync(lesson);
-        await dbcontext.SaveChangesAsync();
-        
-        TempData["SuccessMessage"] = $"Успешно създадохте {lesson.Name}.";
+        TempData["SuccessMessage"] = $"Успешно създадохте {model.Name}.";
         return this.RedirectToAction(nameof(this.Index));
     }
 
