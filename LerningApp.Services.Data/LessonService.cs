@@ -152,4 +152,63 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         
         return ServiceResult.Success();
     }
+
+    public async Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, Guid userId)
+    {
+        Guid courseId = Guid.Empty;
+        if (!string.IsNullOrWhiteSpace(model.CourseId))
+        {
+            if (!Guid.TryParse(model.CourseId, out courseId))
+            {
+                return ServiceResult.Fail("Невалиден Курс.", nameof(model.CourseId));
+                
+               // model.Courses = await GetAllCoursesFromDbAsync();
+
+              //  return View(model);
+            }
+            
+            Course? course = await courseRepository
+                .GetByIdAsync(courseId);
+            
+            if (course == null)
+            {
+                return ServiceResult.Fail("Невалиден Курс.", nameof(model.CourseId));
+                
+                //model.Courses = await GetAllCoursesFromDbAsync();;
+               // return this.View(model);
+            }
+        }
+        
+        Lesson lesson = new Lesson
+        {
+            Name = model.Name,
+            Content = model.Content,
+            CourseId = courseId,
+            CreatedAt = DateTime.Now,
+            PublisherId = userId,
+            OrderIndex = model.OrderIndex,
+            Target = model.Target,
+        };
+        List<LessonSection> sections = new List<LessonSection>()
+        {
+            new LessonSection()
+            {
+                Content = model.Grammar,
+                Type = "grammar",
+                OrderIndex = 1
+            },
+            new LessonSection()
+            {
+                Content = model.Exercise,
+                Type = "exercise",
+                OrderIndex = 2
+            }
+        };
+        
+        lesson.LessonSections = sections;
+        
+        await  lessonRepository.AddAsync(lesson);
+        
+        return ServiceResult.Success();
+    }
 }
