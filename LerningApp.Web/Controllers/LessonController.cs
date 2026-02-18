@@ -1,6 +1,7 @@
 using LerningApp.Common;
 using LerningApp.Data;
 using LerningApp.Data.Models;
+using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.LessonSection;
@@ -9,28 +10,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class LessonController(LerningAppContext dbcontext) : BaseController
+public class LessonController(LerningAppContext dbcontext, ILessonService lessonService) : BaseController
 {
+    
     [HttpGet]
     public async Task<IActionResult> Index()
-    {
+    { 
+        var lessons = await lessonService.IndexGetLessonsAsync();
         
-        IEnumerable<LessonIndexViewModel> lessons =  await dbcontext.Lessons
-            .AsNoTracking()
-            .Include(l => l.Course) 
-            .OrderBy(l => l.Name)
-            .Select(l => new LessonIndexViewModel
-            {
-                Id = l.Id.ToString(),
-                Name = l.Name,
-                CourseId = l.CourseId.ToString(),
-                CourseName = l.Course != null ? l.Course.Name : null,
-                LevelName = l.Course.Level != null ? l.Course.Level.Name : null, 
-                CreatedAt = l.CreatedAt.ToString("dd.MM.yyyy"),
-            })
-            .ToListAsync();
-        
-       return View(lessons);
+        return View(lessons);
     }
 
     [HttpGet]
