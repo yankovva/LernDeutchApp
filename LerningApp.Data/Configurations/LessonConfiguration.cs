@@ -31,6 +31,12 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
              .IsRequired();
          
          builder
+             .HasOne(c => c.Publisher)
+             .WithMany(u => u.CreatedLessons)
+             .HasForeignKey(c => c.PublisherId)
+             .OnDelete(DeleteBehavior.Restrict);
+         
+         builder
              .HasOne(e => e.Course)
              .WithMany(g => g.LessonsForCourse)
              .HasForeignKey(e => e.CourseId)

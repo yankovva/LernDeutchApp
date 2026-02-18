@@ -73,6 +73,7 @@ public class DbSeeder
             OrderIndex = 1,
             CreatedAt = DateTime.UtcNow,
             Course = course,
+            PublisherId = seedUser.Id,
             Target = "Learn basic home vocabulary",
             LessonSections = new List<LessonSection>
             {

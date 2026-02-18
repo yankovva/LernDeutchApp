@@ -10,6 +10,7 @@ public class ApplicationUser : IdentityUser<Guid>
     }
     
     public virtual ICollection<UserCourse> UserCourses { get; set; } = new HashSet<UserCourse>();
-    
     public virtual ICollection<Course> CreatedCourses { get; set; } = new HashSet<Course>();
+    public virtual ICollection<Lesson> CreatedLessons { get; set; } = new HashSet<Lesson>();
+
 }

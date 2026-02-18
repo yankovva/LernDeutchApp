@@ -22,6 +22,12 @@ public class Lesson{
     [Comment("The Creation Date of the Lesson")]
     public DateTime CreatedAt { get; set; }
     
+    [Comment("The Publisher of the Lesson")]
+    public Guid PublisherId { get; set; }
+    
+    [Comment("Publisher Reference")]
+    public ApplicationUser Publisher { get; set; } = null!;
+    
     [Comment("Foreign key to Course")]
     public Guid? CourseId { get; set; } 
     
