@@ -24,50 +24,14 @@ public class LessonController(LerningAppContext dbcontext, ILessonService lesson
     [HttpGet]
     public async Task<IActionResult> Details(string id)
     {
-        Guid lessonId = Guid.Empty;
-
-        if (!IsGuidValid(id, ref lessonId))
+        var result = await  lessonService.GetLessonDetailsAsync(id);
+        if (result.Result == false )
         {
-            TempData["ErrorMessage"] = "Урокът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
         }
         
-        Lesson? lesson = await dbcontext
-            .Lessons
-            .AsNoTracking()
-            .Include(l => l.Course)
-            .Include(lesson => lesson.VocabularyCards)
-            .FirstOrDefaultAsync(l => l.Id == lessonId);
-
-        if (lesson == null)
-        {
-            TempData["ErrorMessage"] = "Урокът не е намерен.";
-            return this.RedirectToAction(nameof(this.Index));
-        }
-
-        LessonContentViewModel model = new LessonContentViewModel()
-        {
-            Id = lesson.Id.ToString(),
-            Name = lesson.Name,
-            CourseId = lesson.CourseId.ToString(),
-            Content = lesson.Content,
-            WordCount = lesson.VocabularyCards.Count(),
-            OrderIndex = lesson.OrderIndex,
-            CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
-            Target = lesson.Target,
-            LessonSections = await dbcontext.LessonsSections
-                .Where(ls => ls.LessonId == lessonId)
-                .OrderBy(ls => ls.OrderIndex)
-                .Select(ls => new LessonSectionViewModel()
-                {
-                    Type = ls.Type,
-                    OrderIndex = ls.OrderIndex,
-                    Content = ls.Content,
-                })
-                .ToListAsync()
-        };
-
-        return this.View(model);
+        return this.View(result.Data);
     }
 
     [HttpGet]
