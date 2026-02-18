@@ -139,91 +139,17 @@ public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
         return View(model);
     }
 
-    Guid lessonId = Guid.Empty;
-    if (!IsGuidValid(id, ref lessonId))
+    var result = await lessonService.PostLessonEditInputModelAsync(model, id);
+    if (result.Result == false)
     {
-        ModelState.AddModelError(string.Empty, "Невалиден урок.");
+        ModelState.AddModelError(string.Empty, result.Message);
         model.Courses = await courseService.GetCourseOptionsAsync();
         return View(model);
     }
-
-    Lesson? lessonToChange = await dbcontext
-        .Lessons
-        .Include(lesson => lesson.LessonSections)
-        .FirstOrDefaultAsync(l => l.Id == lessonId);
-
-    if (lessonToChange == null)
-    {
-        ModelState.AddModelError(string.Empty, "Невалиден урок.");
-        model.Courses = await courseService.GetCourseOptionsAsync();
-        return View(model);
-    }
-
-    Guid? courseId = null;
-    if (!string.IsNullOrWhiteSpace(model.CourseId))
-    {
-        Guid parsedCourseId = Guid.Empty;
-        if (!IsGuidValid(model.CourseId, ref parsedCourseId))
-        {
-            ModelState.AddModelError(nameof(LessonEditInputModel.CourseId), "Невалиден курс.");
-            model.Courses = await courseService.GetCourseOptionsAsync();
-            return View(model);
-        }
-
-        bool courseExists = await dbcontext.Courses
-            .AnyAsync(c => c.Id == parsedCourseId);
-        if (!courseExists)
-        {
-            ModelState.AddModelError(nameof(LessonEditInputModel.CourseId), "Избраният курс не съществува.");
-            model.Courses = await courseService.GetCourseOptionsAsync();
-            return View(model);
-        }
-
-        courseId = parsedCourseId;
-    }
-
-    lessonToChange.Name = model.Name;
-    lessonToChange.Content = model.Content;
-    lessonToChange.OrderIndex = model.OrderIndex;
-    lessonToChange.CourseId = courseId;
-    lessonToChange.Target = model.Target;
+   
     
-    var grammar = lessonToChange.LessonSections
-        .FirstOrDefault(ls => ls.Type == "grammar") ;
-    
-    if (grammar == null)
-    {
-        lessonToChange.LessonSections
-            .Add(new LessonSection
-            {
-                Type = "grammar",
-                Content = model.Grammar,
-                OrderIndex = 1
-            });
-    }
-    else
-        grammar.Content = model.Grammar;
-    
-    var exercise = lessonToChange.LessonSections
-        .FirstOrDefault(ls => ls.Type == "exercise");
-
-    if (exercise == null)
-    {
-        lessonToChange.LessonSections
-            .Add(new LessonSection
-            {
-                Type = "exercise",
-                Content = model.Exercise,
-                OrderIndex = 2
-            });
-    }
-    else
-        exercise.Content = model.Exercise;
-    
-    await dbcontext.SaveChangesAsync();
-    
-    TempData["SuccessMessage"] = $"Успешно редактирахте {lessonToChange.Name}.";
-    return RedirectToAction(nameof(Details), new { id = lessonId });
+    TempData["SuccessMessage"] = $"Успешно редактирахте {model.Name}.";
+    return RedirectToAction(nameof(Details), new { id });
 }
 
 }
