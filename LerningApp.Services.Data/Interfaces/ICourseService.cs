@@ -19,4 +19,6 @@ public interface ICourseService
     
     Task<ServiceResult> RestoreCourseAsync(string id);
     Task<ServiceResult> EnrollInCourseAsync(string id, Guid userId);
+    
+    Task<List<CourseOptionsViewModel>> GetCourseOptionsAsync();
 }

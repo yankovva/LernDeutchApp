@@ -251,4 +251,20 @@ public class CourseService(
 
         return ServiceResult.Success();
     }
+
+    public async Task<List<CourseOptionsViewModel>> GetCourseOptionsAsync()
+    {
+        var courses = await courseRepository
+            .GetAllAttached()
+            .AsNoTracking()
+            .OrderBy(c => c.Name)
+            .Select(c => new CourseOptionsViewModel
+            {
+                Id = c.Id.ToString(), 
+                Name = c.Name
+            })
+            .ToListAsync();
+        
+        return courses;
+    }
 }
