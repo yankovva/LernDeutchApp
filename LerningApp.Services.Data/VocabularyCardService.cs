@@ -51,8 +51,48 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         return ServiceResultT<VocabularyCardsIndexViewModel>.Success(model);
     }
 
-    public Task<ServiceResultT<VocabularyCardDetailsViewModel>> GetDetailsForACardAsync(string id)
+    public async Task<ServiceResultT<VocabularyCardDetailsViewModel>> GetDetailsForACardAsync(string id)
     {
-        throw new NotImplementedException();
+        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid cardGuid))
+        {
+            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail("Картата не е намерена."); 
+            // return this.RedirectToAction(nameof(this.Index));
+        }
+
+        VocabularyCard? card = await vocabularyCardRepository
+            .GetAllAttached()
+            .AsNoTracking()
+            .Include(vc => vc.Lesson)
+            .Include(vc => vc.PartOfSpeech)
+            .Include(vc => vc.Terms)
+            .FirstOrDefaultAsync(vc => vc.Id == cardGuid);
+
+        if (card == null)
+        {
+            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail("Картата не е намерена.");
+           // return this.RedirectToAction(nameof(this.Index));
+        }
+
+        VocabularyCardDetailsViewModel model = new VocabularyCardDetailsViewModel
+        {
+            Id = card.Id.ToString(),
+            LessonId = card.LessonId.ToString(),
+            LessonName = card.Lesson?.Name ?? "Урок",
+            GermanWord = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Word ?? "",
+            BulgarianTranslation = card.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)?.Word,
+            EnglishTranslation = card.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)?.Word,
+            PartOfSpeech = card.PartOfSpeech.Name,
+            BulgarianSynonyms = card.Terms.Where(t => t.Side == "bg" && !t.IsPrimary)
+                .Select(t => t.Word)
+                .ToList(),
+            EnglishSynonyms = card.Terms
+                .Where(t => t.Side == "en" && !t.IsPrimary)
+                .Select(t => t.Word)
+                .ToList(),
+            Gender = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Gender ?? "-",
+            ExampleSentence = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.ExampleSentence ?? "-",
+        };
+        
+        return ServiceResultT<VocabularyCardDetailsViewModel>.Success(model);
     }
 }
