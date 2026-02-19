@@ -7,8 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
-public class VocabularyCardController(LerningAppContext dbcontext,
-    IVocabularyCardService vocabularyCardService) :BaseController
+public class VocabularyCardController(IVocabularyCardService vocabularyCardService) :BaseController
 {
     [HttpGet]
     public async Task<IActionResult> Index(string lessonId)
