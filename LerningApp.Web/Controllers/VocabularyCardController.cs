@@ -27,47 +27,14 @@ public class VocabularyCardController(LerningAppContext dbcontext,
     [HttpGet]
     public async Task<IActionResult> Details(string id)
     {
-        Guid cardId = Guid.Empty;
-        if (!this.IsGuidValid(id, ref cardId))
+        var result = await vocabularyCardService.GetDetailsForACardAsync(id);
+
+        if (result.Result == false)
         {
-            TempData["ErrorMessage"] = "Картата не е намерена.";
+            TempData["ErrorMessage"] = result.Message;
             return this.RedirectToAction(nameof(this.Index));
         }
-
-        VocabularyCard? card = await dbcontext
-            .VocabularyCards
-            .AsNoTracking()
-            .Include(vc => vc.Lesson)
-            .Include(vc => vc.PartOfSpeech)
-            .Include(vc => vc.Terms)
-            .FirstOrDefaultAsync(vc => vc.Id == cardId);
-
-        if (card == null)
-        {
-            TempData["ErrorMessage"] = "Картата не е намерена.";
-            return this.RedirectToAction(nameof(this.Index));
-        }
-
-        VocabularyCardDetailsViewModel model = new VocabularyCardDetailsViewModel
-        {
-            Id = card.Id.ToString(),
-            LessonId = card.LessonId.ToString(),
-            LessonName = card.Lesson?.Name ?? "Урок",
-            GermanWord = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Word ?? "",
-            BulgarianTranslation = card.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)?.Word,
-            EnglishTranslation = card.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)?.Word,
-            PartOfSpeech = card.PartOfSpeech.Name,
-            BulgarianSynonyms = card.Terms.Where(t => t.Side == "bg" && !t.IsPrimary)
-                .Select(t => t.Word)
-                .ToList(),
-            EnglishSynonyms = card.Terms
-                .Where(t => t.Side == "en" && !t.IsPrimary)
-                .Select(t => t.Word)
-                .ToList(),
-            Gender = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Gender ?? "-",
-            ExampleSentence = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.ExampleSentence ?? "-",
-        };
         
-        return this.View(model);
+        return this.View(result.Data);
     }
 }
