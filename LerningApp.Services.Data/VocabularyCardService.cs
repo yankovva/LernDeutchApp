@@ -78,6 +78,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             Id = card.Id.ToString(),
             LessonId = card.LessonId.ToString(),
             LessonName = card.Lesson?.Name ?? "Урок",
+            ImageUrl = card.ImagePath!,
             GermanWord = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Word ?? "",
             BulgarianTranslation = card.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)?.Word,
             EnglishTranslation = card.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)?.Word,
