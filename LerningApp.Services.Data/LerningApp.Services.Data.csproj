@@ -10,5 +10,9 @@
       <ProjectReference Include="..\LerningApp.Data\LerningApp.Data.csproj" />
       <ProjectReference Include="..\LerningApp.Web.ViewModels\LerningApp.Web.ViewModels.csproj" />
     </ItemGroup>
+   
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
 
 </Project>
