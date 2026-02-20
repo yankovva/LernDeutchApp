@@ -7,4 +7,5 @@ public interface IVocabularyCardService
 {
     Task<ServiceResultT<VocabularyCardsIndexViewModel>> IndexGetAllCardsForALessonAsync(string lessonId);
     Task<ServiceResultT<VocabularyCardDetailsViewModel>> GetDetailsForACardAsync(string id);
+    Task<ServiceResult> CreateVocabularyCardAsync(VocabularyCardCreateInputModel model);
 }
