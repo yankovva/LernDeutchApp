@@ -19,6 +19,9 @@ public class VocabularyCard
     [Comment("PartOfSpeech Reference")]
     public PartOfSpeech PartOfSpeech { get; set; } = null!;
     
+    [Comment("Image of the VocabularyCard")]
+    public string? ImagePath { get; set; }
+    
     [Comment("VocabularyTerm in this VocabularyCard")]
      public virtual ICollection<VocabularyTerm> Terms { get; set; }
         = new HashSet<VocabularyTerm>();

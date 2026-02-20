@@ -4,12 +4,16 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LerningApp.Data.Configurations;
 
-public class VocabularyItemConfiguration: IEntityTypeConfiguration<VocabularyCard>
+public class VocabularyCardConfiguration: IEntityTypeConfiguration<VocabularyCard>
 {
     public void Configure(EntityTypeBuilder<VocabularyCard> builder)
     {
         builder
             .HasKey(x => x.Id);
+        
+        builder.Property(vc => vc.ImagePath)
+            .HasMaxLength(500)
+            .HasDefaultValue("/images/VocabularyCardsImages/defaultcardimage.png");
 
         builder.HasOne(x => x.Lesson)
             .WithMany(l => l.VocabularyCards)

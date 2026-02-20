@@ -33,6 +33,7 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\images\flags\" />
+      <Folder Include="wwwroot\images\VocabularyCardsImages\" />
     </ItemGroup>
 
 </Project>
