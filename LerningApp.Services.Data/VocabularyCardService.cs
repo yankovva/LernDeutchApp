@@ -9,7 +9,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 namespace LerningApp.Services.Data;
 
 public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCardRepository,
-    IRepository<Lesson,Guid> lessonRepository): IVocabularyCardService
+    IRepository<Lesson,Guid> lessonRepository,
+    IRepository<PartOfSpeech, Guid> partOfSpeechrRepository): IVocabularyCardService
 {
     public async Task<ServiceResultT<VocabularyCardsIndexViewModel>> IndexGetAllCardsForALessonAsync(string lessonId)
     {
@@ -95,5 +96,63 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         };
         
         return ServiceResultT<VocabularyCardDetailsViewModel>.Success(model);
+    }
+
+    public async Task<ServiceResult> CreateVocabularyCardAsync(VocabularyCardCreateInputModel model)
+    {
+        if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
+        {
+         return ServiceResult.Fail("Невалиден урок.", string.Empty);
+        }
+
+        if (await lessonRepository.GetByIdAsync(lessonId) == null)
+        {
+            return ServiceResult.Fail("Урокът не е намерен.", string.Empty);
+        }
+
+        if (string.IsNullOrEmpty(model.PartOfSpeechId) || !Guid.TryParse(model.PartOfSpeechId, out Guid partOfSpeechId))
+        {
+            return ServiceResult.Fail("Невалидна част на речта.", nameof(model.PartOfSpeechId));
+        }
+
+        if (await partOfSpeechrRepository.GetByIdAsync(partOfSpeechId) == null)
+        {
+            return ServiceResult.Fail("Невалидна част на речта.",nameof(model.PartOfSpeechId));
+        }
+        
+        List<VocabularyTerm> terms = new List<VocabularyTerm>()
+        {
+            new VocabularyTerm()
+            {
+                Word = model.GermanWord,
+                Gender = model.Gender,
+                ExampleSentence = model.ExampleSentence,
+                Side = "de",
+                IsPrimary = true,
+            },
+            new VocabularyTerm()
+            {
+                Word = model.BulgarianWord,
+                Side = "bg",
+                IsPrimary = true,
+            },
+            new VocabularyTerm()
+            {
+                Word = model.EnglishWord,
+                Side = "en",
+                IsPrimary = true,
+            }
+        };
+
+        var newCard = new VocabularyCard()
+        {
+            LessonId = lessonId,
+            PartOfSpeechId = partOfSpeechId,
+            Terms = terms
+        };
+         
+        await vocabularyCardRepository.AddAsync(newCard);
+        
+        return ServiceResult.Success();        
     }
 }
