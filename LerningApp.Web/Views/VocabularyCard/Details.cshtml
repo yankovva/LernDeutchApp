@@ -15,10 +15,15 @@
             ← Назад
         </a>
     </div>
+    <div class="de-header">
+        <div class="de-word">
+            <img src="~/images/flags/de.png" class="flag" />
+            @Model.Gender @Model.GermanWord
+        </div>
 
-    <div class="de-word">
-        <img src="~/images/flags/de.png" class="flag" />
-        @Model.Gender @Model.GermanWord
+        <img src="@(string.IsNullOrWhiteSpace(Model.ImageUrl) ? "/images/VocabularyCardImages/defaultcardimage.png" : Model.ImageUrl)"
+             alt="card image"
+             class="card-thumb" />
     </div>
     <p class="lesson-line">Урок: @Model.LessonName</p>
 
@@ -26,41 +31,23 @@
         <div class="col-md-6">
             <div class="translation-box">
                 <div class="label">Български</div>
-                <div class="value">
-                    @if (!string.IsNullOrWhiteSpace(Model.BulgarianTranslation))
-                    {
-                        <div class="translation">
-                            <img src="~/images/flags/bg.png" class="flag" />
-                            @Model.BulgarianTranslation
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="translation">
-                            <img src="~/images/flags/bg.png" class="flag" />
-                            "No translation available"
-                            </div>
-                    }
+                <div class="translation">
+                    <img src="~/images/flags/bg.png" class="flag" />
+                    @(!string.IsNullOrWhiteSpace(Model.BulgarianTranslation)
+                        ? Model.BulgarianTranslation
+                        : "No translation available")
                 </div>
             </div>
         </div>
         <div class="col-md-6">
             <div class="translation-box">
                 <div class="label">English</div>
-                @if(!string.IsNullOrWhiteSpace(Model.EnglishTranslation))
-                {
-                    <div class="translation">
-                        <img src="~/images/flags/en.png" class="flag" />
-                        @Model.EnglishTranslation
-                    </div>
-                }else
-                {
-                    <div class="translation">
-                        <img src="~/images/flags/en.png" class="flag" />
-                        "No translation available"
-                    </div>
-                }
-                     
+                <div class="translation">
+                    <img src="~/images/flags/en.png" class="flag" />
+                    @(!string.IsNullOrWhiteSpace(Model.EnglishTranslation)
+                        ? Model.EnglishTranslation
+                        : "No translation available")
+                </div>
             </div>
         </div>
     </div>
@@ -103,122 +90,144 @@
 </div>
 
 <style>
-.flashcard-detail {
-    border-radius: 18px;
-    border: 1px solid #e7ecf2;
-    background: #ffffff;
-    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-}
+    .flashcard-detail {
+        border-radius: 18px;
+        border: 1px solid #e7ecf2;
+        background: #ffffff;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
 
-.meta-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    flex-wrap: wrap;
-}
+    .meta-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+    }
 
-.badge-pos {
-    background: #e0f2fe;
-    color: #0c4a6e;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-}
+    .badge-pos {
+        background: #e0f2fe;
+        color: #0c4a6e;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+    }
 
-.gender-chip {
-    background: #fef3c7;
-    color: #92400e;
-    font-weight: 600;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 0.85rem;
-}
+    .gender-chip {
+        background: #fef3c7;
+        color: #92400e;
+        font-weight: 600;
+        padding: 6px 12px;
+        border-radius: 999px;
+        font-size: 0.85rem;
+    }
+    .de-header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 70px;
+        margin-bottom: 12px;
+    }
 
-.word-title {
-    font-size: 2.1rem;
-    font-weight: 700;
-    margin-bottom: 4px;
-}
+    .de-word {
+        font-size: 2rem;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #0f172a;
+    }
 
-.lesson-line {
-    color: #6b7280;
-    margin-bottom: 18px;
-}
+    .card-thumb {
+        width: 280px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 16px;
+        border: 1px solid #eef2f7;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+    }
 
-.translation-box {
-    border-radius: 14px;
-    padding: 16px;
-    border: 1px solid #e5e7eb;
-    background: #f8fafc;
-}
+    .lesson-line {
+        color: #6b7280;
+        margin-bottom: 14px;
+    }
 
-.translation-box .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #64748b;
-    letter-spacing: .05em;
-    margin-bottom: 6px;
-}
+    .translation-box {
+        border-radius: 14px;
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+        background: #f8fafc;
+    }
 
-.translation-box .value {
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: #0f172a;
-}
+    .translation-box .label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #64748b;
+        letter-spacing: .05em;
+        margin-bottom: 6px;
+    }
 
-.example-box {
-    margin-top: 16px;
-    padding: 14px 16px;
-    border-radius: 14px;
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-}
+    .translation {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
 
-.example-box .label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    color: #1d4ed8;
-    letter-spacing: .05em;
-    margin-bottom: 6px;
-}
+    .example-box {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 14px;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+    }
 
-.example-box .value {
-    font-size: 1.05rem;
-    color: #0f172a;
-}
+    .example-box .label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        color: #1d4ed8;
+        letter-spacing: .05em;
+        margin-bottom: 6px;
+    }
 
-.synonym-block {
-    margin-top: 12px;
-}
+    .example-box .value {
+        font-size: 1.05rem;
+        color: #0f172a;
+    }
 
-.synonym-label {
-    font-size: 0.7rem;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-}
+    .synonym-block {
+        margin-top: 12px;
+    }
 
-.synonym-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 6px;
-}
+    .synonym-label {
+        font-size: 0.7rem;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: .06em;
+    }
 
-.synonym-badges .badge {
-    background: #ecfdf5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
-    font-size: 0.8rem;
-    padding: 6px 10px;
-}
-.flag {
-    width: 22px;
-    height: 22px;
-    margin-right: 6px;
-    border-radius: 50%;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.15);
-}
+    .synonym-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 6px;
+    }
 
+    .synonym-badges .badge {
+        background: #ecfdf5;
+        color: #065f46;
+        border: 1px solid #a7f3d0;
+        font-size: 0.8rem;
+        padding: 6px 10px;
+    }
+
+    .flag {
+        width: 22px;
+        height: 22px;
+        margin-right: 4px;
+        border-radius: 50%;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.15);
+    }
 </style>
