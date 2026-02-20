@@ -12,7 +12,7 @@ public class VocabularyCardDetailsViewModel
     public string? BulgarianTranslation { get; set; }
     public string? EnglishTranslation { get; set; }
     public string PartOfSpeech { get; set; } = null!;
-    
+    public string ImageUrl { get; set; } = null!;
     public List<string> BulgarianSynonyms { get; set; } = new();
     
     public List<string> EnglishSynonyms { get; set; } = new();
