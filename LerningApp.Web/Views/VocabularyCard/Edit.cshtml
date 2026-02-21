@@ -1,0 +1,89 @@
+@using LerningApp.Web.ViewModels.VocabularyCard
+@model VocabularyCardEditInputModel
+
+@{
+    ViewData["Title"] = "Create Card";
+}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <div>
+        <div class="text-muted">Създай карта с думи.</div>
+    </div>
+
+    <a asp-action="Index" asp-route-lessonId="@Model.LessonId" class="btn btn-outline-secondary">← Назад</a>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm">
+            <div class="card-body p-4">
+                <form asp-action="Create" method="post" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input asp-for="Id" type="hidden" />
+                    
+                    <div class="mb-3">
+                        <label asp-for="GermanWord" class="form-label">Дума на немски</label>
+                        <input asp-for="GermanWord" class="form-control" placeholder="Пример: Hund" />
+                        <span asp-validation-for="GermanWord" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="EnglishWord" class="form-label">Дума на английски</label>
+                        <input asp-for="EnglishWord" class="form-control" placeholder="Пример: Dog" />
+                        <span asp-validation-for="EnglishWord" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="BulgarianWord" class="form-label">Дума на български</label>
+                        <input asp-for="BulgarianWord" class="form-control" placeholder="Пример: Куче" />
+                        <span asp-validation-for="BulgarianWord" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="PartOfSpeechId" class="form-label">Част на речта</label>
+                        <select asp-for="PartOfSpeechId" class="form-select">
+                            <option value="">-- Избери --</option>
+                            @foreach (var c in Model.PartOfSpeechOptions)
+                            {
+                                <option value="@c.Id">@c.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="PartOfSpeechId" class="text-danger"></span>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="Gender" class="form-label">Род</label>
+                            <input asp-for="Gender" class="form-control" placeholder="der/ die/ das" />
+                            <span asp-validation-for="Gender" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label asp-for="ExampleSentence" class="form-label">Примерно изречение</label>
+                            <input asp-for="ExampleSentence" class="form-control" placeholder="Der Hund ist nett." />
+                            <span asp-validation-for="ExampleSentence" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Image" class="form-label">Изображение (jpg/png/jfif)</label>
+                        <input asp-for="Image" type="file" class="form-control" />
+                        <span asp-validation-for="Image" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-flex gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary">💾 Създай</button>
+                        <a asp-action="Index" asp-route-lessonId="@Model.LessonId" class="btn btn-outline-secondary">Отказ</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
