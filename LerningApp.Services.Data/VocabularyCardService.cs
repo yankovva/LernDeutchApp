@@ -122,7 +122,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         
         string imagePath = "/images/vocabulary/default.png";
 
-        if (model.Image != null && model.Image.Length > 0)
+        if (model.Image?.Length > 0)
         {
             string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".jfif" };
             long maxSize = 5 * 1024 * 1024;
@@ -191,19 +191,93 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         {
             return ServiceResultT<VocabularyCardEditInputModel>.Fail("Невалидна карта.");
         }
+        
+        var de = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "de");
+        var en = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "en");
+        var bg = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "bg");
 
         var model = new VocabularyCardEditInputModel()
         {
             Id = id,
             LessonId = card.LessonId.ToString(),
             PartOfSpeechId = card.PartOfSpeechId.ToString(),
-            GermanWord = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Word ?? "" ,
-            EnglishWord = card.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)?.Word ?? "",
-            BulgarianWord = card.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)?.Word ?? "",
-            ExampleSentence = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.ExampleSentence,
-            Gender = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Gender,
+            GermanWord = de!.Word ,
+            EnglishWord = en!.Word,
+            BulgarianWord = bg!.Word,
+            ExampleSentence = de!.ExampleSentence,
+            Gender = de!.Gender,
         };
         
         return ServiceResultT<VocabularyCardEditInputModel>.Success(model);
+    }
+
+    public async Task<ServiceResult> PostCardEditByIdAsync(VocabularyCardEditInputModel model, string id)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
+        {
+            return ServiceResult.Fail("Невалидна карта.");
+        }
+        
+        var card = await vocabularyCardRepository
+            .GetAllAttached()
+            .Include(c => c.Terms)
+            .Include(c => c.PartOfSpeech)
+            .FirstOrDefaultAsync(c => c.Id == cardId);
+       
+        if (card == null)
+        {
+            return ServiceResult.Fail("Невалидна карта.");
+        }
+        
+        if (string.IsNullOrEmpty(model.PartOfSpeechId) || !Guid.TryParse(model.PartOfSpeechId, out Guid partOfSpeechId))
+        {
+            return ServiceResult.Fail("Невалидна част на речта.",nameof(model.PartOfSpeechId));
+        }
+
+        var partOfSpeech = await partOfSpeechrRepository
+            .GetByIdAsync(partOfSpeechId);
+       
+        if (partOfSpeech == null)
+        {
+            return ServiceResult.Fail("Невалидна част на речта.", nameof(model.PartOfSpeechId));
+        }
+        
+        if (model.Image?.Length > 0)
+        {
+            string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".jfif" };
+            long maxSize = 5 * 1024 * 1024;
+
+            if (!fileService.IsFileValid(model.Image, allowedExtensions, maxSize))
+            {
+                return ServiceResult.Fail("Невалиден файл или твърде голям файл.", nameof(model.Image));
+            }
+
+            string extension = Path.GetExtension(model.Image.FileName);
+            string uniqueFileName = $"{Guid.NewGuid()}{extension}";
+            string imagePath = await fileService.UploadFileAsync(model.Image, "images/VocabularyCardsImages", uniqueFileName);
+           
+            if (card.ImagePath != null && card.ImagePath != "/images/VocabularyCardsImages/defaultcardimage.png")
+            {
+                fileService.DeleteFile(card.ImagePath);
+            }
+
+            card.ImagePath = $"/{imagePath}";
+        }
+
+        card.PartOfSpeechId = partOfSpeechId;
+        
+        var de = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "de");
+        var en = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "en");
+        var bg = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "bg");
+        
+        de!.Word = model.GermanWord;
+        en!.Word = model.EnglishWord;
+        bg!.Word = model.BulgarianWord;
+        de!.ExampleSentence = model.ExampleSentence;
+        de!.Gender = model.Gender;
+        
+        await vocabularyCardRepository.SaveChangesAsync();
+
+        return ServiceResult.Success();
     }
 }
