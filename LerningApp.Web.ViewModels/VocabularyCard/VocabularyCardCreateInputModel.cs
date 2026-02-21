@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using LerningApp.Web.ViewModels.PartOfSpeech;
+using Microsoft.AspNetCore.Http;
 
 namespace LerningApp.Web.ViewModels.VocabularyCard;
 
@@ -24,6 +25,8 @@ public class VocabularyCardCreateInputModel
     
     [MaxLength(500)]
     public string? ImageUrl { get; set; } 
+    
+    public IFormFile Image { get; set; } = null!;
     
     [MaxLength(3)]
     //der die das
