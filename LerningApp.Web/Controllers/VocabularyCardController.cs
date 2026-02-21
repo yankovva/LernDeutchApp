@@ -82,4 +82,17 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         
         return this.View(result.Data);
     }
+    
+    [HttpPost]
+    public async Task<IActionResult> Edit(VocabularyCardEditInputModel model,string id)
+    {
+        var result = await vocabularyCardService.PostCardEditByIdAsync(model,id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index), new { lessonId = model.LessonId });
+        }
+        
+        return RedirectToAction(nameof(Index), new { lessonId = model.LessonId });
+    }
 }
