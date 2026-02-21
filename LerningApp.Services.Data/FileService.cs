@@ -28,10 +28,12 @@ public class FileService(IWebHostEnvironment environment) : IFileService
 
     public void DeleteFile(string relativeFilePath)
     {
-        if (string.IsNullOrEmpty(relativeFilePath))
+        if (string.IsNullOrWhiteSpace(relativeFilePath))
             return;
 
-        string fullPath = Path.Combine(environment.WebRootPath, relativeFilePath);
+        string cleanPath = relativeFilePath.TrimStart('/', '\\');
+        string fullPath = Path.Combine(environment.WebRootPath, cleanPath);
+
         if (File.Exists(fullPath))
             File.Delete(fullPath);
     }
