@@ -8,8 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace LerningApp.Controllers;
 
 public class VocabularyCardController(IVocabularyCardService vocabularyCardService,
-    IPartOfSpeechService partOfSpeechService,
-    LerningAppContext dbContext ) :BaseController
+    IPartOfSpeechService partOfSpeechService) :BaseController
 {
     [HttpGet]
     public async Task<IActionResult> Index(string lessonId)
@@ -58,7 +57,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
             model.PartOfSpeechOptions = await partOfSpeechService.GetAllPartOfSpeechOptionsAsync();
             return View(model);
         }
-
+       
         var result = await vocabularyCardService.CreateVocabularyCardAsync(model);
         if (result.Result == false)
         {
