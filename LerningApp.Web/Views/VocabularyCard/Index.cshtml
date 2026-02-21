@@ -59,11 +59,45 @@
         color: #6b7280;
         font-size: 0.95rem;
     }
+    .btn-add-card {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: linear-gradient(180deg, rgba(255, 138, 76, 1), rgba(255, 122, 48, 1));
+        color: #fff !important;
+        border: none;
+        box-shadow: 0 8px 18px rgba(255, 122, 48, 0.25);
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 10px;
+    }
 
+    .btn-add-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 22px rgba(255, 122, 48, 0.30);
+    }
 
+    .btn-add-card .plus {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.25);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
 </style>
 
 <h2 class="mb-3">Думи за урок: @Model.LessonName</h2>
+<a asp-action="Create"
+   asp-controller="VocabularyCard"
+   asp-route-lessonId="@Model.LessonId"
+   class="btn btn-add-card">
+    <span class="plus">+</span> Добави карта
+</a>
 
 <div class="flashcard-grid">
     @foreach (var c in Model.Cards)
