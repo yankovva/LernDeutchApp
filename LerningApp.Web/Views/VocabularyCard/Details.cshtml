@@ -10,9 +10,13 @@
                 <span class="gender-chip">Род: @Model.Gender</span>
             }
         </div>
-
         <a asp-action="Index" asp-route-lessonId="@Model.LessonId" class="btn btn-sm btn-outline-secondary">
             ← Назад
+        </a>
+        <a asp-action="Edit"
+           asp-controller="VocabularyCard"
+           asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary">
+            Редактирай
         </a>
     </div>
     <div class="de-header">
