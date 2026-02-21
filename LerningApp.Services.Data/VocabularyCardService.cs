@@ -280,4 +280,27 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
 
         return ServiceResult.Success();
     }
+
+    public async Task<ServiceResult> DeleteCardByIdAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
+        {
+            return ServiceResult.Fail("Невалидна карта.");
+        }
+
+        var card = await vocabularyCardRepository
+            .GetByIdAsync(cardId);
+        if (card == null)
+        {
+            return ServiceResult.Fail("Невалидна карта.");
+        }
+
+        if (card.ImagePath != "/images/VocabularyCardsImages/defaultcardimage.png")
+        {
+            fileService.DeleteFile(card.ImagePath);
+        }
+        await vocabularyCardRepository.DeleteAsync(card);
+        
+        return ServiceResult.Success();
+    }
 }
