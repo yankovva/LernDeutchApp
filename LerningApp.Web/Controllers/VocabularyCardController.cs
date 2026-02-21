@@ -95,4 +95,16 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         
         return RedirectToAction(nameof(Index), new { lessonId = model.LessonId });
     }
+    [HttpPost]
+    public async Task<IActionResult> Delete(string id, string lessonId)
+    {
+        var result = await vocabularyCardService.DeleteCardByIdAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index), new { lessonId });
+        }
+        TempData["SuccessMessage"] = "Успешно премахнахте картата.";
+        return RedirectToAction(nameof(Index), new {lessonId });
+    }
 }
