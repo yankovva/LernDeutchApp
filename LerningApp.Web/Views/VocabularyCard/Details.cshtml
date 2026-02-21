@@ -18,6 +18,15 @@
            asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary">
             Редактирай
         </a>
+        <form asp-action="Delete" method="post"
+              onsubmit="return confirm('Сигурне ли сте, че искате да изтриете тази карта?');"
+              class="d-inline">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="id" value="@Model.Id" />
+            <input type="hidden" name="lessonId" value="@Model.LessonId" />
+            <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
+        </form>
+
     </div>
     <div class="de-header">
         <div class="de-word">
