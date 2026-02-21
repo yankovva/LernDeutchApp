@@ -3,7 +3,6 @@ namespace LerningApp.Web.ViewModels.Lesson;
 public class LessonIndexViewModel
 {
     public string Id { get; set; } = null!;
-    
     public string Name { get; set; } = null!;
     
     public string CreatedAt{ get; set; } = null!;
