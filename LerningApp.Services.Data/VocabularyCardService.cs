@@ -3,6 +3,7 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.VocabularyCard;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
@@ -10,7 +11,8 @@ namespace LerningApp.Services.Data;
 
 public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCardRepository,
     IRepository<Lesson,Guid> lessonRepository,
-    IRepository<PartOfSpeech, Guid> partOfSpeechrRepository): IVocabularyCardService
+    IRepository<PartOfSpeech, Guid> partOfSpeechrRepository,
+    IFileService fileService): IVocabularyCardService
 {
     public async Task<ServiceResultT<VocabularyCardsIndexViewModel>> IndexGetAllCardsForALessonAsync(string lessonId)
     {
@@ -57,7 +59,6 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid cardGuid))
         {
             return ServiceResultT<VocabularyCardDetailsViewModel>.Fail("Картата не е намерена."); 
-            // return this.RedirectToAction(nameof(this.Index));
         }
 
         VocabularyCard? card = await vocabularyCardRepository
@@ -71,7 +72,6 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         if (card == null)
         {
             return ServiceResultT<VocabularyCardDetailsViewModel>.Fail("Картата не е намерена.");
-           // return this.RedirectToAction(nameof(this.Index));
         }
 
         VocabularyCardDetailsViewModel model = new VocabularyCardDetailsViewModel
@@ -120,6 +120,23 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             return ServiceResult.Fail("Невалидна част на речта.",nameof(model.PartOfSpeechId));
         }
         
+        string imagePath = "/images/vocabulary/default.png";
+
+        if (model.Image != null && model.Image.Length > 0)
+        {
+            string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".jfif" };
+            long maxSize = 5 * 1024 * 1024;
+
+            if (!fileService.IsFileValid(model.Image, allowedExtensions, maxSize))
+            {
+                return ServiceResult.Fail("Невалиден файл или твърде голям файл.", nameof(model.Image));
+
+            }
+            string extension = Path.GetExtension(model.Image.FileName);
+            string uniqueFileName = $"{Guid.NewGuid()}{extension}";
+            imagePath = await fileService.UploadFileAsync(model.Image, "images/VocabularyCardsImages", uniqueFileName);
+        }
+
         List<VocabularyTerm> terms = new List<VocabularyTerm>()
         {
             new VocabularyTerm()
@@ -148,7 +165,8 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         {
             LessonId = lessonId,
             PartOfSpeechId = partOfSpeechId,
-            Terms = terms
+            Terms = terms,
+            ImagePath = $"/{imagePath}",
         };
          
         await vocabularyCardRepository.AddAsync(newCard);
