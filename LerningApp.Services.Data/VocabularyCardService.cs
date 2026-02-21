@@ -173,4 +173,37 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         
         return ServiceResult.Success();        
     }
+
+    public async Task<ServiceResultT<VocabularyCardEditInputModel>> GetCardEditByIdAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
+        {
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail("Невалидна карта.");
+        }
+        
+        var card = await vocabularyCardRepository
+            .GetAllAttached()
+            .Include(c => c.Terms)
+            .Include(c => c.PartOfSpeech)
+            .FirstOrDefaultAsync(c => c.Id == cardId);
+       
+        if (card == null)
+        {
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail("Невалидна карта.");
+        }
+
+        var model = new VocabularyCardEditInputModel()
+        {
+            Id = id,
+            LessonId = card.LessonId.ToString(),
+            PartOfSpeechId = card.PartOfSpeechId.ToString(),
+            GermanWord = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Word ?? "" ,
+            EnglishWord = card.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)?.Word ?? "",
+            BulgarianWord = card.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)?.Word ?? "",
+            ExampleSentence = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.ExampleSentence,
+            Gender = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Gender,
+        };
+        
+        return ServiceResultT<VocabularyCardEditInputModel>.Success(model);
+    }
 }
