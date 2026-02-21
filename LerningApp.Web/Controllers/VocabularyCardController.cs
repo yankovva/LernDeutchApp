@@ -69,4 +69,17 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         TempData["SuccessMessage"] = "Успешно създадохте нова карта";
         return RedirectToAction(nameof(Index), new { lessonId = model.LessonId });
     }
+    [HttpGet]
+    public async Task<IActionResult> Edit(string id)
+    {
+        var result = await vocabularyCardService.GetCardEditByIdAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index), new { lessonId = result.Data?.LessonId });
+        }
+        result.Data!.PartOfSpeechOptions = await partOfSpeechService.GetAllPartOfSpeechOptionsAsync();
+        
+        return this.View(result.Data);
+    }
 }
