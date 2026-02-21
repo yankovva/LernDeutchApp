@@ -37,7 +37,8 @@ public class VocabularyCardEditInputModel
     public string? Gender { get; set; }
     
     [MaxLength(500)]
-    public string? ExampleSentence { get; set; }
+    [Required]
+    public string? ExampleSentence { get; set; } = null!;
 
     public bool IsPrimary { get; set; }
     
