@@ -6,50 +6,61 @@
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         gap: 16px;
     }
-
-    .flashcard {
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 14px;
-        background: #fff;
-        box-shadow: 0 6px 18px rgba(0,0,0,0.04);
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-
-    }
-    .flashcard:hover{
-        transform: translateY(-6px);
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    .word-card {
+        display: block;
+        text-decoration: none;
+        color: #111827;
+        background: #ffffff;
+        border: 1px solid #f1e4d7;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
     }
 
-    .flashcard-header {
+    .word-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 16px 28px rgba(15, 23, 42, 0.12);
+        border-color: rgba(255, 146, 66, 0.55);
+    }
+
+    .card-top {
         display: flex;
-        justify-content: flex-end;
+        gap: 8px;
+        justify-content: space-between;
+        margin-bottom: 10px;
     }
 
-    .pos {
-        font-size: 0.8rem;
-        color: #4b5563;
-        background: #f3f4f6;
-        padding: 4px 8px;
+    .pos-badge {
+        background: rgba(255, 233, 217, 1);
+        color: rgba(168, 82, 30, 1);
+        font-weight: 600;
+        font-size: 0.75rem;
+        padding: 4px 10px;
         border-radius: 999px;
     }
 
-    .de {
-        font-size: 1.4rem;
+    .gender-badge {
+        background: rgba(255, 248, 221, 1);
+        color: rgba(145, 91, 20, 1);
         font-weight: 600;
-        margin: 8px 0;
+        font-size: 0.75rem;
+        padding: 4px 10px;
+        border-radius: 999px;
     }
 
-    .tr {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        color: #374151;
+    .card-word {
+        font-size: 1.25rem;
+        font-weight: 800;
+        margin-bottom: 6px;
     }
 
-    .flashcard-actions {
-        margin-top: 12px;
+    .card-sub {
+        color: #6b7280;
+        font-size: 0.95rem;
     }
+
+
 </style>
 
 <h2 class="mb-3">Думи за урок: @Model.LessonName</h2>
@@ -57,24 +68,21 @@
 <div class="flashcard-grid">
     @foreach (var c in Model.Cards)
     {
-        <div class="flashcard">
-            <div class="flashcard-header">
-                <span class="pos">@c.PartOfSpeech</span>
+        <a asp-action="Details"
+           asp-route-id="@c.Id"
+           class="word-card">
+            <div class="card-top">
+                <span class="pos-badge">@c.PartOfSpeech</span>
+                @if (!string.IsNullOrWhiteSpace(c.Gender))
+                {
+                    <span class="gender-badge">@c.Gender</span>
+                }
             </div>
 
-            <div class="flashcard-main">
-                <div class="de">@c.Gender @c.German</div>
-            </div>
+            <div class="card-word">@c.German</div>
+            <div class="card-sub">@c.English</div>
+        </a>
 
-            <div class="flashcard-actions">
-                <a class="btn btn-sm btn-outline-primary"
-                   asp-action="Details"
-                   asp-route-id="@c.Id">
-                    Детайли
-                </a>
-
-            </div>
-        </div>
     }
 </div>
 
