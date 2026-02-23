@@ -17,7 +17,7 @@ public class LessonController(ILessonService lessonService,
     ICourseService courseService,
     UserManager<ApplicationUser> userManager) : BaseController
 {
-    
+    //TODO : add delete and / or remove from course
     [HttpGet]
     public async Task<IActionResult> Index()
     { 
@@ -130,25 +130,38 @@ public class LessonController(ILessonService lessonService,
     
     [HttpPost]
     [ValidateAntiForgeryToken]
-public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
-{
-    if (!ModelState.IsValid)
+    public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     {
-        model.Courses = await courseService.GetCourseOptionsAsync();
-        return View(model);
-    }
+        if (!ModelState.IsValid)
+        {
+            model.Courses = await courseService.GetCourseOptionsAsync();
+            return View(model);
+        }
 
-    var result = await lessonService.PostLessonEditInputModelAsync(model, id);
-    if (result.Result == false)
+        var result = await lessonService.PostLessonEditInputModelAsync(model, id);
+        if (result.Result == false)
+        {
+            ModelState.AddModelError(string.Empty, result.Message);
+            model.Courses = await courseService.GetCourseOptionsAsync();
+            return View(model);
+        }
+       
+        
+        TempData["SuccessMessage"] = $"Успешно редактирахте {model.Name}.";
+        return RedirectToAction(nameof(Details), new { id });
+    }
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> SoftDelete(string id)
     {
-        ModelState.AddModelError(string.Empty, result.Message);
-        model.Courses = await courseService.GetCourseOptionsAsync();
-        return View(model);
+        var result = await lessonService.SoftDeleteLessonAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Details", new { id = id });
+        }
+        
+        TempData["SuccessMessage"] = $"Успешно изтрихте урока";
+        return RedirectToAction(nameof(Index));
     }
-   
-    
-    TempData["SuccessMessage"] = $"Успешно редактирахте {model.Name}.";
-    return RedirectToAction(nameof(Details), new { id });
-}
-
 }
