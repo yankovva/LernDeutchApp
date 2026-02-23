@@ -6,160 +6,287 @@
     ViewData["Title"] = "Course Details";
 }
 
-<div class="row justify-content-center">
-    <div class="col-lg-9">
-        <div class="card shadow-sm">
-            <div class="card-body p-4">
-                <div class="d-flex justify-content-between align-items-start gap-3">
-                    <div>
-                        <h2 class="mb-1">@Model.Name</h2>
-                        <div class="text-muted">
-                            Ниво:
-                            <span class="badge bg-secondary">
-                                @(Model.LevelName ?? "—")
-                            </span>
-                        </div>
-                    </div>
+<div class="course-page">
+    <div class="course-hero">
+        <div class="hero-left">
+            <div class="eyebrow">Курс</div>
+            <h2 class="title">@Model.Name</h2>
+            <div class="meta-line">
+                <span class="meta-label">Ниво</span>
+                <span class="level-pill">@(Model.LevelName ?? "—")</span>
+            </div>
+        </div>
 
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <div class="d-flex gap-2">
-                            @if (User.Identity?.IsAuthenticated == true &&
-                                 Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
-                            {
-                                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
-                                    Редактирай
-                                </a>
-                                <form asp-action="SoftDelete" method="post"
-                                      onsubmit="return confirm('Сигурне ли сте, че искате да изтриете този курс?');"
-                                      class="d-inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@Model.Id" />
-                                    <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
-                                </form>
-                            }
-                            <a asp-action="Index"
-                               class="btn btn-outline-secondary">
-                                ← Всички курсове
-                            </a>
-                            @if (Model.IsEnrolled == false)
-                            {
-                                <form asp-action="Enroll" method="post" class="d-inline">
-                                    <input type="hidden" name="courseId" value="@Model.Id"/>
-                                    <button type="submit" class="btn btn-primary">Запиши се</button>
-                                </form>
-                            }
-                            else
-                            {
-                                <span class="badge bg-success">Записан</span>
-                            }
-                        </div>
+        <div class="hero-right">
+            <a asp-action="Index" class="btn btn-outline-secondary">← Всички курсове</a>
+        </div>
+    </div>
 
-                        @if (Model.IsActive)
-                        {
-                            <form asp-action="Deactivate"
-                                  asp-route-id="@Model.Id"
-                                  method="post"
-                                  onsubmit="return confirm('Сигурни ли сте, че искате да деактивирате този курс?');">
-                                @Html.AntiForgeryToken()
+    <div class="course-stats">
+        <div class="stat-card">
+            <div class="stat-label">Уроци</div>
+            <div class="stat-value">@Model.CourseLessons.Count()</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Думи</div>
+            <div class="stat-value">@Model.TotalWordsInCourse</div>
+        </div>
+    </div>
 
-                                <button type="submit" class="btn btn-outline-danger">
-                                    🗄️ Деактивирай
-                                </button>
-                            </form>
-                        }
-                        else
-                        {
-                            <form asp-action="Restore"
-                                  asp-route-id="@Model.Id"
-                                  method="post"
-                                  onsubmit="return confirm('Сигурни ли сте, че искате да активирате този курс?');">
-                                @Html.AntiForgeryToken()
+    <div class="course-actions">
+        @if (User.Identity?.IsAuthenticated == true &&
+             Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+        {
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
 
-                                <button type="submit" class="btn btn-outline-success">
-                                    ♻️ Възстанови курса
-                                </button>
-                            </form>
-                        }
-                    </div>
+            <form asp-action="SoftDelete" method="post"
+                  onsubmit="return confirm('Сигурни ли сте, че искате да изтриете този курс?');"
+                  class="d-inline">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+                <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
+            </form>
+        }
 
-                </div>
+        @if (Model.IsEnrolled == false)
+        {
+            <form asp-action="Enroll" method="post" class="d-inline">
+                <input type="hidden" name="courseId" value="@Model.Id"/>
+                <button type="submit" class="btn btn-accent">Запиши се</button>
+            </form>
+        }
+        else
+        {
+            <span class="badge badge-success">Записан</span>
+        }
 
-                <hr class="my-4" />
+        @if (Model.IsActive)
+        {
+            <form asp-action="Deactivate"
+                  asp-route-id="@Model.Id"
+                  method="post"
+                  onsubmit="return confirm('Сигурни ли сте, че искате да деактивирате този курс?');"
+                  class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-danger">🗄️ Деактивирай</button>
+            </form>
+        }
+        else
+        {
+            <form asp-action="Restore"
+                  asp-route-id="@Model.Id"
+                  method="post"
+                  onsubmit="return confirm('Сигурни ли сте, че искате да активирате този курс?');"
+                  class="d-inline">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-outline-success">♻️ Възстанови курса</button>
+            </form>
+        }
+    </div>
 
-                <h5 class="mb-2">Описание</h5>
+    <div class="section-card">
+        <h5 class="section-title">Описание</h5>
+        @if (string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="text-muted mb-0">Няма описание за този курс.</p>
+        }
+        else
+        {
+            <p class="mb-0">@Model.Description</p>
+        }
+    </div>
 
-                @if (string.IsNullOrWhiteSpace(Model.Description))
+    <div class="section-card">
+        <div class="section-head">
+            <h4 class="section-title">Уроци в курса</h4>
+            <span class="lesson-count">@Model.CourseLessons.Count() урока</span>
+        </div>
+
+        @if (!Model.CourseLessons.Any())
+        {
+            <div class="alert alert-info">Все още няма уроци в този курс.</div>
+        }
+        else
+        {
+            <div class="lesson-grid">
+                @foreach (var lesson in Model.CourseLessons)
                 {
-                    <p class="text-muted mb-0">Няма описание за този курс.</p>
-                }
-                else
-                {
-                    <p class="mb-0">@Model.Description</p>
-                }
+                    <div class="lesson-card">
+                        <div class="lesson-title">@lesson.LessonName</div>
+                        <div class="lesson-desc">@lesson.LessonTarget</div>
+                        <div class="lesson-meta">@lesson.WordsInLesson думи</div>
 
-                <hr class="my-4" />
-                
-                <h4 class="mt-4 mb-3">Уроци в курса</h4>
-
-                @if (!Model.CourseLessons.Any())
-                {
-                    <div class="alert alert-info">Все още няма уроци в този курс.</div>
-                }
-                else
-                {
-                    <div class="lesson-grid">
-                        @foreach (var lesson in Model.CourseLessons)
-                        {
-                            <div class="lesson-card">
-                                <div class="lesson-title">@lesson.LessonName</div>
-                                <div class="lesson-desc">@lesson.LessonTarget</div>
-                                <div class="lesson-meta">@lesson.WordsInLesson думи</div>
-
-                                <a asp-controller="Lesson"
-                                   asp-action="Details"
-                                   asp-route-id="@lesson.LessinId"
-                                   class="btn btn-outline-primary btn-sm">
-                                    Отвори урок
-                                </a>
-                            </div>
-                        }
+                        <a asp-controller="Lesson"
+                           asp-action="Details"
+                           asp-route-id="@lesson.LessinId"
+                           class="btn btn-outline-primary btn-sm">
+                            Отвори урок →
+                        </a>
                     </div>
                 }
             </div>
-           
-        </div>
+        }
     </div>
 </div>
+
 <style>
-    .lesson-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-        gap: 14px;
-    }
+.course-page {
+    padding: 18px 0 30px 0;
+}
 
-    .lesson-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 14px;
-        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-    }
+.course-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    background: linear-gradient(135deg, rgba(255, 245, 235, 1), rgba(255, 255, 255, 1));
+    border-radius: 18px;
+    border: 1px solid #f1e4d7;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+    margin-bottom: 14px;
+}
 
-    .lesson-title {
-        font-weight: 700;
-        margin-bottom: 4px;
-    }
+.eyebrow {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    color: #8b93a6;
+    margin-bottom: 4px;
+}
 
-    .lesson-desc {
-        color: #475569;
-        font-size: 0.95rem;
-        min-height: 38px;
-        margin-bottom: 8px;
-    }
+.title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin: 0 0 6px 0;
+}
 
-    .lesson-meta {
-        font-size: 0.85rem;
-        color: #6b7280;
-        margin-bottom: 10px;
-    }
+.meta-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.meta-label {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.level-pill {
+    background: rgba(255, 230, 210, 1);
+    color: #9a4a1a;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.course-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+    margin: 10px 0 16px 0;
+}
+
+.stat-card {
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 6px 14px rgba(255, 122, 48, 0.08);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #9a4a1a;
+}
+
+.stat-value {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #7c2d12;
+}
+
+.course-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 10px 0 18px 0;
+}
+
+.btn-accent {
+    background: linear-gradient(180deg, rgba(255, 138, 76, 1), rgba(255, 122, 48, 1));
+    color: white;
+    border: none;
+    box-shadow: 0 8px 18px rgba(255, 122, 48, 0.25);
+}
+
+.badge-success {
+    background: #ecfdf5;
+    color: #065f46;
+    border: 1px solid #a7f3d0;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.section-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+    margin-bottom: 14px;
+}
+
+.section-title {
+    margin: 0 0 10px 0;
+    font-weight: 700;
+}
+
+.section-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.lesson-count {
+    font-size: 0.85rem;
+    color: #6b7280;
+}
+
+.lesson-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 14px;
+}
+
+.lesson-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+}
+
+.lesson-title {
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.lesson-desc {
+    color: #475569;
+    font-size: 0.95rem;
+    min-height: 38px;
+    margin-bottom: 8px;
+}
+
+.lesson-meta {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin-bottom: 10px;
+}
 </style>

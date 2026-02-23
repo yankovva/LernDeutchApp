@@ -88,6 +88,7 @@ public class CourseService(
             Name = course.Name,
             Description = course.Description,
             LevelName = course.Level.Name,
+            TotalWordsInCourse = course.LessonsForCourse.Select(l => l.VocabularyCards.Count).Sum(),
             PublisherId = course.PublisherId.ToString(),
             IsActive = course.IsPublished,
             CourseLessons = course.LessonsForCourse

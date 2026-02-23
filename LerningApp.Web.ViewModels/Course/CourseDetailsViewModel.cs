@@ -15,6 +15,8 @@ public class CourseDetailsViewModel
     public bool IsEnrolled { get; set; }
     
     public string PublisherId { get; set; } = null!;
+    
+    public int TotalWordsInCourse { get; set; }
 
     public virtual IList<CourseLessonsViewModel> CourseLessons { get; set; } =
         new List<CourseLessonsViewModel>();
