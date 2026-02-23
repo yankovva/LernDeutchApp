@@ -252,6 +252,39 @@ public class CourseService(
         return ServiceResult.Success();
     }
 
+    public async Task<ServiceResult> SoftDeleteCourseAsync(string id)
+    {
+        if (!Guid.TryParse(id, out var courseId))
+        {
+            return ServiceResult.Fail("Невалиден курс.");
+        }
+
+        var course = await courseRepository
+            .GetAllAttached()
+            .Include(c => c.LessonsForCourse)
+            .Include(c => c.CourseParticipants)
+            .FirstOrDefaultAsync(c => c.Id == courseId);
+
+        if (course == null)
+        {
+            return ServiceResult.Fail("Курсът не е намерен.");
+        }
+
+        course.IsDeleted = true;
+
+        foreach (var lesson in course.LessonsForCourse)
+        {
+            lesson.IsDeleted = true;
+        }
+
+        foreach (var uc in course.CourseParticipants)
+        {
+            uc.IsDeleted = true;
+        }
+
+        await courseRepository.SaveChangesAsync();
+        return ServiceResult.Success();
+    }
     public async Task<List<CourseOptionsViewModel>> GetCourseOptionsAsync()
     {
         var courses = await courseRepository

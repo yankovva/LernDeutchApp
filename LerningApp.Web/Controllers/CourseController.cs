@@ -183,4 +183,19 @@ public class CourseController(
         TempData["SuccessMessage"] = $"Успешно се запизахте за курса.";
         return RedirectToAction("Details", new { id = courseId });
     }
+
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> SoftDelete(string id)
+    {
+        var result = await courseService.SoftDeleteCourseAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Details", new { id = id });
+        }
+        
+        TempData["SuccessMessage"] = $"Успешно изтрихте курса";
+        return RedirectToAction(nameof(Index));
+    }
 }
