@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
+[Authorize]
 public class VocabularyCardController(IVocabularyCardService vocabularyCardService,
     IPartOfSpeechService partOfSpeechService) :BaseController
 {
@@ -96,6 +97,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         
         return RedirectToAction(nameof(Index), new { lessonId = model.LessonId });
     }
+    
     [HttpPost]
     public async Task<IActionResult> Delete(string id, string lessonId)
     {
@@ -103,15 +105,14 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return RedirectToAction(nameof(Index), new { lessonId });
+            return RedirectToAction("Details", new { id = id });
         }
         TempData["SuccessMessage"] = "Успешно премахнахте картата.";
         return RedirectToAction(nameof(Index), new {lessonId });
     }
     
-    [Authorize]
     [HttpPost]
-    public async Task<IActionResult> SoftDelete(string id)
+    public async Task<IActionResult> SoftDelete(string id, string lessonId)
     {
         var result = await vocabularyCardService.SoftDeleteCardAsync(id);
         if (result.Result == false)
@@ -121,6 +122,6 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         }
         
         TempData["SuccessMessage"] = $"Успешно изтрихте картата";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Index), new {lessonId });
     }
 }
