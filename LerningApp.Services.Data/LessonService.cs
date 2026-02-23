@@ -319,4 +319,31 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     await lessonRepository.SaveChangesAsync();
     return ServiceResult.Success();
     }
+
+    public async Task<ServiceResult> SoftDeleteLessonAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
+        {
+            return ServiceResult.Fail("Невалиден урок.");
+        }
+
+        Lesson? lesson = await lessonRepository
+            .GetAllAttached()
+            .Include(ls => ls.LessonSections)
+            .FirstOrDefaultAsync(c => c.Id == lessonId);
+
+        if (lesson == null)
+        {
+            return ServiceResult.Fail("Урокът не е намерен.");
+        }
+        
+        lesson.IsDeleted = true;
+
+        foreach (var section in lesson.LessonSections)
+        {
+            section.IsDeleted = true;
+        }
+
+        return ServiceResult.Success();
+    }
 }
