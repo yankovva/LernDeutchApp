@@ -331,6 +331,8 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         {
             term.IsDeleted = true;
         }
+        
+        await vocabularyCardRepository.SaveChangesAsync();
 
         return ServiceResult.Success();
     }

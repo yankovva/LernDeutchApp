@@ -338,6 +338,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             section.IsDeleted = true;
         }
 
+        await lessonRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
 }
