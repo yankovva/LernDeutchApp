@@ -308,4 +308,30 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         
         return ServiceResult.Success();
     }
+    public async Task<ServiceResult> SoftDeleteCardAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
+        {
+            return ServiceResult.Fail("Невалидна карта.");
+        }
+
+        VocabularyCard? card = await vocabularyCardRepository
+            .GetAllAttached()
+            .Include(c => c.Terms)
+            .FirstOrDefaultAsync(c => c.Id == cardId);
+
+        if (card == null)
+        {
+            return ServiceResult.Fail("Картата не е намерена.");
+        }
+        
+        card.IsDeleted = true;
+
+        foreach (var term in card.Terms)
+        {
+            term.IsDeleted = true;
+        }
+
+        return ServiceResult.Success();
+    }
 }

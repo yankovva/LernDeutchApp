@@ -12,4 +12,5 @@ public interface IVocabularyCardService
     Task<ServiceResultT<VocabularyCardEditInputModel>> GetCardEditByIdAsync(string id);
     Task<ServiceResult> PostCardEditByIdAsync( VocabularyCardEditInputModel model,string id);
     Task<ServiceResult> DeleteCardByIdAsync(string id);
+    Task<ServiceResult> SoftDeleteCardAsync(string id);
 } 
