@@ -19,6 +19,7 @@ public class LessonContentViewModel
     public int WordCount { get; set; }
     
     public string Target { get; set; } = null!;
+    public string PublisherId { get; set; } = null!;
     
     public  IList<LessonSectionViewModel> LessonSections { get; set; } 
         = new List<LessonSectionViewModel>();
