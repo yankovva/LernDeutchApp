@@ -60,6 +60,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             CourseId = lesson.CourseId.ToString(),
             Content = lesson.Content,
             WordCount = lesson.VocabularyCards.Count(),
+            PublisherId = lesson.PublisherId.ToString(),
             OrderIndex = lesson.OrderIndex,
             CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
             Target = lesson.Target,
@@ -158,13 +159,9 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         Guid courseId = Guid.Empty;
         if (!string.IsNullOrWhiteSpace(model.CourseId))
         {
-            if (!Guid.TryParse(model.CourseId, out courseId))
+            if (!Guid.TryParse(model.CourseId, out  courseId))
             {
                 return ServiceResult.Fail("Невалиден Курс.", nameof(model.CourseId));
-                
-               // model.Courses = await GetAllCoursesFromDbAsync();
-
-              //  return View(model);
             }
             
             Course? course = await courseRepository
@@ -173,9 +170,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             if (course == null)
             {
                 return ServiceResult.Fail("Невалиден Курс.", nameof(model.CourseId));
-                
-                //model.Courses = await GetAllCoursesFromDbAsync();;
-               // return this.View(model);
             }
         }
         
@@ -183,8 +177,8 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         {
             Name = model.Name,
             Content = model.Content,
-            CourseId = courseId,
-            CreatedAt = DateTime.Now,
+            CourseId = courseId == Guid.Empty ? null : courseId,
+            CreatedAt = DateTime.UtcNow,
             PublisherId = userId,
             OrderIndex = model.OrderIndex,
             Target = model.Target,
