@@ -17,7 +17,6 @@ public class CourseService(
             .GetAllAttached()
             .AsNoTracking()
             .OrderBy(c => c.CreatedAt)
-            .Where(c=>c.IsPublished)
             .Select(c => new CourseIndexViewModel
             {
                 Id = c.Id.ToString(),
@@ -224,7 +223,7 @@ public class CourseService(
         }
 
         Course? course = await courseRepository
-            .FirstorDefaultAsync(c => c.Id == courseId && c.IsPublished == true);
+            .FirstorDefaultAsync(c => c.Id == courseId);
 
         if (course == null)
         {
