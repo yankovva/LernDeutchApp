@@ -2,6 +2,7 @@ using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.VocabularyCard;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -106,5 +107,20 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         }
         TempData["SuccessMessage"] = "Успешно премахнахте картата.";
         return RedirectToAction(nameof(Index), new {lessonId });
+    }
+    
+    [Authorize]
+    [HttpPost]
+    public async Task<IActionResult> SoftDelete(string id)
+    {
+        var result = await vocabularyCardService.SoftDeleteCardAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Details", new { id = id });
+        }
+        
+        TempData["SuccessMessage"] = $"Успешно изтрихте картата";
+        return RedirectToAction(nameof(Index));
     }
 }
