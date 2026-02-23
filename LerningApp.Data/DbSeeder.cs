@@ -120,6 +120,13 @@ public class DbSeeder
                     Side = "bg",
                     Word = "дом",
                     IsPrimary = false
+                }, 
+                new VocabularyTerm
+                {
+                    Id = Guid.NewGuid(),
+                    Side = "en",
+                    Word = "house",
+                    IsPrimary = false
                 },
                 new VocabularyTerm
                 {
@@ -145,6 +152,13 @@ public class DbSeeder
                     Id = Guid.NewGuid(),
                     Side = "bg",
                     Word = "куче",
+                    IsPrimary = true
+                },
+                new VocabularyTerm
+                {
+                    Id = Guid.NewGuid(),
+                    Side = "en",
+                    Word = "dog",
                     IsPrimary = true
                 },
                 new VocabularyTerm
@@ -181,7 +195,14 @@ public class DbSeeder
                     IsPrimary = true,
                     Gender = "die",
                     ExampleSentence = "Die Tür ist offen."
-                }
+                },
+                new VocabularyTerm
+                {
+                    Id = Guid.NewGuid(),
+                    Side = "en",
+                    Word = "Door",
+                    IsPrimary = true
+                 }
             }
         };
 
