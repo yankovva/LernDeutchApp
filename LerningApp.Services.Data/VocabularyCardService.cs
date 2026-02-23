@@ -3,10 +3,9 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.VocabularyCard;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
+using static LerningApp.Common.ApplicationConstants;
 namespace LerningApp.Services.Data;
 
 public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCardRepository,
@@ -28,7 +27,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         {
             return ServiceResultT<VocabularyCardsIndexViewModel>.Fail("Урокът не е намерен.");
         }
-
+        
         var cards = await vocabularyCardRepository
             .GetAllAttached()
             .AsNoTracking()
@@ -73,6 +72,10 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         {
             return ServiceResultT<VocabularyCardDetailsViewModel>.Fail("Картата не е намерена.");
         }
+        
+        var de = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "de");
+        var en = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "en");
+        var bg = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "bg");
 
         VocabularyCardDetailsViewModel model = new VocabularyCardDetailsViewModel
         {
@@ -80,9 +83,9 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             LessonId = card.LessonId.ToString(),
             LessonName = card.Lesson?.Name ?? "Урок",
             ImageUrl = card.ImagePath!,
-            GermanWord = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Word ?? "",
-            BulgarianTranslation = card.Terms.FirstOrDefault(t => t.Side == "bg" && t.IsPrimary)?.Word,
-            EnglishTranslation = card.Terms.FirstOrDefault(t => t.Side == "en" && t.IsPrimary)?.Word,
+            GermanWord = de!.Word ,
+            BulgarianTranslation = bg!.Word,
+            EnglishTranslation = en!.Word,
             PartOfSpeech = card.PartOfSpeech.Name,
             BulgarianSynonyms = card.Terms.Where(t => t.Side == "bg" && !t.IsPrimary)
                 .Select(t => t.Word)
@@ -91,8 +94,8 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
                 .Where(t => t.Side == "en" && !t.IsPrimary)
                 .Select(t => t.Word)
                 .ToList(),
-            Gender = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.Gender ?? "-",
-            ExampleSentence = card.Terms.FirstOrDefault(t => t.Side == "de" && t.IsPrimary)?.ExampleSentence ?? "-",
+            Gender = de.Gender ?? "-",
+            ExampleSentence = de.ExampleSentence ?? "-",
         };
         
         return ServiceResultT<VocabularyCardDetailsViewModel>.Success(model);
@@ -120,12 +123,12 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             return ServiceResult.Fail("Невалидна част на речта.",nameof(model.PartOfSpeechId));
         }
         
-        string imagePath = "/images/vocabulary/default.png";
+        string imagePath = DefaultCardImagePath;
 
         if (model.Image?.Length > 0)
         {
-            string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".jfif" };
-            long maxSize = 5 * 1024 * 1024;
+            string[] allowedExtensions = AllowedImageExtensions;
+            long maxSize = MaxFileSize;
 
             if (!fileService.IsFileValid(model.Image, allowedExtensions, maxSize))
             {
@@ -134,11 +137,11 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             }
             string extension = Path.GetExtension(model.Image.FileName);
             string uniqueFileName = $"{Guid.NewGuid()}{extension}";
-            imagePath = await fileService.UploadFileAsync(model.Image, "images/VocabularyCardsImages", uniqueFileName);
+            imagePath = await fileService.UploadFileAsync(model.Image, DefaultCardDirectoryPath, uniqueFileName);
         }
 
-        List<VocabularyTerm> terms = new List<VocabularyTerm>()
-        {
+        List<VocabularyTerm> terms =
+        [
             new VocabularyTerm()
             {
                 Word = model.GermanWord,
@@ -147,19 +150,21 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
                 Side = "de",
                 IsPrimary = true,
             },
+
             new VocabularyTerm()
             {
                 Word = model.BulgarianWord,
                 Side = "bg",
                 IsPrimary = true,
             },
+
             new VocabularyTerm()
             {
                 Word = model.EnglishWord,
                 Side = "en",
                 IsPrimary = true,
             }
-        };
+        ];
 
         var newCard = new VocabularyCard()
         {
@@ -244,8 +249,8 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         
         if (model.Image?.Length > 0)
         {
-            string[] allowedExtensions = { ".jpg", ".jpeg", ".png", ".jfif" };
-            long maxSize = 5 * 1024 * 1024;
+            string[] allowedExtensions = AllowedImageExtensions;
+            long maxSize = MaxFileSize;
 
             if (!fileService.IsFileValid(model.Image, allowedExtensions, maxSize))
             {
@@ -254,9 +259,9 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
 
             string extension = Path.GetExtension(model.Image.FileName);
             string uniqueFileName = $"{Guid.NewGuid()}{extension}";
-            string imagePath = await fileService.UploadFileAsync(model.Image, "images/VocabularyCardsImages", uniqueFileName);
+            string imagePath = await fileService.UploadFileAsync(model.Image, DefaultCardDirectoryPath, uniqueFileName);
            
-            if (card.ImagePath != null && card.ImagePath != "/images/VocabularyCardsImages/defaultcardimage.png")
+            if (card.ImagePath != null && card.ImagePath != DefaultCardImagePath)
             {
                 fileService.DeleteFile(card.ImagePath);
             }
@@ -295,7 +300,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             return ServiceResult.Fail("Невалидна карта.");
         }
 
-        if (card.ImagePath != "/images/VocabularyCardsImages/defaultcardimage.png")
+        if (card.ImagePath != DefaultCardImagePath)
         {
             fileService.DeleteFile(card.ImagePath);
         }
