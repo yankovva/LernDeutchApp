@@ -28,4 +28,7 @@ public class VocabularyTerm
     
     [Comment("Is the VocabularyTerm primary for the VocabularyCard")]
     public bool IsPrimary { get; set; }
+    
+    [Comment("Shows if the VocabularyTerm is deleted")]
+    public bool IsDeleted { get; set; }
 }

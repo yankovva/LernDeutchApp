@@ -31,6 +31,9 @@ public class LessonConfiguration : IEntityTypeConfiguration<Lesson>
              .IsRequired();
          
          builder
+             .HasQueryFilter(l => l.IsDeleted == false);
+         
+         builder
              .HasOne(c => c.Publisher)
              .WithMany(u => u.CreatedLessons)
              .HasForeignKey(c => c.PublisherId)

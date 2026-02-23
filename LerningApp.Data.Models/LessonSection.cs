@@ -19,4 +19,8 @@ public class LessonSection
     
     [Comment("The Order Index of the LessonSection")]
     public int OrderIndex { get; set; }
+    
+    [Comment("Shows if the Lesson Section is deleted")]
+    public bool IsDeleted { get; set; }
+
 }

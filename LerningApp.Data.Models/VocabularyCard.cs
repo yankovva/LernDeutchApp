@@ -25,4 +25,7 @@ public class VocabularyCard
     [Comment("VocabularyTerm in this VocabularyCard")]
      public virtual ICollection<VocabularyTerm> Terms { get; set; }
         = new HashSet<VocabularyTerm>();
+     
+    [Comment("Shows if the VocabularyCard is deleted")]
+    public bool IsDeleted { get; set; }
 }

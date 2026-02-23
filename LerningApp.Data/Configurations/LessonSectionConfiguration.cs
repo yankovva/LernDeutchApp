@@ -21,7 +21,9 @@ public class LessonSectionConfiguration : IEntityTypeConfiguration<LessonSection
 
        builder.Property(x => x.OrderIndex)
            .IsRequired();
-
+       
+       builder.HasQueryFilter(x => x.IsDeleted == false);
+       
        builder.HasOne(x => x.Lesson)
            .WithMany(l => l.LessonSections)
            .HasForeignKey(x => x.LessonId)

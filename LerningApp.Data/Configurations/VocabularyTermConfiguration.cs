@@ -27,6 +27,8 @@ public class VocabularyTermConfiguration
         builder.Property(x => x.ExampleSentence)
             .HasMaxLength(ExampleSentenceMaxLenght);
         
+        builder.HasQueryFilter(x => x.IsDeleted == false);
+        
         builder.HasOne(x => x.VocabularyCard)
             .WithMany(i => i.Terms)
             .HasForeignKey(x => x.VocabularyCardId)

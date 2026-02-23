@@ -9,7 +9,9 @@ public class UserCourseConfiguration : IEntityTypeConfiguration<UserCourse>
     public void Configure(EntityTypeBuilder<UserCourse> builder)
     {
         builder.HasKey(x => new { x.UserId, x.CourseId });
-
+        
+        builder.HasQueryFilter(x => x.IsDeleted == false);
+        
         builder.HasOne(x => x.User)
             .WithMany(u => u.UserCourses)
             .HasForeignKey(x => x.UserId);

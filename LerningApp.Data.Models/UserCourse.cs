@@ -21,4 +21,7 @@ public class UserCourse
     
     [Comment("Course completed at (UTC)")]
     public DateTime? CompletedAt { get; set; }
+    
+    [Comment("Shows if the UserCourse is deleted")]
+    public bool IsDeleted { get; set; }
 }

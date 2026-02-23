@@ -7,6 +7,7 @@ namespace LerningApp.Data.Models;
 
 public class Course
 {
+    //TODO: Split Course into Modules, Add Final Module Test and Final Test for the course
     [Comment("PK Unique Identifier")]
     public Guid Id { get; set; }= Guid.NewGuid();
     
@@ -18,6 +19,9 @@ public class Course
     
     [Comment("The status of the Course")]
     public bool IsPublished { get; set; }
+    
+    [Comment("Shows if the Course is deleted")]
+    public bool IsDeleted { get; set; }
     
     [Comment("The Creation Date of the Course")]
     public DateTime CreatedAt { get; set; }

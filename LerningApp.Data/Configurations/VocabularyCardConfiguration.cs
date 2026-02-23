@@ -9,11 +9,13 @@ public class VocabularyCardConfiguration: IEntityTypeConfiguration<VocabularyCar
     public void Configure(EntityTypeBuilder<VocabularyCard> builder)
     {
         builder
-            .HasKey(x => x.Id);
+            .HasKey(vc => vc.Id);
         
         builder.Property(vc => vc.ImagePath)
             .HasMaxLength(500)
             .HasDefaultValue("/images/VocabularyCardsImages/defaultcardimage.png");
+        
+        builder.HasQueryFilter(vc => vc.IsDeleted == false);
 
         builder.HasOne(x => x.Lesson)
             .WithMany(l => l.VocabularyCards)

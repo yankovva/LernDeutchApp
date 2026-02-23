@@ -21,6 +21,9 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .IsRequired();
         
         builder
+            .HasQueryFilter(l => l.IsPublished == true && l.IsDeleted == false);
+        
+        builder
             .HasOne(e => e.Level)
             .WithMany(g => g.CoursesForLevel)
             .HasForeignKey(e => e.LevelId)

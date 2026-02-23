@@ -4,6 +4,7 @@ using LerningApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LerningApp.Data.Migrations
 {
     [DbContext(typeof(LerningAppContext))]
-    partial class LerningAppContextModelSnapshot : ModelSnapshot
+    [Migration("20260223075011_AddIsDeletedToLesson")]
+    partial class AddIsDeletedToLesson
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,10 +107,6 @@ namespace LerningApp.Data.Migrations
                         .HasMaxLength(3000)
                         .HasColumnType("nvarchar(3000)")
                         .HasComment("The Description of the Course");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasComment("Shows if the Course is deleted");
 
                     b.Property<bool>("IsPublished")
                         .HasColumnType("bit")
@@ -203,10 +202,6 @@ namespace LerningApp.Data.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasComment("The Content of the LessonSection");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasComment("Shows if the Lesson Section is deleted");
-
                     b.Property<Guid>("LessonId")
                         .HasColumnType("uniqueidentifier")
                         .HasComment("Foreign key to Lesson");
@@ -284,10 +279,6 @@ namespace LerningApp.Data.Migrations
                         .HasColumnType("datetime2")
                         .HasComment("Course completed at (UTC)");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasComment("Shows if the UserCourse is deleted");
-
                     b.Property<DateTime>("StartedAt")
                         .HasColumnType("datetime2")
                         .HasComment("Course started at (UTC)");
@@ -312,10 +303,6 @@ namespace LerningApp.Data.Migrations
                         .HasColumnType("nvarchar(500)")
                         .HasDefaultValue("/images/VocabularyCardsImages/defaultcardimage.png")
                         .HasComment("Image of the VocabularyCard");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasComment("Shows if the VocabularyCard is deleted");
 
                     b.Property<Guid>("LessonId")
                         .HasColumnType("uniqueidentifier")
@@ -351,10 +338,6 @@ namespace LerningApp.Data.Migrations
                         .HasColumnType("nchar(3)")
                         .IsFixedLength()
                         .HasComment("German gender (der/die/das), only for Side = 'de'");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit")
-                        .HasComment("Shows if the VocabularyTerm is deleted");
 
                     b.Property<bool>("IsPrimary")
                         .HasColumnType("bit")
