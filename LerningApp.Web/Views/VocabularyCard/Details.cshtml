@@ -18,7 +18,7 @@
            asp-route-id="@Model.Id" class="btn btn-sm btn-outline-secondary">
             Редактирай
         </a>
-        <form asp-action="Delete" method="post"
+        <form asp-action="SoftDelete" method="post"
               onsubmit="return confirm('Сигурне ли сте, че искате да изтриете тази карта?');"
               class="d-inline">
             @Html.AntiForgeryToken()
