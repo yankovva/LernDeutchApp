@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using LerningApp.Web.ViewModels.PartOfSpeech;
 using Microsoft.AspNetCore.Http;
-
+using static LerningApp.Common.EntityValidationConstants.VocabularyTerm;
 namespace LerningApp.Web.ViewModels.VocabularyCard;
 
 public class VocabularyCardCreateInputModel
@@ -9,17 +9,17 @@ public class VocabularyCardCreateInputModel
     [Required]
     public string LessonId { get; set; } = null!;
     [Required]
-    [MaxLength(63)]
-    [MinLength(2)]
+    [MaxLength(GermanWordMaxLength)]
+    [MinLength(GermanWordMinLength)]
     public string GermanWord { get; set; } = null!;
     
-    [MaxLength(45)]
-    [MinLength(1)]
+    [MaxLength(EnglishWordMaxLength)]
+    [MinLength(EnglishWordMinLength)]
     [Required]
     public string EnglishWord { get; set; } = null!;
     
-    [MaxLength(39)]
-    [MinLength(1)]
+    [MaxLength(BulgarianWordMaxLength)]
+    [MinLength(BulgarianWordMinLength)]
     [Required]
     public string BulgarianWord { get; set; } = null!;
     
@@ -28,11 +28,13 @@ public class VocabularyCardCreateInputModel
     
     public IFormFile Image { get; set; } = null!;
     
-    [MaxLength(3)]
+    [MinLength(GenderdMinLength)]
+    [MaxLength(GenderMaxLength)]
     //der die das
     public string? Gender { get; set; }
     
-    [MaxLength(500)]
+    [MaxLength(ExampleSentenceMaxLenght)]
+    [MinLength(ExampleSentenceMinLenght)]
     [Required]
     public string ExampleSentence { get; set; } = null!;
 
@@ -43,5 +45,4 @@ public class VocabularyCardCreateInputModel
 
     public IList<PartOfSpeechOptionsViewModel> PartOfSpeechOptions { get; set; } 
         = new List<PartOfSpeechOptionsViewModel>();
-
 }

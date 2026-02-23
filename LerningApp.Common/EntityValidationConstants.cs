@@ -11,7 +11,7 @@ public static class EntityValidationConstants
         public const int ContentMaxLength = 500;
         
         public const int TargetMinLength = 10;
-        public const int TargetMaxLength = 400;
+        public const int TargetMaxLength = 200;
       
         public const int OrderIndexMin = 1;
         public const int OrderIndexMax = 1000;
@@ -30,7 +30,7 @@ public static class EntityValidationConstants
         public const int NameMaxLength = 100;
         
         public const int DescriptionMinLength = 500;
-        public const int DescriptionMaxLength = 3000;
+        public const int DescriptionMaxLength = 1000;
     }
     public static class Level
     {
@@ -43,13 +43,21 @@ public static class EntityValidationConstants
     }
     public static class VocabularyTerm
     {
-        public const int WordMinLength = 1;
-        public const int WordMaxLength = 150;
+        public const int WordMaxLength = 63;
+        
+        public const int GermanWordMinLength = 2;
+        public const int GermanWordMaxLength = 63;
+        
+        public const int EnglishWordMinLength = 1;
+        public const int EnglishWordMaxLength = 45;
+        
+        public const int BulgarianWordMinLength = 1;
+        public const int BulgarianWordMaxLength = 39;
         
         public const int SideMinLength = 2;
         public const int SideMaxLength = 5;
         
-        public const int GenderdMinLength = 1;
+        public const int GenderdMinLength = 2;
         public const int GenderMaxLength = 3;
         
         public const int ExampleSentenceMinLenght = 8;
@@ -61,7 +69,6 @@ public static class EntityValidationConstants
     {
         public const int PartOfSpeechMinLength = 3;
         public const int PartOfSpeecheMaxLength = 30;
-        
     }
 
     public static class LessonSection
@@ -71,6 +78,5 @@ public static class EntityValidationConstants
         
         public const int ContentMinLength = 5;
         public const int ContentMaxLength = 7000;
-        
     }
 }
