@@ -29,6 +29,13 @@
                                 <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
                                     Редактирай
                                 </a>
+                                <form asp-action="SoftDelete" method="post"
+                                      onsubmit="return confirm('Сигурне ли сте, че искате да изтриете този курс?');"
+                                      class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.Id" />
+                                    <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
+                                </form>
                             }
                             <a asp-action="Index"
                                class="btn btn-outline-secondary">
