@@ -23,7 +23,7 @@ public class CourseService(
                 Name = c.Name,
                 LessonsCount = c.LessonsForCourse.Count,
                 CourseLevel = c.Level.Name,
-                IsActive = c.IsPublished,
+                Price = c.Price,
                 IsEnrolled = userId != null && c.CourseParticipants
                     .Any(cp => cp.UserId == userId),
             })
@@ -55,7 +55,8 @@ public class CourseService(
             LevelId = levelId,
             IsPublished = true,
             CreatedAt = DateTime.Now,
-            PublisherId = userId
+            PublisherId = userId,
+            Price = model.Price
         };
 
         await courseRepository.AddAsync(course);
@@ -87,6 +88,7 @@ public class CourseService(
             Id = course.Id.ToString(),
             Name = course.Name,
             Description = course.Description,
+            Price = course.Price,
             LevelName = course.Level.Name,
             TotalWordsInCourse = course.LessonsForCourse.Select(l => l.VocabularyCards.Count).Sum(),
             PublisherId = course.PublisherId.ToString(),
@@ -130,6 +132,7 @@ public class CourseService(
         {
             Id = courseId.ToString(),
             Name = course.Name,
+            Price = course.Price,
             Description = course.Description,
             LevelId = course.LevelId.ToString()
         };
@@ -168,6 +171,7 @@ public class CourseService(
         courseToChange.Name = model.Name;
         courseToChange.Description = model.Description;
         courseToChange.LevelId = levelId;
+        courseToChange.Price = model.Price;
 
         await courseRepository.SaveChangesAsync();
 

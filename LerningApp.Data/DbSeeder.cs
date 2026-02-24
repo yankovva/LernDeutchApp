@@ -62,7 +62,8 @@ public class DbSeeder
             IsPublished = true,
             CreatedAt = DateTime.UtcNow,
             Level = a1,
-            PublisherId = seedUser.Id
+            PublisherId = seedUser.Id,
+            Price = 20
         };
 
         var lesson1 = new Lesson
