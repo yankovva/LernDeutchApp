@@ -123,6 +123,11 @@ namespace LerningApp.Data.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasComment("The Name of the Course");
 
+                    b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)")
+                        .HasComment("The Price of the Course");
+
                     b.Property<Guid>("PublisherId")
                         .HasColumnType("uniqueidentifier")
                         .HasComment("The Publisher of the Course");

@@ -1,0 +1,110 @@
+@using LerningApp.Web.ViewModels.Course
+@model CourseDetailsViewModel
+
+<div class="course-sidecard">
+    <div class="side-image">
+        <img src="/images/courses/default-course.png" alt="course" />
+        <span class="side-tag">@Model.Name</span>
+    </div>
+
+    <div class="side-body">
+        <div class="side-row">
+            <span>📘 Уроци:</span>
+            <strong>@Model.CourseLessons.Count()</strong>
+        </div>
+        <div class="side-row">
+            <span>🔤 Думи:</span>
+            <strong>@Model.TotalWordsInCourse</strong>
+        </div>
+
+        @if (Model.IsEnrolled == false)
+        {
+            <form asp-action="Enroll" method="post" class="d-inline">
+                <input type="hidden" name="courseId" value="@Model.Id"/>
+                <button type="submit" class="btn btn-accent">Запиши се</button>
+            </form>
+        }
+        else
+        {
+            <span class="badge badge-success">Записан</span>
+        }
+    </div>
+
+    <div class="side-price">
+        <span>💻 Онлайн</span>
+        <strong>@Model.Price €</strong>
+    </div>
+</div>
+<style>
+    .course-sidecard {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+        overflow: hidden;
+        border: 1px solid #f1e4d7;
+        max-width: 320px;
+    }
+
+    .side-image {
+        position: relative;
+        height: 170px;
+        background: #f8f8f8;
+    }
+
+    .side-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .side-tag {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: #ff9800;
+        color: white;
+        font-weight: 600;
+        font-size: 0.85rem;
+        padding: 4px 10px;
+        border-radius: 6px;
+    }
+
+    .side-body {
+        padding: 16px;
+    }
+
+    .side-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+        color: #444;
+    }
+
+    .side-cta {
+        margin-top: 12px;
+        width: 100%;
+        border: none;
+        background: #ff9800;
+        color: white;
+        padding: 10px;
+        border-radius: 999px;
+        font-weight: bold;
+        font-size: 1rem;
+        box-shadow: 0 8px 16px rgba(255, 152, 0, 0.25);
+    }
+
+    .side-cta:hover {
+        background: #f57c00;
+    }
+
+    .side-price {
+        padding: 12px 16px;
+        background: #fafafa;
+        border-top: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        font-weight: 600;
+        color: #333;
+    }
+</style>

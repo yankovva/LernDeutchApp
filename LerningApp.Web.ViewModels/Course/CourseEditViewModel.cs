@@ -21,6 +21,8 @@ public class CourseEditViewModel
 
     [Required(ErrorMessage = CourseLevelValidationMessage)]
     public string LevelId { get; set; } = null!;
+    
+    public decimal Price { get; set; }
 
     public IEnumerable<LevelOptionsViewModel> Levels { get; set; } 
         = new HashSet<LevelOptionsViewModel>();

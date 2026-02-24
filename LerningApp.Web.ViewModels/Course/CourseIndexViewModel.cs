@@ -8,6 +8,7 @@ public class CourseIndexViewModel
     
    public int LessonsCount { get; set; }
    
+   public decimal Price { get; set; }
    public string CourseLevel { get; set; } = null!;
    public bool IsActive { get; set; }
    

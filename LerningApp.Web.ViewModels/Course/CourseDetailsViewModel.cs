@@ -12,6 +12,8 @@ public class CourseDetailsViewModel
     
     public bool IsActive { get; set; }
     
+    public decimal Price { get; set; }
+    
     public bool IsEnrolled { get; set; }
     
     public string PublisherId { get; set; } = null!;

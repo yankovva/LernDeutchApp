@@ -5,129 +5,129 @@
 @{
     ViewData["Title"] = "Course Details";
 }
+<div class="row g-4">
+    <div class="col-lg-8">
 
-<div class="course-page">
-    <div class="course-hero">
-        <div class="hero-left">
-            <div class="eyebrow">Курс</div>
-            <h2 class="title">@Model.Name</h2>
-            <div class="meta-line">
-                <span class="meta-label">Ниво</span>
-                <span class="level-pill">@(Model.LevelName ?? "—")</span>
+        <div class="course-page">
+            <div class="course-hero">
+                <div class="hero-left">
+                    <div class="eyebrow">Курс</div>
+                    <h2 class="title">@Model.Name</h2>
+                    <div class="meta-line">
+                        <span class="meta-label">Ниво</span>
+                        <span class="level-pill">@(Model.LevelName ?? "—")</span>
+                    </div>
+                </div>
+
+                <div class="hero-right">
+                    <a asp-action="Index" class="btn btn-outline-secondary">← Всички курсове</a>
+                    @if (Model.IsActive && User.Identity?.IsAuthenticated == true &&
+                         Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    {
+                        <form asp-action="Deactivate"
+                              asp-route-id="@Model.Id"
+                              method="post"
+                              onsubmit="return confirm('Сигурни ли сте, че искате да деактивирате този курс?');"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-danger">🗄️ Деактивирай</button>
+                        </form>
+                    }
+                    else if(!Model.IsActive  && User.Identity?.IsAuthenticated == true &&
+                            Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    {
+                        <form asp-action="Restore"
+                              asp-route-id="@Model.Id"
+                              method="post"
+                              onsubmit="return confirm('Сигурни ли сте, че искате да активирате този курс?');"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-outline-success">♻️ Възстанови курса</button>
+                        </form>
+                    }
+                </div>
             </div>
-        </div>
 
-        <div class="hero-right">
-            <a asp-action="Index" class="btn btn-outline-secondary">← Всички курсове</a>
-        </div>
-    </div>
+            <div class="course-stats">
+                <div class="stat-card">
+                    <div class="stat-label">Уроци</div>
+                    <div class="stat-value">@Model.CourseLessons.Count()</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Думи</div>
+                    <div class="stat-value">@Model.TotalWordsInCourse</div>
+                </div>
+            </div>
 
-    <div class="course-stats">
-        <div class="stat-card">
-            <div class="stat-label">Уроци</div>
-            <div class="stat-value">@Model.CourseLessons.Count()</div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-label">Думи</div>
-            <div class="stat-value">@Model.TotalWordsInCourse</div>
-        </div>
-    </div>
-
-    <div class="course-actions">
-        @if (User.Identity?.IsAuthenticated == true &&
-             Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
-        {
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
-
-            <form asp-action="SoftDelete" method="post"
-                  onsubmit="return confirm('Сигурни ли сте, че искате да изтриете този курс?');"
-                  class="d-inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.Id" />
-                <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
-            </form>
-        }
-
-        @if (Model.IsEnrolled == false)
-        {
-            <form asp-action="Enroll" method="post" class="d-inline">
-                <input type="hidden" name="courseId" value="@Model.Id"/>
-                <button type="submit" class="btn btn-accent">Запиши се</button>
-            </form>
-        }
-        else
-        {
-            <span class="badge badge-success">Записан</span>
-        }
-
-        @if (Model.IsActive)
-        {
-            <form asp-action="Deactivate"
-                  asp-route-id="@Model.Id"
-                  method="post"
-                  onsubmit="return confirm('Сигурни ли сте, че искате да деактивирате този курс?');"
-                  class="d-inline">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-outline-danger">🗄️ Деактивирай</button>
-            </form>
-        }
-        else
-        {
-            <form asp-action="Restore"
-                  asp-route-id="@Model.Id"
-                  method="post"
-                  onsubmit="return confirm('Сигурни ли сте, че искате да активирате този курс?');"
-                  class="d-inline">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-outline-success">♻️ Възстанови курса</button>
-            </form>
-        }
-    </div>
-
-    <div class="section-card">
-        <h5 class="section-title">Описание</h5>
-        @if (string.IsNullOrWhiteSpace(Model.Description))
-        {
-            <p class="text-muted mb-0">Няма описание за този курс.</p>
-        }
-        else
-        {
-            <p class="mb-0">@Model.Description</p>
-        }
-    </div>
-
-    <div class="section-card">
-        <div class="section-head">
-            <h4 class="section-title">Уроци в курса</h4>
-            <span class="lesson-count">@Model.CourseLessons.Count() урока</span>
-        </div>
-
-        @if (!Model.CourseLessons.Any())
-        {
-            <div class="alert alert-info">Все още няма уроци в този курс.</div>
-        }
-        else
-        {
-            <div class="lesson-grid">
-                @foreach (var lesson in Model.CourseLessons)
+            <div class="course-actions">
+                @if (User.Identity?.IsAuthenticated == true &&
+                     Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
                 {
-                    <div class="lesson-card">
-                        <div class="lesson-title">@lesson.LessonName</div>
-                        <div class="lesson-desc">@lesson.LessonTarget</div>
-                        <div class="lesson-meta">@lesson.WordsInLesson думи</div>
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
 
-                        <a asp-controller="Lesson"
-                           asp-action="Details"
-                           asp-route-id="@lesson.LessinId"
-                           class="btn btn-outline-primary btn-sm">
-                            Отвори урок →
-                        </a>
+                    <form asp-action="SoftDelete" method="post"
+                          onsubmit="return confirm('Сигурни ли сте, че искате да изтриете този курс?');"
+                          class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.Id" />
+                        <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
+                    </form>
+                }
+
+                
+            </div>
+
+            <div class="section-card">
+                <h5 class="section-title">Описание</h5>
+                @if (string.IsNullOrWhiteSpace(Model.Description))
+                {
+                    <p class="text-muted mb-0">Няма описание за този курс.</p>
+                }
+                else
+                {
+                    <p class="mb-0">@Model.Description</p>
+                }
+            </div>
+
+            <div class="section-card">
+                <div class="section-head">
+                    <h4 class="section-title">Уроци в курса</h4>
+                    <span class="lesson-count">@Model.CourseLessons.Count() урока</span>
+                </div>
+
+                @if (!Model.CourseLessons.Any())
+                {
+                    <div class="alert alert-info">Все още няма уроци в този курс.</div>
+                }
+                else
+                {
+                    <div class="lesson-grid">
+                        @foreach (var lesson in Model.CourseLessons)
+                        {
+                            <div class="lesson-card">
+                                <div class="lesson-title">@lesson.LessonName</div>
+                                <div class="lesson-desc">@lesson.LessonTarget</div>
+                                <div class="lesson-meta">@lesson.WordsInLesson думи</div>
+
+                                <a asp-controller="Lesson"
+                                   asp-action="Details"
+                                   asp-route-id="@lesson.LessinId"
+                                   class="btn btn-outline-primary btn-sm">
+                                    Отвори урок →
+                                </a>
+                            </div>
+                        }
                     </div>
                 }
             </div>
-        }
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <partial name="_CourseDetailsSidebarPartial" model="Model" />
     </div>
 </div>
+
 
 <style>
 .course-page {
