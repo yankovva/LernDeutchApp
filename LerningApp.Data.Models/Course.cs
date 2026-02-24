@@ -38,6 +38,9 @@ public class Course
     [Comment("Level Reference")]
     public Level Level { get; set; } = null!;
     
+    [Comment("The Price of the Course")]
+    public decimal Price { get; set; }
+    
     [Comment("Lessons in this course")]
     public virtual ICollection<Lesson> LessonsForCourse { get; set; } = new HashSet<Lesson>();
     

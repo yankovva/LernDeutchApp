@@ -20,6 +20,10 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .HasMaxLength(DescriptionMaxLength)
             .IsRequired();
         
+        builder.Property(c => c.Price)
+            .HasPrecision(18, 2)
+            .IsRequired();
+        
         builder
             .HasQueryFilter(l => l.IsPublished == true && l.IsDeleted == false);
         
