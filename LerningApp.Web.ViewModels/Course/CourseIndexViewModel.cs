@@ -3,14 +3,12 @@ namespace LerningApp.Web.ViewModels.Course;
 public class CourseIndexViewModel
 {
     public string Id { get; set; } = null!;
-    
     public string Name { get; set; } = null!;
-    
    public int LessonsCount { get; set; }
-   
    public decimal Price { get; set; }
    public string CourseLevel { get; set; } = null!;
    public bool IsActive { get; set; }
-   
    public bool IsEnrolled { get; set; }
+   
+   public int EnrolledCount { get; set; }
 }
