@@ -297,7 +297,6 @@ namespace LerningApp.Data.Migrations
                         .HasComment("The Question for the exercise");
 
                     b.Property<string>("SecondWrongAnswer")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)")
                         .HasComment("The Second wrong answer of the exercise");
