@@ -88,4 +88,10 @@ public static class EntityValidationConstants
         public const int AnswerMinLength = 2;
         public const int AnswerMaxLength = 100;
     }
+    
+    public static class TranslationExercise
+    {
+        public const int SentenceMinLength = 10;
+        public const int SentenceMaxLength = 300;
+    }
 }

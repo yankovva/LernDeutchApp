@@ -40,7 +40,8 @@ public class Lesson{
         = new List<LessonSection>();
     public virtual ICollection<VocabularyCard> VocabularyCards { get; set; }
         = new HashSet<VocabularyCard>();
-    
     public virtual ICollection<MultipleChoiceExercise> MultipleChoiceExercises { get; set; } 
         = new HashSet<MultipleChoiceExercise>();
+    public virtual ICollection<TranslationExercise> TranslationExercises { get; set; } 
+        = new HashSet<TranslationExercise>();
 }
