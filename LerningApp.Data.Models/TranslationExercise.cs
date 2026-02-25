@@ -27,4 +27,10 @@ public class TranslationExercise
    
     [Comment("Lesson Reference")]
     public Lesson Lesson { get; set; } = null!;
+    
+    [Comment("Foreign key to ApplicationUser")]
+    public Guid PublisherId { get; set; }
+   
+    [Comment("ApplicationUser Reference")]
+    public ApplicationUser Publisher { get; set; } = null!;
 }

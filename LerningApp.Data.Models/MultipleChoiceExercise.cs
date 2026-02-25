@@ -16,7 +16,6 @@ public class MultipleChoiceExercise
     public string FirstWrongAnswer { get; set; }= null!;
    
     [Comment("The Second wrong answer of the exercise")]
-    
     public string SecondWrongAnswer { get; set; }= null!;
    
     [Comment("The Third wrong answer of the exercise if needed")]
@@ -24,7 +23,6 @@ public class MultipleChoiceExercise
 
     [Comment("The order of the exercise")]
     public int OrderIndex { get; set; }
-    
     public bool IsDeleted { get; set; } 
    
     [Comment("Foreign key to Lesson")]
@@ -32,4 +30,10 @@ public class MultipleChoiceExercise
    
     [Comment("Lesson Reference")]
     public Lesson Lesson { get; set; } = null!;
+    
+    [Comment("Foreign key to ApplicationUser")]
+    public Guid PublisherId { get; set; }
+   
+    [Comment("ApplicationUser Reference")]
+    public ApplicationUser Publisher { get; set; } = null!;
 }

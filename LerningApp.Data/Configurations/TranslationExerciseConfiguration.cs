@@ -31,6 +31,12 @@ public class TranslationExerciseConfiguration : IEntityTypeConfiguration<Transla
             .WithMany(x => x.TranslationExercises)
             .HasForeignKey(x => x.LessonId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasOne(c => c.Publisher)
+            .WithMany(u => u.CreatedTranslationExercises)
+            .HasForeignKey(c => c.PublisherId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder
             .HasIndex(x => new { x.LessonId, x.OrderIndex });

@@ -43,6 +43,12 @@ public class MultipleChoiceExerciseConfiguration : IEntityTypeConfiguration<Mult
             .HasForeignKey(x => x.LessonId)
             .OnDelete(DeleteBehavior.Cascade);
         
+        builder
+            .HasOne(c => c.Publisher)
+            .WithMany(u => u.CreatedMultipleChoiceExercises)
+            .HasForeignKey(c => c.PublisherId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
         builder.HasIndex(x => new { x.LessonId, x.OrderIndex });
     }
 }
