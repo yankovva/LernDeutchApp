@@ -1,4 +1,5 @@
 @using System.Security.Claims
+@using LerningApp.Common
 @using LerningApp.Web.ViewModels.Lesson
 @model LessonContentViewModel
 
@@ -115,6 +116,11 @@
                 <input type="hidden" name="id" value="@Model.Id"/>
                 <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
             </form>
+            <a asp-action="Create" method="get" asp-controller="MultipleChoiceExercise"
+                    asp-route-lessonId="@Model.Id" class="btn btn-primary">
+                + Добави упражнение
+            </a>
+           
         }
        
         @if (Model.CourseId != null)
@@ -181,3 +187,47 @@ else
 {
     <p class="text-muted fst-italic">Няма секции за този урок.</p>
 }
+
+@if (Model.MultipleChoiceExercises.Any())
+{
+    <h4 class="mt-4">Упражнения</h4>
+
+    @foreach (var ex in Model.MultipleChoiceExercises)
+    {
+        // Randoom order of the answers
+        var answers = new List<string>
+            {
+                ex.CorrectAnswer,
+                ex.FirstWrongAnswer,
+                ex.SecondWrongAnswer,
+                ex.ThirdWrongAnswer ?? ""
+            }.Where(a => !string.IsNullOrWhiteSpace(a))
+            .OrderBy(_ => Guid.NewGuid())
+            .ToList();
+
+        <form asp-action="CheckMultipleChoice" method="post" 
+              asp-controller="MultipleChoiceExercise" class="exercise-box">
+            @Html.AntiForgeryToken()
+            <input type="hidden" name="exerciseId" value="@ex.Id" />
+            <input type="hidden" name="lessonId" value="@Model.Id" />
+
+            <div class="question">@ex.Question</div>
+
+            @for (int i = 0; i < answers.Count; i++)
+            {
+                <div class="form-check">
+                    <input class="form-check-input"
+                           type="radio"
+                           name="selectedAnswer"
+                           value="@answers[i]"
+                           required />
+                    <label class="form-check-label">@answers[i]</label>
+                </div>
+            }
+            <button type="submit" class="btn btn-sm btn-primary mt-2">Провери</button>
+        </form>
+    }
+}
+
+
+
