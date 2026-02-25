@@ -79,4 +79,13 @@ public static class EntityValidationConstants
         public const int ContentMinLength = 5;
         public const int ContentMaxLength = 7000;
     }
+
+    public static class MultipleChoiceExercise
+    {
+        public const int QuestionMinLength = 10;
+        public const int QuestionMaxLength = 250;
+        
+        public const int AnswerMinLength = 2;
+        public const int AnswerMaxLength = 100;
+    }
 }
