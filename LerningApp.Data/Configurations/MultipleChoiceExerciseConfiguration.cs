@@ -28,7 +28,6 @@ public class MultipleChoiceExerciseConfiguration : IEntityTypeConfiguration<Mult
         
         builder.
             Property(x => x.SecondWrongAnswer)
-            .IsRequired()
             .HasMaxLength(AnswerMaxLength);
         
         builder

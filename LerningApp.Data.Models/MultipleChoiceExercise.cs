@@ -16,7 +16,7 @@ public class MultipleChoiceExercise
     public string FirstWrongAnswer { get; set; }= null!;
    
     [Comment("The Second wrong answer of the exercise")]
-    public string SecondWrongAnswer { get; set; }= null!;
+    public string? SecondWrongAnswer { get; set; }
    
     [Comment("The Third wrong answer of the exercise if needed")]
     public string? ThirdWrongAnswer { get; set; }
