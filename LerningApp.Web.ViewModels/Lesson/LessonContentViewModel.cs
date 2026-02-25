@@ -1,4 +1,5 @@
 using LerningApp.Web.ViewModels.LessonSection;
+using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 
 namespace LerningApp.Web.ViewModels.Lesson;
 
@@ -20,6 +21,9 @@ public class LessonContentViewModel
     
     public string Target { get; set; } = null!;
     public string PublisherId { get; set; } = null!;
+
+    public IList<IndexMultipleChoiceExerciseViewModel> MultipleChoiceExercises { get; set; }
+        = new List<IndexMultipleChoiceExerciseViewModel>();
     
     public  IList<LessonSectionViewModel> LessonSections { get; set; } 
         = new List<LessonSectionViewModel>();

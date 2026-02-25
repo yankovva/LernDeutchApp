@@ -5,13 +5,15 @@ using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.LessonSection;
+using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Services.Data;
 
 public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     IRepository<LessonSection, Guid> lessonSectionRepository,
-    IRepository<Course, Guid> courseRepository) : ILessonService
+    IRepository<Course, Guid> courseRepository,
+    IRepository<MultipleChoiceExercise, Guid> multipleExerciseRepository) : ILessonService
 {
     public async Task<IEnumerable<LessonIndexViewModel>> IndexGetLessonsAsync()
     {
@@ -74,7 +76,21 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                     OrderIndex = ls.OrderIndex,
                     Content = ls.Content,
                 })
-                .ToListAsync()
+                .ToListAsync(),
+            MultipleChoiceExercises = await multipleExerciseRepository
+                .GetAllAttached()
+                .Where(ex => ex.LessonId == lessonId)
+                .OrderBy(ex => ex.OrderIndex)
+                .Select(ex => new IndexMultipleChoiceExerciseViewModel()
+                {
+                    Question = ex.Question,
+                    Id = ex.Id.ToString(),
+                    OrderIndex = ex.OrderIndex,
+                    CorrectAnswer = ex.CorrectAnswer,
+                    FirstWrongAnswer = ex.FirstWrongAnswer,
+                    SecondWrongAnswer = ex.SecondWrongAnswer,
+                    ThirdWrongAnswer = ex.ThirdWrongAnswer,
+                }).ToListAsync()
         };
         
         return ServiceResultT<LessonContentViewModel>.Success(model);
@@ -191,12 +207,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                 Type = "grammar",
                 OrderIndex = 1
             },
-            new LessonSection()
-            {
-                Content = model.Exercise,
-                Type = "exercise",
-                OrderIndex = 2
-            }
+           
         };
         
         lesson.LessonSections = sections;
@@ -244,74 +255,74 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     public async Task<ServiceResult> PostLessonEditInputModelAsync(LessonEditInputModel model, string id)
     {
        
-    if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid lessonId))
-    {
-        return ServiceResult.Fail("Невалиден урок.");
-    }
+        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid lessonId))
+        {
+            return ServiceResult.Fail("Невалиден урок.");
+        }
 
-    Lesson? lessonToChange = await lessonRepository
-        .GetAllAttached()
-        .Include(lesson => lesson.LessonSections)
-        .FirstOrDefaultAsync(l => l.Id == lessonId);
+        Lesson? lessonToChange = await lessonRepository
+            .GetAllAttached()
+            .Include(lesson => lesson.LessonSections)
+            .FirstOrDefaultAsync(l => l.Id == lessonId);
 
-    if (lessonToChange == null)
-    {
-        return ServiceResult.Fail("Урокът не е намерен.");
-    }
+        if (lessonToChange == null)
+        {
+            return ServiceResult.Fail("Урокът не е намерен.");
+        }
 
-    Guid? courseId = null;
-    if (!string.IsNullOrWhiteSpace(model.CourseId))
-    {
-        if (!Guid.TryParse(model.CourseId, out var parsedCourseId))
-            return ServiceResult.Fail("Невалиден курс.");
+        Guid? courseId = null;
+        if (!string.IsNullOrWhiteSpace(model.CourseId))
+        {
+            if (!Guid.TryParse(model.CourseId, out var parsedCourseId))
+                return ServiceResult.Fail("Невалиден курс.");
 
-        var courseExists = await courseRepository.GetByIdAsync(parsedCourseId);
-        if (courseExists == null)
-            return ServiceResult.Fail("Избраният курс не съществува.");
+            var courseExists = await courseRepository.GetByIdAsync(parsedCourseId);
+            if (courseExists == null)
+                return ServiceResult.Fail("Избраният курс не съществува.");
 
-        courseId = parsedCourseId;
-    }
+            courseId = parsedCourseId;
+        }
 
-    lessonToChange.Name = model.Name;
-    lessonToChange.Content = model.Content;
-    lessonToChange.OrderIndex = model.OrderIndex;
-    lessonToChange.CourseId = courseId;
-    lessonToChange.Target = model.Target;
-    
-    var grammar = lessonToChange.LessonSections
-        .FirstOrDefault(ls => ls.Type == "grammar") ;
-    
-    if (grammar == null)
-    {
-        lessonToChange.LessonSections
-            .Add(new LessonSection
-            {
-                Type = "grammar",
-                Content = model.Grammar,
-                OrderIndex = 1
-            });
-    }
-    else
-        grammar.Content = model.Grammar;
-    
-    var exercise = lessonToChange.LessonSections
-        .FirstOrDefault(ls => ls.Type == "exercise");
+        lessonToChange.Name = model.Name;
+        lessonToChange.Content = model.Content;
+        lessonToChange.OrderIndex = model.OrderIndex;
+        lessonToChange.CourseId = courseId;
+        lessonToChange.Target = model.Target;
+        
+        var grammar = lessonToChange.LessonSections
+            .FirstOrDefault(ls => ls.Type == "grammar") ;
+        
+        if (grammar == null)
+        {
+            lessonToChange.LessonSections
+                .Add(new LessonSection
+                {
+                    Type = "grammar",
+                    Content = model.Grammar,
+                    OrderIndex = 1
+                });
+        }
+        else
+            grammar.Content = model.Grammar;
+        
+        var exercise = lessonToChange.LessonSections
+            .FirstOrDefault(ls => ls.Type == "exercise");
 
-    if (exercise == null)
-    {
-        lessonToChange.LessonSections
-            .Add(new LessonSection
-            {
-                Type = "exercise",
-                Content = model.Exercise,
-                OrderIndex = 2
-            });
-    }
-    else
-        exercise.Content = model.Exercise;
-    
-    await lessonRepository.SaveChangesAsync();
-    return ServiceResult.Success();
+        if (exercise == null)
+        {
+            lessonToChange.LessonSections
+                .Add(new LessonSection
+                {
+                    Type = "exercise",
+                    Content = model.Exercise,
+                    OrderIndex = 2
+                });
+        }
+        else
+            exercise.Content = model.Exercise;
+        
+        await lessonRepository.SaveChangesAsync();
+        return ServiceResult.Success();
     }
 
     public async Task<ServiceResult> SoftDeleteLessonAsync(string id)
@@ -341,4 +352,5 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         await lessonRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
+    
 }
