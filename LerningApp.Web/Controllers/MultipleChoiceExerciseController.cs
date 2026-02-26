@@ -1,6 +1,8 @@
 using LerningApp.Common;
 using LerningApp.Data;
 using LerningApp.Data.Models;
+using LerningApp.Services.Data;
+using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +12,8 @@ using Microsoft.EntityFrameworkCore;
 namespace LerningApp.Controllers;
 
 [Authorize]
-public class MultipleChoiceExerciseController(LerningAppContext dbContext, UserManager<ApplicationUser> userManager) : Controller
+public class MultipleChoiceExerciseController(UserManager<ApplicationUser> userManager,
+    IMultipleChoiceExerciseService exerciseService ) : Controller
 {
     
     [HttpGet]
@@ -32,44 +35,14 @@ public class MultipleChoiceExerciseController(LerningAppContext dbContext, UserM
         {
             return View(model);
         }
-        
         string currentUserId = userManager.GetUserId(User)!;
-        
-        Guid lessonId = Guid.Empty;
-        if (!string.IsNullOrWhiteSpace(model.LessonId))
+        var result = await exerciseService.CreateAsync(model, currentUserId);
+        if (result.Result == false)
         {
-            if (!Guid.TryParse(model.LessonId, out  lessonId))
-            {
-                ModelState.AddModelError("", "Невалиден урок.");
-                return View(model);
-            }
-            
-            Lesson? lesson = await dbContext
-                .Lessons
-                .FirstOrDefaultAsync(l=> l.Id == lessonId);
-            
-            if (lesson == null)
-            {
-                ModelState.AddModelError("", "Невалиден урок.");
-                return View(model);
-            }
+            TempData["ErrorMessage"] = result.Message;
+            return View(model);
         }
-
-        MultipleChoiceExercise exercise = new MultipleChoiceExercise()
-        {
-            LessonId = lessonId,
-            Question = model.Question,
-            CorrectAnswer = model.CorrectAnswer,
-            SecondWrongAnswer = model.SecondWrongAnswer ?? null,
-            FirstWrongAnswer = model.FirstWrongAnswer,
-            ThirdWrongAnswer = model.ThirdWrongAnswer ?? null,
-            OrderIndex = model.OrderIndex,
-            PublisherId = Guid.Parse(currentUserId),
-        };
-        
-        await dbContext.MultipleChoiceExercises.AddAsync(exercise);
-        await dbContext.SaveChangesAsync();
-        
+       
         TempData["SuccessMessage"] = "Успешно създадохте упражнението";
         return RedirectToAction(nameof(Create), new { lessonId = model.LessonId });
     }
@@ -78,33 +51,19 @@ public class MultipleChoiceExerciseController(LerningAppContext dbContext, UserM
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CheckMultipleChoice(string exerciseId, string lessonId, string selectedAnswer)
     {
-        if (!Guid.TryParse(exerciseId, out var exId))
+        var result = await exerciseService
+            .CheckMultipleChoice(exerciseId, selectedAnswer);
+
+        if (result == null)
         {
             TempData["ErrorMessage"] = "Невалидно упражнение.";
             return RedirectToAction("Details", "Lesson" ,new { id = lessonId });
         }
         
-        var exercise = await dbContext
-            .MultipleChoiceExercises
-            .FirstOrDefaultAsync(ex => ex.Id == Guid.Parse(exerciseId));
-
-        if (exercise == null)
-        {
-            TempData["ErrorMessage"] = "Упражнението не е намерено.";
-            return RedirectToAction("Details", "Lesson" ,new { id = lessonId });
-        }
-        
-        bool isCorrect;
-        if (exercise.CorrectAnswer == selectedAnswer)
-        {
-            isCorrect = true;
-        } else
-            isCorrect = false;
-        
         return Json(new
         {
-            isCorrect,
-            correctAnswer = exercise.CorrectAnswer
+            result.Value.isCorrect,
+            result.Value.correctAnswer,
         });
     }
 }
