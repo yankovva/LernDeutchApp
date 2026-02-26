@@ -54,6 +54,18 @@
                             <input asp-for="ThirdWrongAnswer" class="form-control" placeholder="Пример: Прозорец" />
                             <span asp-validation-for="ThirdWrongAnswer" class="text-danger"></span>
                         </div>
+                        <div class="mb-3">
+                            <label asp-for="DifficultyLevel" class="form-label">Трудност</label>
+                            <select asp-for="DifficultyLevel" class="form-select">
+                                <option value="1">Very Easy</option>
+                                <option value="2">Easy</option>
+                                <option value="3">Medium</option>
+                                <option value="4">Hard</option>
+                                <option value="5">Very Hard</option>
+                            </select>
+                            <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
+                        </div>
+
                         <div class="col-md-6">
                             <label asp-for="OrderIndex" class="form-label">Подредба</label>
                             <input asp-for="OrderIndex" class="form-control" type="number" min="1" />

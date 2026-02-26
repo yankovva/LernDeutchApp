@@ -31,7 +31,8 @@ public class CreateMultipleChoiceExerciseViewModel
     [MaxLength(AnswerMaxLength)]
     [MinLength(AnswerMinLength)]
     public string? ThirdWrongAnswer { get; set; }
-    
     public int OrderIndex { get; set; }
-
+    
+    [Range(1,5)]
+    public int DifficultyLevel { get; set; }
 }

@@ -269,6 +269,10 @@ namespace LerningApp.Data.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasComment("The Correct answer of the exercise");
 
+                    b.Property<int>("DifficultyLevel")
+                        .HasColumnType("int")
+                        .HasComment("The difficulty level of the exercise");
+
                     b.Property<string>("FirstWrongAnswer")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -344,6 +348,10 @@ namespace LerningApp.Data.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)")
                         .HasComment("The bulgarian sentence");
+
+                    b.Property<int>("DifficultyLevel")
+                        .HasColumnType("int")
+                        .HasComment("The difficulty level of the exercise");
 
                     b.Property<string>("EnglishSentence")
                         .IsRequired()

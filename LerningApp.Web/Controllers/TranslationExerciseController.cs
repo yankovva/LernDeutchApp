@@ -41,7 +41,9 @@ public class TranslationExerciseController(LerningAppContext dbContext,
             EnglishSentence = model.SentenceEn,
             BulgarianSentence = model.SentenceBg,
             OrderIndex = model.OrderIndex,
-            PublisherId = currentUserId
+            PublisherId = currentUserId,
+            DifficultyLevel = model.DifficultyLevel,
+            
         };
        
         await dbContext.TranslationExercises.AddAsync(exercise);

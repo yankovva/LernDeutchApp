@@ -24,5 +24,7 @@ public class CreateTranslationExerciseViewModel
     [MaxLength(SentenceMaxLength)]
     public string SentenceBg { get; set; } = null!;
     
+    [Range(1,5)]
+    public int DifficultyLevel { get; set; }
     public int OrderIndex { get; set; }
 }
