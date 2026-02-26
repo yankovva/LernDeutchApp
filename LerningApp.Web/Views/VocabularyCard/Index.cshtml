@@ -1,77 +1,124 @@
 @using LerningApp.Web.ViewModels.VocabularyCard
 @model VocabularyCardsIndexViewModel
+
 <style>
+    :root {
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --card: #ffffff;
+        --accent: #ea580c;
+        --accent-soft: #fff7ed;
+        --success: #16a34a;
+        --success-soft: #e7f9ef;
+        --shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+        --shadow-hover: 0 16px 28px rgba(15, 23, 42, 0.12);
+    }
+    
+
+
     .flashcard-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
         gap: 16px;
     }
+
     .word-card {
-        display: block;
-        text-decoration: none;
-        color: #111827;
-        background: #ffffff;
-        border: 1px solid #f1e4d7;
+        background: var(--card);
+        border: 1px solid var(--line);
         border-radius: 16px;
         padding: 16px;
-        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+        box-shadow: var(--shadow);
         transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
     }
 
     .word-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 16px 28px rgba(15, 23, 42, 0.12);
-        border-color: rgba(255, 146, 66, 0.55);
+        box-shadow: var(--shadow-hover);
+        border-color: #fdba74;
+    }
+
+    .word-card.marked {
+        border-color: #86efac;
+        background: linear-gradient(180deg, #ffffff 0%, #f0fdf4 100%);
+    }
+
+    .word-card.marked::after {
+        content: "✓ Научена";
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #166534;
+        background: var(--success-soft);
+        border: 1px solid #b7f0cc;
+        padding: 3px 8px;
+        border-radius: 999px;
+    }
+
+    .card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
     }
 
     .card-top {
         display: flex;
         gap: 8px;
         justify-content: space-between;
-        margin-bottom: 10px;
+        align-items: center;
+    }
+
+    .pos-badge, .gender-badge {
+        font-weight: 600;
+        font-size: 0.72rem;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid transparent;
     }
 
     .pos-badge {
-        background: rgba(255, 233, 217, 1);
-        color: rgba(168, 82, 30, 1);
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 4px 10px;
-        border-radius: 999px;
+        background: #fff1e6;
+        color: #9a3412;
+        border-color: #fed7aa;
     }
 
     .gender-badge {
-        background: rgba(255, 248, 221, 1);
-        color: rgba(145, 91, 20, 1);
-        font-weight: 600;
-        font-size: 0.75rem;
-        padding: 4px 10px;
-        border-radius: 999px;
+        background: #fef9c3;
+        color: #854d0e;
+        border-color: #fde68a;
     }
 
     .card-word {
         font-size: 1.25rem;
         font-weight: 800;
-        margin-bottom: 6px;
+        color: var(--ink);
+        margin-bottom: 4px;
     }
 
     .card-sub {
-        color: #6b7280;
+        color: var(--muted);
         font-size: 0.95rem;
     }
+
     .btn-add-card {
         display: inline-flex;
         align-items: center;
         gap: 8px;
         padding: 8px 14px;
         border-radius: 999px;
-        background: linear-gradient(180deg, rgba(255, 138, 76, 1), rgba(255, 122, 48, 1));
+        background: linear-gradient(180deg, #fb923c, #f97316);
         color: #fff !important;
         border: none;
         box-shadow: 0 8px 18px rgba(255, 122, 48, 0.25);
         font-weight: 600;
         text-decoration: none;
-        margin-bottom: 10px;
+        margin-bottom: 12px;
     }
 
     .btn-add-card:hover {
@@ -89,6 +136,22 @@
         justify-content: center;
         font-weight: 700;
     }
+    .mark-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 999px;
+        border: 1px solid #bbf7d0;
+        background: #f0fdf4;
+        color: #166534;
+        font-weight: 800;
+        display: grid;
+        place-items: center;
+        padding: 0;
+    }
+    .mark-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 8px 16px rgba(22, 163, 74, 0.12);
+    }
 </style>
 
 <h2 class="mb-3">Думи за урок: @Model.LessonName</h2>
@@ -102,21 +165,37 @@
 <div class="flashcard-grid">
     @foreach (var c in Model.Cards)
     {
-        <a asp-action="Details"
-           asp-route-id="@c.Id"
-           class="word-card">
-            <div class="card-top">
-                <span class="pos-badge">@c.PartOfSpeech</span>
-                @if (!string.IsNullOrWhiteSpace(c.Gender))
-                {
-                    <span class="gender-badge">@c.Gender</span>
-                }
-            </div>
+        <div class="word-card">
+            <a asp-action="Details"
+               asp-route-id="@c.Id"
+               class="card-link">
+                <div class="card-top">
+                    <span class="pos-badge">@c.PartOfSpeech</span>
+                    @if (!string.IsNullOrWhiteSpace(c.Gender))
+                    {
+                        <span class="gender-badge">@c.Gender</span>
+                    }
+                </div>
 
-            <div class="card-word">@c.German</div>
-            <div class="card-sub">@c.English</div>
-        </a>
+                <div class="card-word">@c.German</div>
+                <div class="card-sub">@c.English</div>
+            </a>
 
+            <button type="button" class="mark-btn" aria-label="Маркирай като научена">✓</button>
+        </div>
     }
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.word-card').forEach(card => {
+            const btn = card.querySelector('.mark-btn');
+            if (!btn) return;
+
+            btn.addEventListener('click', () => {
+                card.classList.add('marked');
+                btn.style.display = 'none';
+            });
+        });
+    });
+</script>
