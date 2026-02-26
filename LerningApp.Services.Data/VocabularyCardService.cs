@@ -84,8 +84,8 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             LessonName = card.Lesson?.Name ?? "Урок",
             ImageUrl = card.ImagePath!,
             GermanWord = de!.Word ,
-            BulgarianTranslation = bg!.Word,
-            EnglishTranslation = en!.Word,
+            BulgarianTranslation = bg?.Word ?? "no word",
+            EnglishTranslation = en?.Word ?? "no word",
             PartOfSpeech = card.PartOfSpeech.Name,
             BulgarianSynonyms = card.Terms.Where(t => t.Side == "bg" && !t.IsPrimary)
                 .Select(t => t.Word)
