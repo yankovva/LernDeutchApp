@@ -19,13 +19,14 @@ public class TranslationExerciseConfiguration : IEntityTypeConfiguration<Transla
             .HasMaxLength(SentenceMaxLength);
 
         builder
-            .Property(x => x.CorrectTranslation)
+            .Property(x => x.BulgarianSentence)
             .IsRequired()
             .HasMaxLength(SentenceMaxLength);
 
         builder
-            .Property(x => x.ChosenTranslationLanguage)
-            .IsRequired();
+            .Property(x => x.EnglishSentence)
+            .IsRequired()
+            .HasMaxLength(SentenceMaxLength);
 
         builder.HasOne(x => x.Lesson)
             .WithMany(x => x.TranslationExercises)

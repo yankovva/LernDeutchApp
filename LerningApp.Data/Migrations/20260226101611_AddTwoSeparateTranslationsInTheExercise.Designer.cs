@@ -4,6 +4,7 @@ using LerningApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LerningApp.Data.Migrations
 {
     [DbContext(typeof(LerningAppContext))]
-    partial class LerningAppContextModelSnapshot : ModelSnapshot
+    [Migration("20260226101611_AddTwoSeparateTranslationsInTheExercise")]
+    partial class AddTwoSeparateTranslationsInTheExercise
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -339,23 +342,23 @@ namespace LerningApp.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("BulgarianSentence")
+                    b.Property<string>("CorrectTranslationBg")
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)")
-                        .HasComment("The bulgarian sentence");
+                        .HasComment("The correct translated sentence in Bulgarian");
 
-                    b.Property<string>("EnglishSentence")
+                    b.Property<string>("CorrectTranslationEn")
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)")
-                        .HasComment("The english sentence");
+                        .HasComment("The correct translated sentence in English");
 
                     b.Property<string>("GermanSentence")
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)")
-                        .HasComment("The german sentence");
+                        .HasComment("The german sentence for translation");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit")

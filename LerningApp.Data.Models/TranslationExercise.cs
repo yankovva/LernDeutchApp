@@ -7,14 +7,14 @@ public class TranslationExercise
 {
     public Guid Id { get; set; } = Guid.NewGuid();
 
-    [Comment("The german sentence for translation")]
+    [Comment("The german sentence")]
     public string GermanSentence { get; set; } = null!;
-   
-    [Comment("The chosen translation language option bg / en")]
-    public TranslationLanguage ChosenTranslationLanguage { get; set; }
     
-    [Comment("The correct translated sentence in the chosen language")]
-    public string CorrectTranslation { get; set; }  = null!;
+    [Comment("The bulgarian sentence")]
+    public string BulgarianSentence { get; set; }  = null!;
+    
+    [Comment("The english sentence")]
+    public string EnglishSentence { get; set; }  = null!;
     
     [Comment("The order of the exercise")]
     public int OrderIndex { get; set; }
