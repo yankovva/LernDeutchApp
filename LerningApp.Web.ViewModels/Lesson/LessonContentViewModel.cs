@@ -1,5 +1,6 @@
 using LerningApp.Web.ViewModels.LessonSection;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
+using LerningApp.Web.ViewModels.TranslationExercise;
 
 namespace LerningApp.Web.ViewModels.Lesson;
 
@@ -24,6 +25,9 @@ public class LessonContentViewModel
 
     public IList<IndexMultipleChoiceExerciseViewModel> MultipleChoiceExercises { get; set; }
         = new List<IndexMultipleChoiceExerciseViewModel>();
+    
+    public IList<IndexTranslationExerciseViewModel> TranslationExercises { get; set; }
+        = new List<IndexTranslationExerciseViewModel>();
     
     public  IList<LessonSectionViewModel> LessonSections { get; set; } 
         = new List<LessonSectionViewModel>();

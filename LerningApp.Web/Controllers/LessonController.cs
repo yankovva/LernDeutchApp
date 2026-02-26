@@ -17,7 +17,6 @@ public class LessonController(ILessonService lessonService,
     ICourseService courseService,
     UserManager<ApplicationUser> userManager) : BaseController
 {
-    //TODO : add delete and / or remove from course
     [HttpGet]
     public async Task<IActionResult> Index()
     { 
