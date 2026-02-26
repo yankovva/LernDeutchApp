@@ -23,6 +23,9 @@ public class MultipleChoiceExercise
 
     [Comment("The order of the exercise")]
     public int OrderIndex { get; set; }
+    
+    [Comment("The difficulty level of the exercise")]
+    public int DifficultyLevel { get; set; }
     public bool IsDeleted { get; set; } 
    
     [Comment("Foreign key to Lesson")]

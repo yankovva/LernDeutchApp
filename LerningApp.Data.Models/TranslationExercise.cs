@@ -21,6 +21,9 @@ public class TranslationExercise
     
     [Comment("Shows if the exercise is deleted")]
     public bool IsDeleted { get; set; } 
+    
+    [Comment("The difficulty level of the exercise")]
+    public int DifficultyLevel { get; set; }
    
     [Comment("Foreign key to Lesson")]
     public Guid LessonId { get; set; }

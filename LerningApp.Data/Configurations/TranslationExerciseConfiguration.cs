@@ -27,6 +27,10 @@ public class TranslationExerciseConfiguration : IEntityTypeConfiguration<Transla
             .Property(x => x.EnglishSentence)
             .IsRequired()
             .HasMaxLength(SentenceMaxLength);
+        
+        builder
+            .Property(x => x.DifficultyLevel)
+            .IsRequired();
 
         builder.HasOne(x => x.Lesson)
             .WithMany(x => x.TranslationExercises)
