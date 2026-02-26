@@ -253,7 +253,11 @@
                 </form>
                 <a asp-action="Create" asp-controller="MultipleChoiceExercise"
                    asp-route-lessonId="@Model.Id" class="btn btn-primary">
-                    + Добави упражнение
+                    + Добави multi choice упражненуе 
+                </a>
+                <a asp-action="Create" asp-controller="TranslationExercise"
+                   asp-route-lessonId="@Model.Id" class="btn btn-primary">
+                    + Добави translation упражнение
                 </a>
             }
 
