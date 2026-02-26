@@ -23,6 +23,7 @@ public class CourseService(
                 Name = c.Name,
                 LessonsCount = c.LessonsForCourse.Count,
                 CourseLevel = c.Level.Name,
+                IsActive = c.IsPublished,
                 EnrolledCount = c.CourseParticipants.Count,
                 Price = c.Price,
                 IsEnrolled = userId != null && c.CourseParticipants

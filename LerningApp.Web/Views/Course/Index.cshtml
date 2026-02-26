@@ -38,16 +38,15 @@
         <div id="course-grid" class="course-grid">
             @foreach (var course in Model)
             {
-                var isInactive = !course.IsActive;
-
-                <div class="course-card @(isInactive ? "inactive" : "")">
+                <div class="course-card @(course.IsActive == false ? "inactive" : "")">
                     <div class="course-top">
                         <span class="badge badge-level">@course.CourseLevel</span>
                         @if (course.IsEnrolled)
                         {
                             <span class="badge badge-enrolled">Записан</span>
                         }
-                        @if (isInactive)
+                        
+                        @if (course.IsActive == false)
                         {
                             <span class="badge badge-inactive">Неактивен</span>
                         }
