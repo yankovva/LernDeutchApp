@@ -1,5 +1,6 @@
 using LerningApp.Data;
 using LerningApp.Data.Models;
+using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Web.ViewModels.TranslationExercise;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -8,7 +9,9 @@ using Microsoft.AspNetCore.Mvc;
 namespace LerningApp.Controllers;
 
 [Authorize]
-public class TranslationExerciseController(LerningAppContext dbContext, UserManager<ApplicationUser> userManager) : Controller
+public class TranslationExerciseController(LerningAppContext dbContext,
+    UserManager<ApplicationUser> userManager,
+    IRepository<TranslationExercise, Guid> exerciseRepository) : Controller
 {
     [HttpGet]
     public  IActionResult Create(string lessonId)
@@ -47,4 +50,27 @@ public class TranslationExerciseController(LerningAppContext dbContext, UserMana
         TempData["SuccessMessage"] = "Успешно създадохте упражнението";
         return RedirectToAction(nameof(Create), new { lessonId = model.LessonId });
     }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CheckTranslationExercise(string exerciseId, string lessonId, string userAnswer)
+    {
+        if (!Guid.TryParse(exerciseId, out var exId))
+        {
+            return Json(new { isCorrect = false });
+        }
+
+        var exercise = await exerciseRepository
+            .GetByIdAsync(exId);
+
+        if (exercise == null)
+        {
+            return Json(new { isCorrect = false });
+        }
+
+        bool isCorrect = string.Equals(userAnswer?.Trim(), exercise.GermanSentence.Trim(),
+            StringComparison.OrdinalIgnoreCase);
+
+        return Json(new { isCorrect, correctAnswer = exercise.GermanSentence });
+    }
+
 }
