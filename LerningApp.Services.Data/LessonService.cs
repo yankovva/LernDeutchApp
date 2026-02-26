@@ -6,6 +6,7 @@ using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.LessonSection;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
+using LerningApp.Web.ViewModels.TranslationExercise;
 using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Services.Data;
@@ -13,7 +14,8 @@ namespace LerningApp.Services.Data;
 public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     IRepository<LessonSection, Guid> lessonSectionRepository,
     IRepository<Course, Guid> courseRepository,
-    IRepository<MultipleChoiceExercise, Guid> multipleExerciseRepository) : ILessonService
+    IRepository<MultipleChoiceExercise, Guid> multipleExerciseRepository,
+    IRepository<TranslationExercise, Guid> translationExersiceRepository) : ILessonService
 {
     public async Task<IEnumerable<LessonIndexViewModel>> IndexGetLessonsAsync()
     {
@@ -90,7 +92,20 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                     FirstWrongAnswer = ex.FirstWrongAnswer,
                     SecondWrongAnswer = ex.SecondWrongAnswer,
                     ThirdWrongAnswer = ex.ThirdWrongAnswer,
+                }).ToListAsync(),
+            TranslationExercises = await translationExersiceRepository
+                .GetAllAttached()
+                .Where(ex => ex.LessonId == lessonId)
+                .OrderBy(ex => ex.OrderIndex)
+                .Select(ex => new IndexTranslationExerciseViewModel()
+                {
+                    Id = ex.Id.ToString(),
+                    GermanSentence = ex.GermanSentence,
+                    EnglishSentence = ex.EnglishSentence,
+                    BulgarianSentence = ex.BulgarianSentence,
+                    OrderIndex = ex.OrderIndex
                 }).ToListAsync()
+            
         };
         
         return ServiceResultT<LessonContentViewModel>.Success(model);
