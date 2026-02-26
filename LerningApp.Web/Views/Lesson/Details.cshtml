@@ -8,51 +8,131 @@
 }
 
 <style>
+    :root {
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --paper: #ffffff;
+        --sand: #fff7ed;
+        --accent: #ea580c;
+        --accent-soft: #ffedd5;
+        --success: #10b981;
+        --danger: #ef4444;
+        --shadow: 0 16px 40px rgba(2, 6, 23, 0.08);
+        --shadow-soft: 0 8px 18px rgba(2, 6, 23, 0.06);
+        --radius-lg: 18px;
+        --radius-md: 12px;
+    }
+
+    body {
+        background: radial-gradient(800px 400px at 10% -10%, #fff1e6, transparent 60%),
+        radial-gradient(900px 500px at 110% 10%, #e0f2fe, transparent 60%),
+        #f8fafc;
+    }
+
+    .lesson-wrap {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 24px;
+        padding: 24px;
+        box-shadow: var(--shadow);
+    }
+
+    .lesson-title {
+        font-size: 2rem;
+        font-weight: 800;
+        color: var(--ink);
+        letter-spacing: -0.02em;
+    }
+
+    .meta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 6px;
+    }
+
     .meta-pill {
-        border: 1px solid #dee2e6;
+        border: 1px solid var(--line);
         border-radius: 999px;
         padding: 6px 12px;
         background: #fff;
         font-size: 0.9rem;
+        color: var(--muted);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .meta-pill strong {
+        color: var(--ink);
+    }
+
+    .btn {
+        border-radius: 999px;
+        padding: 8px 14px;
+        font-weight: 600;
+    }
+
+    .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+        background: #c2410c;
+        border-color: #c2410c;
+    }
+
+    .btn-outline-primary {
+        border-color: #fdba74;
+        color: #c2410c;
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--accent-soft);
+        color: #9a3412;
+    }
+
+    .btn-outline-secondary {
+        border-color: #cbd5f5;
     }
 
     .lesson-section {
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
         padding: 16px;
         background: #fff;
         margin-bottom: 16px;
-    }
-
-    .lesson-section h5 {
-        margin-bottom: 10px;
-    }
-
-    .lesson-content {
-        white-space: pre-wrap;
-        line-height: 1.7;
-        font-size: 1rem;
+        box-shadow: var(--shadow-soft);
     }
 
     .section-label {
         font-size: 0.75rem;
         text-transform: uppercase;
-        color: #6b7280;
-        letter-spacing: 0.04em;
+        color: var(--muted);
+        letter-spacing: 0.08em;
         margin-bottom: 6px;
     }
+
+    .lesson-content {
+        white-space: pre-wrap;
+        line-height: 1.75;
+        font-size: 1rem;
+        color: var(--ink);
+    }
+
     .lesson-sections {
-        display: flex;
-        flex-direction: column;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 14px;
         margin-top: 16px;
     }
 
     .section-card {
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-md);
         padding: 14px;
-        background: #ffffff;
+        background: linear-gradient(180deg, #fff 0%, #fffaf5 100%);
+        box-shadow: var(--shadow-soft);
     }
 
     .section-head {
@@ -63,12 +143,12 @@
     }
 
     .section-type {
-        font-weight: 600;
+        font-weight: 700;
         text-transform: uppercase;
-        font-size: 0.75rem;
-        letter-spacing: 0.05em;
-        color: #334155;
-        background: #f1f5f9;
+        font-size: 0.72rem;
+        letter-spacing: 0.08em;
+        color: #7c2d12;
+        background: var(--accent-soft);
         padding: 4px 8px;
         border-radius: 999px;
     }
@@ -81,153 +161,244 @@
     .section-content {
         white-space: pre-wrap;
         line-height: 1.6;
+        color: var(--ink);
+    }
+
+    .exercise-box {
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: var(--radius-lg);
+        padding: 16px;
+        margin-top: 12px;
+        box-shadow: var(--shadow-soft);
+    }
+
+    .exercise-box .question {
+        font-weight: 800;
+        font-size: 1.05rem;
+        margin-bottom: 10px;
+        color: var(--ink);
+    }
+
+    .exercise-box .form-check {
+        padding: 8px 10px;
+        border-radius: 10px;
+        transition: background 0.15s ease, transform 0.1s ease;
+        border: 1px solid transparent;
+    }
+
+    .exercise-box .form-check:hover {
+        background: var(--sand);
+        border-color: #fed7aa;
+        transform: translateY(-1px);
+    }
+
+    .exercise-box .form-check-input:checked + .form-check-label {
+        font-weight: 700;
+        color: #b45309;
+    }
+
+    .answer-row.correct {
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 10px;
+    }
+
+    .answer-row.wrong {
+        background: #fef2f2;
+        border: 1px solid #fecaca;
+        border-radius: 10px;
+    }
+
+    .empty-state {
+        background: #fff7ed;
+        border: 1px dashed #fdba74;
+        padding: 12px;
+        border-radius: var(--radius-md);
+        color: #9a3412;
+        font-style: italic;
     }
 </style>
 
-<div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-    <div>
-        <h1 class="mb-2">@Model.Name</h1>
+<div class="lesson-wrap">
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+        <div>
+            <h1 class="lesson-title mb-2">@Model.Name</h1>
+
+            <div class="meta-row">
+                <span class="meta-pill">🧾 Думи в урока: <strong>@Model.WordCount</strong></span>
+                <span class="meta-pill">🔢 Номер в курса: <strong>@Model.OrderIndex</strong></span>
+
+                @if (!string.IsNullOrWhiteSpace(Model.CourseName))
+                {
+                    <span class="meta-pill">📚 Курс: <strong>@Model.CourseName</strong></span>
+                }
+                else
+                {
+                    <span class="meta-pill">📚 Без курс</span>
+                }
+            </div>
+        </div>
 
         <div class="d-flex flex-wrap gap-2">
-            <span class="meta-pill">🧾 Думи в урока: <strong>@Model.WordCount</strong></span>
-            <span class="meta-pill">🔢 Номер в курса: <strong>@Model.OrderIndex</strong></span>
+            @if (User.Identity?.IsAuthenticated == true &&
+                 Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+            {
+                <form asp-action="SoftDelete" method="post"
+                      onsubmit="return confirm('Сигурне ли сте, че искате да изтриете този урок?');"
+                      class="d-inline">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="id" value="@Model.Id"/>
+                    <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
+                </form>
+                <a asp-action="Create" asp-controller="MultipleChoiceExercise"
+                   asp-route-lessonId="@Model.Id" class="btn btn-primary">
+                    + Добави упражнение
+                </a>
+            }
 
-            @if (!string.IsNullOrWhiteSpace(Model.CourseName))
+            @if (Model.CourseId != null)
             {
-                <span class="meta-pill">
-                    📚 Курс: <strong>@Model.CourseName</strong>
-                </span>
+                <a asp-controller="Course" asp-action="Details" asp-route-id="@Model.CourseId"
+                   class="btn btn-outline-primary">
+                    Виж курс
+                </a>
             }
-            else
-            {
-                <span class="meta-pill">📚 Без курс</span>
-            }
+
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                ← Назад
+            </a>
+
+            <a asp-controller="VocabularyCard" asp-action="Index" asp-route-lessonId="@Model.Id"
+               class="btn btn-outline-primary">
+                Flashcards
+            </a>
         </div>
     </div>
 
-    <div class="d-flex gap-2">
-        @if (User.Identity?.IsAuthenticated == true &&
-             Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+    <div class="lesson-section">
+        <div class="section-label">Цел на урока</div>
+        @if (string.IsNullOrWhiteSpace(Model.Target))
         {
-            <form asp-action="SoftDelete" method="post"
-                  onsubmit="return confirm('Сигурне ли сте, че искате да изтриете този урок?');"
-                  class="d-inline">
-                @Html.AntiForgeryToken()
-                <input type="hidden" name="id" value="@Model.Id"/>
-                <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
-            </form>
-            <a asp-action="Create" method="get" asp-controller="MultipleChoiceExercise"
-                    asp-route-lessonId="@Model.Id" class="btn btn-primary">
-                + Добави упражнение
-            </a>
-           
+            <div class="empty-state">Няма зададена цел за този урок.</div>
         }
-       
-        @if (Model.CourseId != null)
+        else
         {
-            <a asp-controller="Course" asp-action="Details" asp-route-id="@Model.CourseId"
-               class="btn btn-outline-primary">
-                Виж курс
-            </a>
-        }
-
-        <a asp-action="Index" class="btn btn-outline-secondary">
-            ← Назад
-        </a>
-
-        <a asp-controller="VocabularyCard" asp-action="Index" asp-route-lessonId="@Model.Id"
-           class="btn btn-outline-primary">
-            Flashcards
-        </a>
-    </div>
-</div>
-
-<div class="lesson-section">
-    <div class="section-label">Цел на урока</div>
-    @if (string.IsNullOrWhiteSpace(Model.Target))
-    {
-        <p class="text-muted mb-0 fst-italic">Няма зададена цел за този урок.</p>
-    }
-    else
-    {
-        <div class="lesson-content">@Model.Target</div>
-    }
-</div>
-
-
-<div class="lesson-section">
-    <div class="section-label">Съдържание</div>
-    @if (string.IsNullOrWhiteSpace(Model.Content))
-    {
-        <p class="text-muted mb-0 fst-italic">Няма съдържание за този урок.</p>
-    }
-    else
-    {
-        <div class="lesson-content">@Model.Content</div>
-    }
-</div>
-@if (Model.LessonSections != null && Model.LessonSections.Any())
-{
-    <div class="lesson-sections">
-        @foreach (var s in Model.LessonSections.OrderBy(s => s.OrderIndex))
-        {
-            <div class="section-card">
-                <div class="section-head">
-                    <span class="section-type">@s.Type</span>
-                    <span class="section-order">#@s.OrderIndex</span>
-                </div>
-                <div class="section-content">
-                    @s.Content
-                </div>
-            </div>
+            <div class="lesson-content">@Model.Target</div>
         }
     </div>
-}
-else
-{
-    <p class="text-muted fst-italic">Няма секции за този урок.</p>
-}
 
-@if (Model.MultipleChoiceExercises.Any())
-{
-    <h4 class="mt-4">Упражнения</h4>
+    <div class="lesson-section">
+        <div class="section-label">Съдържание</div>
+        @if (string.IsNullOrWhiteSpace(Model.Content))
+        {
+            <div class="empty-state">Няма съдържание за този урок.</div>
+        }
+        else
+        {
+            <div class="lesson-content">@Model.Content</div>
+        }
+    </div>
 
-    @foreach (var ex in Model.MultipleChoiceExercises)
+    @if (Model.LessonSections != null && Model.LessonSections.Any())
     {
-        // Randoom order of the answers
-        var answers = new List<string>
+        <div class="lesson-sections">
+            @foreach (var s in Model.LessonSections.OrderBy(s => s.OrderIndex))
             {
-                ex.CorrectAnswer,
-                ex.FirstWrongAnswer,
-                ex.SecondWrongAnswer,
-                ex.ThirdWrongAnswer ?? ""
-            }.Where(a => !string.IsNullOrWhiteSpace(a))
-            .OrderBy(_ => Guid.NewGuid())
-            .ToList();
-
-        <form asp-action="CheckMultipleChoice" method="post" 
-              asp-controller="MultipleChoiceExercise" class="exercise-box">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="exerciseId" value="@ex.Id" />
-            <input type="hidden" name="lessonId" value="@Model.Id" />
-
-            <div class="question">@ex.Question</div>
-
-            @for (int i = 0; i < answers.Count; i++)
-            {
-                <div class="form-check">
-                    <input class="form-check-input"
-                           type="radio"
-                           name="selectedAnswer"
-                           value="@answers[i]"
-                           required />
-                    <label class="form-check-label">@answers[i]</label>
+                <div class="section-card">
+                    <div class="section-head">
+                        <span class="section-type">@s.Type</span>
+                        <span class="section-order">#@s.OrderIndex</span>
+                    </div>
+                    <div class="section-content">@s.Content</div>
                 </div>
             }
-            <button type="submit" class="btn btn-sm btn-primary mt-2">Провери</button>
-        </form>
+        </div>
     }
-}
+    else
+    {
+        <p class="text-muted fst-italic">Няма секции за този урок.</p>
+    }
 
+    @if (Model.MultipleChoiceExercises.Any())
+    {
+        <h4 class="mt-4">Упражнения</h4>
 
+        @foreach (var ex in Model.MultipleChoiceExercises)
+        {
+            var answers = new List<string>
+                {
+                    ex.CorrectAnswer,
+                    ex.FirstWrongAnswer,
+                    ex.SecondWrongAnswer ?? "",
+                    ex.ThirdWrongAnswer ?? ""
+                }.Where(a => !string.IsNullOrWhiteSpace(a))
+                .OrderBy(_ => Guid.NewGuid())
+                .ToList();
 
+            <form asp-action="CheckMultipleChoice" method="post"
+                  asp-controller="MultipleChoiceExercise" data-correct="@ex.CorrectAnswer" class="exercise-box">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="exerciseId" value="@ex.Id" />
+                <input type="hidden" name="lessonId" value="@Model.Id" />
+
+                <div class="question">@ex.Question</div>
+
+                @for (int i = 0; i < answers.Count; i++)
+                {
+                    <div class="form-check answer-row">
+                        <input class="form-check-input"
+                               type="radio"
+                               name="selectedAnswer"
+                               value="@answers[i]" />
+                        <label class="form-check-label">@answers[i]</label>
+                    </div>
+                }
+                <button type="button" class="btn btn-sm btn-primary mt-2 check-btn">Провери</button>
+            </form>
+        }
+    }
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.exercise-box').forEach(box => {
+            box.querySelector('.check-btn').addEventListener('click', async () => {
+                box.querySelectorAll('.answer-row').forEach(r => r.classList.remove('correct', 'wrong'));
+
+                const selected = box.querySelector('input[type="radio"]:checked');
+                if (!selected) return;
+
+                const exerciseId = box.querySelector('input[name="exerciseId"]').value;
+                const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                const formData = new URLSearchParams();
+                formData.append("exerciseId", exerciseId);
+                formData.append("selectedAnswer", selected.value);
+
+                const res = await fetch('/MultipleChoiceExercise/CheckMultipleChoice', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': token
+                    },
+                    body: formData
+                });
+
+                const data = await res.json();
+
+                const selectedRow = selected.closest('.answer-row');
+                if (data.isCorrect) {
+                    selectedRow.classList.add('correct');
+                } else {
+                    selectedRow.classList.add('wrong');
+                    box.querySelectorAll('input[type="radio"]').forEach(r => {
+                        if (r.value === data.correctAnswer) {
+                            r.closest('.answer-row').classList.add('correct');
+                        }
+                    });
+                }
+            });
+        });
+    });
+</script>
