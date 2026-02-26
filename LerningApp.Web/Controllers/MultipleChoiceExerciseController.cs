@@ -60,7 +60,7 @@ public class MultipleChoiceExerciseController(LerningAppContext dbContext, UserM
             LessonId = lessonId,
             Question = model.Question,
             CorrectAnswer = model.CorrectAnswer,
-            SecondWrongAnswer = model.SecondWrongAnswer,
+            SecondWrongAnswer = model.SecondWrongAnswer ?? null,
             FirstWrongAnswer = model.FirstWrongAnswer,
             ThirdWrongAnswer = model.ThirdWrongAnswer ?? null,
             OrderIndex = model.OrderIndex,
@@ -93,12 +93,18 @@ public class MultipleChoiceExerciseController(LerningAppContext dbContext, UserM
             TempData["ErrorMessage"] = "Упражнението не е намерено.";
             return RedirectToAction("Details", "Lesson" ,new { id = lessonId });
         }
+        
+        bool isCorrect;
         if (exercise.CorrectAnswer == selectedAnswer)
         {
-            TempData["SuccessMessage"] = "Правилен отговор";
+            isCorrect = true;
         } else
-            TempData["ErrorMessage"] = "Грешен отговор.";
+            isCorrect = false;
         
-        return RedirectToAction("Details", "Lesson" ,new { id = lessonId });
+        return Json(new
+        {
+            isCorrect,
+            correctAnswer = exercise.CorrectAnswer
+        });
     }
 }
