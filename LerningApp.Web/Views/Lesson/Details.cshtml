@@ -1,5 +1,5 @@
 @using System.Security.Claims
-@using LerningApp.Common
+@using static LerningApp.Common.Enums
 @using LerningApp.Web.ViewModels.Lesson
 @model LessonContentViewModel
 
@@ -218,6 +218,16 @@
         color: #9a3412;
         font-style: italic;
     }
+    
+    .form-control.correct {
+        background-color: #dcfce7;
+        border-color: #22c55e;
+    }
+    .form-control.wrong {
+        background-color: #fee2e2;
+        border-color: #ef4444;
+    }
+
 </style>
 
 <div class="lesson-wrap">
@@ -362,12 +372,58 @@
             </form>
         }
     }
+    @if (Model.TranslationExercises.Any())
+    {
+        <h4 class="mt-4">Преведете на немски от избраният от вас език.</h4>
+
+        @foreach (var ex in Model.TranslationExercises)
+        {
+            
+
+            <form asp-action="CheckTranslationExercise" method="post"
+                  asp-controller="TranslationExercise" data-correct="@ex.GermanSentence" class="exercise-box">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="exerciseId" value="@ex.Id" />
+                <input type="hidden" name="lessonId" value="@Model.Id" />
+
+                <div class="mb-2">
+                    <label class="me-3">
+                        <input type="radio" name="selectedLanguage" value="Bg" checked />
+                        Български
+                    </label>
+                    <label>
+                        <input type="radio" name="selectedLanguage" value="En" />
+                        English
+                    </label>
+                </div>
+
+                <div class="question"
+                     data-bg="@ex.BulgarianSentence"
+                     data-en="@ex.EnglishSentence">
+                    @ex.BulgarianSentence
+                </div>
+
+                <input type="text"
+                       name="userAnswer"
+                       class="form-control mt-2"
+                       placeholder="Напишете превода на немски" />
+
+
+                <button type="button" class="btn btn-sm btn-primary mt-2 check-translation-btn">Провери</button>
+            </form>
+        }
+    }
 </div>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+
+        // Multiple choice
         document.querySelectorAll('.exercise-box').forEach(box => {
-            box.querySelector('.check-btn').addEventListener('click', async () => {
+            const checkBtn = box.querySelector('.check-btn');
+            if (!checkBtn) return;
+
+            checkBtn.addEventListener('click', async () => {
                 box.querySelectorAll('.answer-row').forEach(r => r.classList.remove('correct', 'wrong'));
 
                 const selected = box.querySelector('input[type="radio"]:checked');
@@ -404,5 +460,57 @@
                 }
             });
         });
+
+        // Translation:BG/EN
+        document.querySelectorAll('.exercise-box').forEach(box => {
+            const question = box.querySelector('.question');
+            const radios = box.querySelectorAll('input[name="selectedLanguage"]');
+            if (!question || radios.length === 0) return;
+
+            radios.forEach(r => {
+                r.addEventListener('change', () => {
+                    question.textContent = r.value === 'Bg'
+                        ? question.dataset.bg
+                        : question.dataset.en;
+                });
+            });
+        });
+
+        // Translation: проверка
+        document.querySelectorAll('.exercise-box').forEach(box => {
+            const btn = box.querySelector('.check-translation-btn');
+            if (!btn) return;
+
+            btn.addEventListener('click', async () => {
+                const exerciseId = box.querySelector('input[name="exerciseId"]').value;
+                const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
+                const userAnswer = box.querySelector('input[name="userAnswer"]').value;
+                    
+                const formData = new URLSearchParams();
+                formData.append("exerciseId", exerciseId);
+                formData.append("userAnswer", userAnswer);
+
+                const res = await fetch('/TranslationExercise/CheckTranslationExercise', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': token
+                    },
+                    body: formData
+                });
+
+                const data = await res.json();
+                const input = box.querySelector('input[name="userAnswer"]');
+                input.classList.remove('correct', 'wrong');
+
+                if (data.isCorrect) {
+                    input.classList.add('correct');
+                } else {
+                    input.classList.add('wrong');
+                }
+
+            });
+        });
     });
 </script>
+
