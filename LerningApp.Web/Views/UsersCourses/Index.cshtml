@@ -17,30 +17,44 @@ else
         @foreach (var c in Model.Courses)
         {
             <div class="course-card">
-                <div class="course-head">
-                    <span class="badge bg-warning text-dark">@c.LevelName</span>
+                <div class="course-cover">
+                    <img src="/images/Common/default-course-img.png" alt="course" class="course-img" />
+                    <span class="badge badge-level">@c.LevelName</span>
                 </div>
 
-                <h5 class="course-title">@c.Name</h5>
-                <p class="course-desc">@c.Description</p>
+                <div class="course-body">
+                    <h5 class="course-title">@c.Name</h5>
+                    <p class="course-desc">@c.Description</p>
 
-                <div class="course-meta">
+                    <div class="course-meta">
                         <span>Започнат: @c.StartedAt.ToString("dd.MM.yyyy")</span>
-                    @if (c.CompletedAt.HasValue)
-                    {
-                        <span>Завършен: @c.CompletedAt.Value.ToString("dd.MM.yyyy")</span>
-                    }
-                </div>
+                        @if (c.CompletedAt.HasValue)
+                        {
+                            <span>Завършен: @c.CompletedAt.Value.ToString("dd.MM.yyyy")</span>
+                        }
+                    </div>
 
-                <a asp-controller="Course" asp-action="Details" asp-route-id="@c.Id" class="btn btn-outline-primary btn-sm">
-                    Отвори курс
-                </a>
+                    <a asp-controller="Course" asp-action="Details" asp-route-id="@c.Id"
+                       class="btn btn-outline-primary btn-sm">
+                        Отвори курс
+                    </a>
+                </div>
             </div>
         }
     </div>
 }
 
 <style>
+    :root {
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --card: #ffffff;
+        --accent: #f97316;
+        --shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+        --shadow-hover: 0 18px 32px rgba(15, 23, 42, 0.12);
+    }
+
     .course-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -48,36 +62,84 @@ else
     }
 
     .course-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 14px;
-        padding: 16px;
-        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: var(--shadow);
+        transition: transform .18s ease, box-shadow .18s ease;
+        display: flex;
+        flex-direction: column;
     }
 
-    .course-head {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 8px;
+    .course-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-hover);
+    }
+
+    .course-cover {
+        height: 140px;
+        background: linear-gradient(135deg, #fff1e6, #ffe2c5);
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+
+    .badge-level {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: #ffedd5;
+        color: #9a3412;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        border: 1px solid #fed7aa;
+    }
+
+    .course-body {
+        padding: 14px 16px 16px;
     }
 
     .course-title {
-        font-weight: 700;
+        font-weight: 800;
+        color: var(--ink);
         margin-bottom: 6px;
     }
 
     .course-desc {
-        color: #475569;
+        color: var(--muted);
         font-size: 0.95rem;
         min-height: 40px;
+        margin-bottom: 10px;
     }
 
     .course-meta {
         font-size: 0.85rem;
         color: #64748b;
-        margin: 10px 0;
         display: flex;
         flex-direction: column;
         gap: 4px;
+        margin-bottom: 10px;
     }
+    .course-cover {
+        height: 140px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .course-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .badge-level {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+    }
+
 </style>
