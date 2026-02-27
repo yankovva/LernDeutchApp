@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using LerningApp.Common;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using LerningApp.Data.Models;
@@ -84,6 +85,10 @@ namespace LerningApp.Areas.Identity.Pages.Account
             [StringLength(59, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 3)]
             [Display(Name = "Username")]
             public string Username { get; set; }
+            
+            [Required]
+            [Display(Name = " Native Language")]
+            public Enums.TranslationLanguage NativeLanguage { get; set; }
 
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -119,7 +124,8 @@ namespace LerningApp.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-
+                
+                user.NativeLanguage = Input.NativeLanguage;
                 await _userStore.SetUserNameAsync(user, Input.Username, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);

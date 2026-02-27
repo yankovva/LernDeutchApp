@@ -1,5 +1,6 @@
 using LerningApp.Common;
 using Microsoft.AspNetCore.Identity;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Data.Models;
 
@@ -9,7 +10,8 @@ public class ApplicationUser : IdentityUser<Guid>
     {
         this.Id = Guid.NewGuid();
     }
-    
+
+    public TranslationLanguage NativeLanguage { get; set; } = TranslationLanguage.Bg;
     public virtual ICollection<UserCourse> UserCourses { get; set; } = new HashSet<UserCourse>();
     public virtual ICollection<Course> CreatedCourses { get; set; } = new HashSet<Course>();
     public virtual ICollection<Lesson> CreatedLessons { get; set; } = new HashSet<Lesson>();
