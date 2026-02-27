@@ -1,6 +1,8 @@
 using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
+using LerningApp.Services.Data;
+using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.TranslationExercise;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LerningApp.Controllers;
 
 [Authorize]
-public class TranslationExerciseController(LerningAppContext dbContext,
+public class TranslationExerciseController(ITranslationExerciseService translationExerciseService,
     UserManager<ApplicationUser> userManager,
     IRepository<TranslationExercise, Guid> exerciseRepository) : Controller
 {
@@ -34,45 +36,30 @@ public class TranslationExerciseController(LerningAppContext dbContext,
         }
         var currentUserId = Guid.Parse(userManager.GetUserId(User)!);
 
-        TranslationExercise exercise = new TranslationExercise()
+        var result = await translationExerciseService.AddTranslationExerciseAsync(model, currentUserId);
+        if (result.Result == false)
         {
-            LessonId = Guid.Parse(model.LessonId),
-            GermanSentence = model.GermanCorrectTranslation,
-            EnglishSentence = model.SentenceEn,
-            BulgarianSentence = model.SentenceBg,
-            OrderIndex = model.OrderIndex,
-            PublisherId = currentUserId,
-            DifficultyLevel = model.DifficultyLevel,
-            
-        };
-       
-        await dbContext.TranslationExercises.AddAsync(exercise);
-        await dbContext.SaveChangesAsync();
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index), "Home");
+        }
         
         TempData["SuccessMessage"] = "Успешно създадохте упражнението";
         return RedirectToAction(nameof(Create), new { lessonId = model.LessonId });
     }
+   
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CheckTranslationExercise(string exerciseId, string lessonId, string userAnswer)
+    public async Task<IActionResult> CheckTranslationExercise(string exerciseId, string userAnswer)
     {
-        if (!Guid.TryParse(exerciseId, out var exId))
+        var result = await translationExerciseService
+            .CheckTranslationAsync(exerciseId, userAnswer);
+
+        if (result == null)
         {
             return Json(new { isCorrect = false });
         }
 
-        var exercise = await exerciseRepository
-            .GetByIdAsync(exId);
-
-        if (exercise == null)
-        {
-            return Json(new { isCorrect = false });
-        }
-
-        bool isCorrect = string.Equals(userAnswer?.Trim(), exercise.GermanSentence.Trim(),
-            StringComparison.OrdinalIgnoreCase);
-
-        return Json(new { isCorrect, correctAnswer = exercise.GermanSentence });
+        return Json(new { result.Value.isCorrect, result.Value.correctAnswer });
     }
 
 }
