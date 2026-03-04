@@ -1,6 +1,9 @@
 @using System.Security.Claims
+@using LerningApp.Services.Data.Interfaces
+@using LerningApp.Web.Infrastructure.Extensions
 @using static LerningApp.Common.Enums
 @using LerningApp.Web.ViewModels.Lesson
+@inject ITeacherService teacherService
 @model LessonContentViewModel
 
 @{
@@ -252,7 +255,7 @@
 
         <div class="d-flex flex-wrap gap-2">
             @if (User.Identity?.IsAuthenticated == true &&
-                 Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                await teacherService.IsUserTeacherAsync(User.GetUserId()!))
             {
                 <form asp-action="SoftDelete" method="post"
                       onsubmit="return confirm('Сигурне ли сте, че искате да изтриете този урок?');"

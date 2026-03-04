@@ -64,8 +64,7 @@
             </div>
 
             <div class="course-actions">
-                @if (User.Identity?.IsAuthenticated == true &&
-                     Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                @if (User.Identity?.IsAuthenticated == true && await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                 {
                     <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
 
@@ -77,8 +76,6 @@
                         <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
                     </form>
                 }
-
-                
             </div>
 
             <div class="section-card">
