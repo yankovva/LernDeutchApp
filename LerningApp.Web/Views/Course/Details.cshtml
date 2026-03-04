@@ -1,5 +1,8 @@
 @using System.Security.Claims
+@using LerningApp.Services.Data.Interfaces
 @using LerningApp.Web.ViewModels.Course
+@using LerningApp.Web.Infrastructure.Extensions
+@inject ITeacherService teacherService
 @model CourseDetailsViewModel
 
 @{
@@ -21,29 +24,30 @@
 
                 <div class="hero-right">
                     <a asp-action="Index" class="btn btn-outline-secondary">← Всички курсове</a>
-                    @if (Model.IsActive && User.Identity?.IsAuthenticated == true &&
-                         Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
+                    @if (User.Identity?.IsAuthenticated == true && await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                     {
-                        <form asp-action="Deactivate"
-                              asp-route-id="@Model.Id"
-                              method="post"
-                              onsubmit="return confirm('Сигурни ли сте, че искате да деактивирате този курс?');"
-                              class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-outline-danger">🗄️ Деактивирай</button>
-                        </form>
-                    }
-                    else if(!Model.IsActive  && User.Identity?.IsAuthenticated == true &&
-                            Model.PublisherId == User.FindFirstValue(ClaimTypes.NameIdentifier))
-                    {
-                        <form asp-action="Restore"
-                              asp-route-id="@Model.Id"
-                              method="post"
-                              onsubmit="return confirm('Сигурни ли сте, че искате да активирате този курс?');"
-                              class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="btn btn-outline-success">♻️ Възстанови курса</button>
-                        </form>
+                        if (Model.IsActive)
+                        {
+                            <form asp-action="Deactivate"
+                                  asp-route-id="@Model.Id"
+                                  method="post"
+                                  onsubmit="return confirm('Сигурни ли сте, че искате да деактивирате този курс?');"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-danger">🗄️ Деактивирай</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form asp-action="Restore"
+                                  asp-route-id="@Model.Id"
+                                  method="post"
+                                  onsubmit="return confirm('Сигурни ли сте, че искате да активирате този курс?');"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-success">♻️ Възстанови курса</button>
+                            </form>
+                        }
                     }
                 </div>
             </div>
