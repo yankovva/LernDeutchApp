@@ -1,0 +1,371 @@
+@{
+    ViewData["Title"] = "About";
+}
+
+<style>
+    :root {
+        --accent-soft-2: #ffe7d2;
+        --shadow: 0 28px 60px rgba(15, 23, 42, 0.18);
+        --radius: 28px;
+    }
+
+    body {
+        background: #fff7f0;
+    }
+
+    .about-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 56px;
+        padding: 24px 0 60px 0;
+    }
+
+    .hero {
+        border-radius: 36px;
+        background: linear-gradient(135deg, #ffedd5 0%, #fff7ed 40%, #ffffff 100%);
+        padding: 48px;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 32px;
+        align-items: center;
+        box-shadow: var(0 28px 60px rgba(15, 23, 42, 0.18));
+    }
+
+    .hero h1 {
+        font-size: 2.9rem;
+        font-weight: 900;
+        letter-spacing: -0.02em;
+        margin-bottom: 14px;
+        color: var(#1b1b1b);
+    }
+
+    .hero p {
+        font-size: 1.15rem;
+        color: var(#5b6575);
+        line-height: 1.8;
+        margin-bottom: 22px;
+    }
+
+    .hero-badges {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+    }
+
+    .badge-pill {
+        background: #ffceac;
+        color: #ff6800;
+        padding: 10px 16px;
+        border-radius: 999px;
+        font-weight: 700;
+        box-shadow: 0 10px 22px rgba(255, 215, 195, 0.25);
+    }
+
+    .hero-img img {
+        height: 300px;
+        width: 100%;
+        border-radius: 26px;
+        border: 2px solid #ffcc9e;
+        object-fit: cover;
+        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.2);
+        min-height: 280px;
+    }
+
+    .section {
+        padding: 38px;
+        border-radius: var(#ffffff);
+        background: #fff;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
+        border: 2px solid #ffe2c3;
+    }
+
+    .section-title {
+        font-size: 1.7rem;
+        font-weight: 900;
+        margin-bottom: 14px;
+        color: var(#1b1b1b);
+    }
+
+    .section-text {
+        color: var(#5b6575);
+        line-height: 1.8;
+        font-size: 1.05rem;
+    }
+
+    .progress-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+        margin-top: 20px;
+    }
+
+    .step {
+        background: var(#fff0e3);
+        border-radius: 22px;
+        padding: 22px;
+        border: 2px solid #ffd6b0;
+    }
+
+    .step-num {
+        width: 44px;
+        height: 44px;
+        border-radius: 999px;
+        background: var(#ea580c);
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        margin-bottom: 12px;
+        font-size: 1.05rem;
+    }
+
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 26px;
+    }
+
+    .info-card {
+        background: #fff;
+        border-radius: 24px;
+        padding: 26px;
+        border: 2px solid #ffe2c3;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .info-card h5 {
+        font-weight: 800;
+        margin-bottom: 10px;
+        color: var(#1b1b1b);
+    }
+
+    .info-card p {
+        color: var(#5b6575);
+        line-height: 1.7;
+        margin: 0;
+    }
+
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 24px;
+        margin-top: 20px;
+    }
+
+    .team-card {
+        background: #fff;
+        border-radius: 22px;
+        border: 2px solid #ffe2c3;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+    }
+
+    .team-card img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 16px;
+        border: 2px solid #ffd6b0;
+        margin-bottom: 12px;
+    }
+
+    .slider {
+        position: relative;
+        border-radius: 28px;
+        overflow: hidden;
+        background: #fff;
+        border: 2px solid #ffe2c3;
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.12);
+    }
+
+    .slides {
+        display: flex;
+        transition: transform 0.6s ease;
+    }
+
+    .slide {
+        min-width: 100%;
+        padding: 30px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 24px;
+        align-items: center;
+    }
+
+    .slide img {
+        width: 100%;
+        height: 220px;
+        object-fit: cover;
+        border-radius: 18px;
+        border: 2px solid #ffd6b0;
+    }
+
+    .slider-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 46px;
+        height: 46px;
+        border-radius: 999px;
+        border: 2px solid #ffd6b0;
+        background: #fff;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        font-weight: 700;
+    }
+    
+    .prev { left: 14px; }
+    .next { right: 14px; }
+</style>
+
+<div class="about-wrap">
+    <div class="hero">
+        <div>
+            <h1>Немският вече е по‑лесен</h1>
+            <p>
+                LernEasy Deutsch е онлайн платформа, която превръща ученето на немски в ясен и приятен процес.
+                Всичко е подредено: уроци → упражнения → тест → сертификат.
+            </p>
+            <div class="hero-badges">
+                <span class="badge-pill">Доживотен достъп</span>
+                <span class="badge-pill">Сертификат</span>
+                <span class="badge-pill">Професионален екип</span>
+            </div>
+        </div>
+        <div  class="hero-img">
+            <img src="/images/Common/default-course-img.png" alt="course" />
+
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Как работи</div>
+        <div class="section-text">
+            Първо избираш курс по ниво. След това минаваш през подредени уроци, решаваш упражнения и трупаш увереност.
+            Накрая има финален тест – ако го вземеш, получаваш сертификат.
+        </div>
+        <div class="progress-steps">
+            <div class="step">
+                <div class="step-num">1</div>
+                <strong>Уроци</strong>
+                <div class="section-text">Кратки, ясни и фокусирани теми.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">2</div>
+                <strong>Упражнения</strong>
+                <div class="section-text">Практика след всеки урок за стабилни знания.</div>
+            </div>
+            <div class="step">
+                <div class="step-num">3</div>
+                <strong>Тест + сертификат</strong>
+                <div class="section-text">Финален тест и официално завършване.</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid">
+        <div class="info-card">
+            <h5>Изцяло онлайн</h5>
+            <p>Учи от всяко място и време. Няма нужда от присъствени занятия.</p>
+        </div>
+        <div class="info-card">
+            <h5>Упражнения</h5>
+            <p>Граматика, думи, четене, слушане – всичко в единна система.</p>
+        </div>
+        <div class="info-card">
+            <h5>Доживотен достъп</h5>
+            <p>Всяка лекция остава при теб и можеш да я преглеждаш по всяко време.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">История</div>
+        <div class="section-text">
+            Идеята за LernEasy Deutsch се роди от реални трудности при учене на език –
+            твърде много разхвърляни материали и липса на ясен път. 
+            Целта ни е да дадем точно тази структура, която прави ученето по‑лесно.
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-title">Нашият екип</div>
+        <div class="section-text">
+            Съдържанието е подготвено от професионалисти – преподаватели и специалисти по езиково обучение.
+        </div>
+        <div class="team-grid">
+            <div class="team-card">
+                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=60" alt="Team member" />
+                <strong>Анна Петрова</strong><br/>
+                Немски преподавател
+            </div>
+            <div class="team-card">
+                <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=60" alt="Team member" />
+                <strong>Мартин Иванов</strong><br/>
+                Методолог
+            </div>
+            <div class="team-card">
+                <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=60" alt="Team member" />
+                <strong>Елица Георгиева</strong><br/>
+                Курсов дизайнер
+            </div>
+        </div>
+    </div>
+
+    <div class="slider" id="aboutSlider">
+        <div class="slides">
+            <div class="slide">
+                <div>
+                    <h5>Курсове по ниво</h5>
+                    <p>Избираш A1–B2 и следваш стъпка по стъпка ясна структура.</p>
+                </div>
+                <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=60" alt="Levels" />
+            </div>
+            <div class="slide">
+                <div>
+                    <h5>Практика и упражнения</h5>
+                    <p>След всеки урок има упражнения, за да затвърдиш наученото.</p>
+                </div>
+                <img src="/images/Common/learn-progress.jpg" alt="Practice" />
+            </div>
+            <div class="slide">
+                <div>
+                    <h5>Финален тест и сертификат</h5>
+                    <p>След финалния тест получаваш сертификат за успешно завършен курс.</p>
+                </div>
+                <img src="/images/Common/smart.jpg" alt="Certificate" />
+            </div>
+        </div>
+        <button class="slider-nav prev" type="button">‹</button>
+        <button class="slider-nav next" type="button">›</button>
+    </div>
+</div>
+
+<script>
+    (function () {
+        const slider = document.getElementById('aboutSlider');
+        const slides = slider.querySelector('.slides');
+        const total = slides.children.length;
+        let index = 0;
+
+        function update() {
+            slides.style.transform = `translateX(-${index * 100}%)`;
+        }
+
+        const next = () => {
+            index = (index + 1) % total;
+            update();
+        };
+
+        slider.querySelector('.prev').addEventListener('click', () => {
+            index = (index - 1 + total) % total;
+            update();
+        });
+
+        slider.querySelector('.next').addEventListener('click', next);
+
+        setInterval(next, 5000);
+        update();
+    })();
+</script>
