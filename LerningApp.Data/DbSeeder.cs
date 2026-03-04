@@ -7,7 +7,7 @@ namespace LerningApp.Data;
 
 public class DbSeeder
 {
-   public static async Task SeedAsync(IServiceProvider services)
+    public static async Task SeedAsync(IServiceProvider services)
     {
         using IServiceScope scope = services.CreateScope();
 
@@ -40,7 +40,19 @@ public class DbSeeder
             }
         }
 
-        var a1 = new Level
+        var teacher = new Teacher
+        {
+            Id = Guid.Parse("662d6cc2-90ea-4e1b-bf31-2f43088233e4"),
+            FirstName = "Teacher",
+            LastName = "Teacher",
+            Biography =
+                "I'm a teacher! The Best ever! You can learn a lot from me and be the best student ever to exist! Join my Courses now!",
+            Qualification = "I have studied something with computers!",
+            UserId = seedUser.Id,
+            IsApproved = true
+        };
+
+    var a1 = new Level
         {
             Id = Guid.NewGuid(),
             Name = "A1",
@@ -62,7 +74,7 @@ public class DbSeeder
             IsPublished = true,
             CreatedAt = DateTime.UtcNow,
             Level = a1,
-            PublisherId = seedUser.Id,
+            PublisherId = teacher.Id,
             Price = 20
         };
 
