@@ -30,8 +30,7 @@ public class LerningAppContext : IdentityDbContext<ApplicationUser, IdentityRole
     public virtual DbSet<MultipleChoiceExercise> MultipleChoiceExercises { get; set; } = null!;
     
     public virtual DbSet<TranslationExercise> TranslationExercises { get; set; } = null!;
-    
-    public virtual Teacher Teachers { get; set; } = null!;
+    public virtual DbSet<Teacher> Teachers { get; set; } = null!;
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
