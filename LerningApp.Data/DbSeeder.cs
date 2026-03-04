@@ -52,7 +52,7 @@ public class DbSeeder
             IsApproved = true
         };
 
-    var a1 = new Level
+        var a1 = new Level
         {
             Id = Guid.NewGuid(),
             Name = "A1",
@@ -86,7 +86,7 @@ public class DbSeeder
             OrderIndex = 1,
             CreatedAt = DateTime.UtcNow,
             Course = course,
-            PublisherId = seedUser.Id,
+            PublisherId = teacher.Id,
             Target = "Learn basic home vocabulary",
             LessonSections = new List<LessonSection>
             {
@@ -224,6 +224,8 @@ public class DbSeeder
         await db.Lessons.AddAsync(lesson1);
         await db.PartsOfSpeech.AddAsync(noun);
         await db.VocabularyCards.AddRangeAsync(item1, item2, item3);
+        await db.Teachers.AddAsync(teacher);
+
 
         await db.SaveChangesAsync();
     }
