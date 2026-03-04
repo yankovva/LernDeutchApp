@@ -11,6 +11,8 @@ public class ApplicationUser : IdentityUser<Guid>
         this.Id = Guid.NewGuid();
     }
 
+    public Teacher? Teacher { get; set; }
+
     public TranslationLanguage NativeLanguage { get; set; } = TranslationLanguage.Bg;
     public virtual ICollection<UserCourse> UserCourses { get; set; } = new HashSet<UserCourse>();
     public virtual ICollection<Course> CreatedCourses { get; set; } = new HashSet<Course>();

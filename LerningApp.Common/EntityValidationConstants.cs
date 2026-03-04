@@ -94,4 +94,22 @@ public static class EntityValidationConstants
         public const int SentenceMinLength = 10;
         public const int SentenceMaxLength = 300;
     }
+    
+    public static class Teacher
+    {
+        public const int FirstNameMinLength = 2;
+        public const int FirstNameMaxLength = 50;
+        
+        public const int LastNameMinLength = 2;
+        public const int LastNameMaxLength = 50;
+        
+        public const int BiographyMinLength = 20;
+        public const int BiographyMaxLength = 250;
+        
+        public const int QualificationMinLength = 20;
+        public const int QualificationMaxLength = 70;
+        
+        public const int ProfileImageMinLength = 150;
+        public const int ProfileImageMaxLength = 350;
+    }
 }
