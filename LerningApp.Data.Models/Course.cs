@@ -30,7 +30,7 @@ public class Course
     public Guid PublisherId { get; set; }
     
     [Comment("Publisher Reference")]
-    public ApplicationUser Publisher { get; set; } = null!;
+    public Teacher Publisher { get; set; } = null!;
     
     [Comment("Foreign key to Level")]
     public Guid LevelId { get; set; } 

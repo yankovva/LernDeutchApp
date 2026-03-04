@@ -1,4 +1,5 @@
 using System;
+using LerningApp.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Data.Models;
@@ -26,7 +27,7 @@ public class Lesson{
     public Guid PublisherId { get; set; }
     
     [Comment("Publisher Reference")]
-    public ApplicationUser Publisher { get; set; } = null!;
+    public Teacher Publisher { get; set; } = null!;
     
     [Comment("Foreign key to Course")]
     public Guid? CourseId { get; set; } 

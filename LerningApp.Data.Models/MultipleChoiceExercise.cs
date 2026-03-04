@@ -38,5 +38,5 @@ public class MultipleChoiceExercise
     public Guid PublisherId { get; set; }
    
     [Comment("ApplicationUser Reference")]
-    public ApplicationUser Publisher { get; set; } = null!;
+    public Teacher Publisher { get; set; } = null!;
 }

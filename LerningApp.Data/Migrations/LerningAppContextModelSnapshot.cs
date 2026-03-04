@@ -688,7 +688,7 @@ namespace LerningApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("LerningApp.Data.Models.ApplicationUser", "Publisher")
+                    b.HasOne("LerningApp.Data.Models.Teacher", "Publisher")
                         .WithMany("CreatedCourses")
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -706,7 +706,7 @@ namespace LerningApp.Data.Migrations
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.HasOne("LerningApp.Data.Models.ApplicationUser", "Publisher")
+                    b.HasOne("LerningApp.Data.Models.Teacher", "Publisher")
                         .WithMany("CreatedLessons")
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -736,7 +736,7 @@ namespace LerningApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LerningApp.Data.Models.ApplicationUser", "Publisher")
+                    b.HasOne("LerningApp.Data.Models.Teacher", "Publisher")
                         .WithMany("CreatedMultipleChoiceExercises")
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -766,7 +766,7 @@ namespace LerningApp.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LerningApp.Data.Models.ApplicationUser", "Publisher")
+                    b.HasOne("LerningApp.Data.Models.Teacher", "Publisher")
                         .WithMany("CreatedTranslationExercises")
                         .HasForeignKey("PublisherId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -879,14 +879,6 @@ namespace LerningApp.Data.Migrations
 
             modelBuilder.Entity("LerningApp.Data.Models.ApplicationUser", b =>
                 {
-                    b.Navigation("CreatedCourses");
-
-                    b.Navigation("CreatedLessons");
-
-                    b.Navigation("CreatedMultipleChoiceExercises");
-
-                    b.Navigation("CreatedTranslationExercises");
-
                     b.Navigation("Teacher");
 
                     b.Navigation("UserCourses");
@@ -918,6 +910,17 @@ namespace LerningApp.Data.Migrations
             modelBuilder.Entity("LerningApp.Data.Models.PartOfSpeech", b =>
                 {
                     b.Navigation("VocabularyCards");
+                });
+
+            modelBuilder.Entity("LerningApp.Data.Models.Teacher", b =>
+                {
+                    b.Navigation("CreatedCourses");
+
+                    b.Navigation("CreatedLessons");
+
+                    b.Navigation("CreatedMultipleChoiceExercises");
+
+                    b.Navigation("CreatedTranslationExercises");
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.VocabularyCard", b =>
