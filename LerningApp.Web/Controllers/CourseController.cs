@@ -69,7 +69,7 @@ public class CourseController(
             return this.View(model);
         }
         
-        var userId = Guid.Parse(userManager.GetUserId(User)!);
+        var userId = userManager.GetUserId(User)!;
         var result = await courseService.AddCourseAsync(model, userId);
         
         if (result.Result == false)

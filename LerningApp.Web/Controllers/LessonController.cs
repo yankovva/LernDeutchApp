@@ -91,7 +91,7 @@ public class LessonController(ILessonService lessonService,
     [HttpPost]
     public async Task<IActionResult> Create(AddLessonInputModel model)
     {
-        Guid userId = Guid.Parse(userManager.GetUserId(User)!);
+        string userId = userManager.GetUserId(User);
         
         if (!this.ModelState.IsValid)
         {

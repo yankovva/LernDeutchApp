@@ -9,7 +9,7 @@ public interface ILessonService
     Task<ServiceResultT<LessonContentViewModel>> GetLessonDetailsAsync(string id);
     Task<ServiceResultT<AddLessonToCourseViewModel>> GetAddLessonToCourseByIdAsync(string id);
     Task<ServiceResult> AddLessonToCourseAsync(AddLessonToCourseViewModel model);
-    Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, Guid userId);
+    Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, string userId);
     Task<ServiceResultT<LessonEditInputModel>> GetLessonEditInputModelAsync(string id);
     Task<ServiceResult> PostLessonEditInputModelAsync(LessonEditInputModel model, string id);
     Task<ServiceResult> SoftDeleteLessonAsync(string id);

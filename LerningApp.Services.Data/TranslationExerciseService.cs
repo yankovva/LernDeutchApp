@@ -8,9 +8,10 @@ namespace LerningApp.Services.Data;
 
 public class TranslationExerciseService(
     IRepository<TranslationExercise, Guid> exerciseRepository,
-    IRepository<Lesson, Guid> lessonRepository) : ITranslationExerciseService
+    IRepository<Lesson, Guid> lessonRepository,
+    ITeacherService teacherService) : ITranslationExerciseService
 {
-    public async Task<ServiceResult> AddTranslationExerciseAsync(CreateTranslationExerciseViewModel model, Guid userId)
+    public async Task<ServiceResult> AddTranslationExerciseAsync(CreateTranslationExerciseViewModel model, string userId)
     {
         if (string.IsNullOrWhiteSpace(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
@@ -24,6 +25,12 @@ public class TranslationExerciseService(
             return ServiceResult.Fail("Invalid Lesson");
         }
 
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null)
+        {
+            return ServiceResult.Fail("Invalid Teacher");
+        }
+        
         TranslationExercise exercise = new TranslationExercise()
         {
             LessonId = Guid.Parse(model.LessonId),
@@ -31,7 +38,7 @@ public class TranslationExerciseService(
             EnglishSentence = model.SentenceEn,
             BulgarianSentence = model.SentenceBg,
             OrderIndex = model.OrderIndex,
-            PublisherId = userId,
+            PublisherId = teacherId.Value,
             DifficultyLevel = model.DifficultyLevel,
         };
 

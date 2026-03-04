@@ -9,7 +9,8 @@ namespace LerningApp.Services.Data;
 public class CourseService(
     IRepository<Course, Guid> courseRepository,
     IRepository<Level, Guid> levelRepository,
-    IRepository<UserCourse, object> userCourseRepository) : ICourseService
+    IRepository<UserCourse, object> userCourseRepository,
+    ITeacherService teacherService) : ICourseService
 {
     public async Task<IEnumerable<CourseIndexViewModel>> IndexGetCoursesAsync(Guid? userId)
     {
@@ -33,8 +34,9 @@ public class CourseService(
 
         return courses;
     }
+    
 
-    public async Task<ServiceResult> AddCourseAsync(AddCourseViewModel model, Guid userId)
+    public async Task<ServiceResult> AddCourseAsync(AddCourseViewModel model, string userId)
     {
         if (string.IsNullOrWhiteSpace(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
         {
@@ -49,6 +51,13 @@ public class CourseService(
             return ServiceResult.Fail("Невалидно ниво.");
         }
 
+        var teacherGuid = await teacherService.GetTeacherIdAsync(userId);
+
+        if (teacherGuid == null)
+        {
+            return ServiceResult.Fail("Невалиден учител.");
+        }
+        
         var course = new Course
         {
             Id = Guid.NewGuid(),
@@ -57,7 +66,7 @@ public class CourseService(
             LevelId = levelId,
             IsPublished = true,
             CreatedAt = DateTime.Now,
-            PublisherId = userId,
+            PublisherId = teacherGuid.Value,
             Price = model.Price
         };
 

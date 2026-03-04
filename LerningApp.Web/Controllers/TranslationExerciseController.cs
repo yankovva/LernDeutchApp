@@ -34,7 +34,7 @@ public class TranslationExerciseController(ITranslationExerciseService translati
         {
             return View(model);
         }
-        var currentUserId = Guid.Parse(userManager.GetUserId(User)!);
+        var currentUserId = userManager.GetUserId(User)!;
 
         var result = await translationExerciseService.AddTranslationExerciseAsync(model, currentUserId);
         if (result.Result == false)
@@ -53,7 +53,7 @@ public class TranslationExerciseController(ITranslationExerciseService translati
     {
         var result = await translationExerciseService
             .CheckTranslationAsync(exerciseId, userAnswer);
-
+        
         if (result == null)
         {
             return Json(new { isCorrect = false });
@@ -61,5 +61,4 @@ public class TranslationExerciseController(ITranslationExerciseService translati
 
         return Json(new { result.Value.isCorrect, result.Value.correctAnswer });
     }
-
 }

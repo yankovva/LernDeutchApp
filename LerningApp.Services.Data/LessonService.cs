@@ -15,7 +15,8 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     IRepository<LessonSection, Guid> lessonSectionRepository,
     IRepository<Course, Guid> courseRepository,
     IRepository<MultipleChoiceExercise, Guid> multipleExerciseRepository,
-    IRepository<TranslationExercise, Guid> translationExersiceRepository) : ILessonService
+    IRepository<TranslationExercise, Guid> translationExersiceRepository,
+    ITeacherService teacherService) : ILessonService
 {
     public async Task<IEnumerable<LessonIndexViewModel>> IndexGetLessonsAsync()
     {
@@ -82,7 +83,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             MultipleChoiceExercises = await multipleExerciseRepository
                 .GetAllAttached()
                 .Where(ex => ex.LessonId == lessonId)
-                .OrderBy(ex => ex.OrderIndex)
+                .OrderBy(ex => ex.DifficultyLevel)
                 .Select(ex => new IndexMultipleChoiceExerciseViewModel()
                 {
                     Question = ex.Question,
@@ -96,7 +97,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             TranslationExercises = await translationExersiceRepository
                 .GetAllAttached()
                 .Where(ex => ex.LessonId == lessonId)
-                .OrderBy(ex => ex.OrderIndex)
+                .OrderBy(ex => ex.DifficultyLevel)
                 .Select(ex => new IndexTranslationExerciseViewModel()
                 {
                     Id = ex.Id.ToString(),
@@ -185,7 +186,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, Guid userId)
+    public async Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, string userId)
     {
         Guid courseId = Guid.Empty;
         if (!string.IsNullOrWhiteSpace(model.CourseId))
@@ -204,13 +205,20 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             }
         }
         
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+
+        if (teacherId == null)
+        {
+            return ServiceResult.Fail("Невалиден учител.");
+        }
+        
         Lesson lesson = new Lesson
         {
             Name = model.Name,
             Content = model.Content,
             CourseId = courseId == Guid.Empty ? null : courseId,
             CreatedAt = DateTime.UtcNow,
-            PublisherId = userId,
+            PublisherId = teacherId.Value,
             OrderIndex = model.OrderIndex,
             Target = model.Target,
         };

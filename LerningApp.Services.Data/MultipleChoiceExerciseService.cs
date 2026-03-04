@@ -8,7 +8,8 @@ using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 namespace LerningApp.Services.Data;
 
 public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepository,
-    IRepository<MultipleChoiceExercise, Guid> exerciseRepository) : IMultipleChoiceExerciseService
+    IRepository<MultipleChoiceExercise, Guid> exerciseRepository,
+    ITeacherService teacherService) : IMultipleChoiceExerciseService
 {
     public async Task<ServiceResult> CreateAsync(CreateMultipleChoiceExerciseViewModel model, string userId)
     {
@@ -25,6 +26,13 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
                 return ServiceResult.Fail("Невалиден урок.");
 
             }
+
+            Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+
+            if (teacherId == null)
+            {
+                return ServiceResult.Fail("Невалиден учител.");
+            }
         
             MultipleChoiceExercise exercise = new MultipleChoiceExercise()
         {
@@ -36,7 +44,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
             ThirdWrongAnswer = model.ThirdWrongAnswer ?? null,
             DifficultyLevel = model.DifficultyLevel,
             OrderIndex = model.OrderIndex,
-            PublisherId = Guid.Parse(userId),
+            PublisherId = teacherId.Value,
         };
         
             await exerciseRepository.AddAsync(exercise);
