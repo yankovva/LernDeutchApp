@@ -1,14 +1,10 @@
-using LerningApp.Common;
-using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
+using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.Course;
-using LerningApp.Web.ViewModels.Level;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 
@@ -20,13 +16,10 @@ public class CourseController(
     [HttpGet]
     public async Task<IActionResult> Index()
     {
-        var userId = userManager.GetUserId(User);
-        Guid? userGuidId = Guid.TryParse(userId, out var parsed)
-            ? parsed
-            : null;
-
+        var userId =  User.GetUserId();
+       
         IEnumerable<CourseIndexViewModel> courses = await courseService
-            .IndexGetCoursesAsync(userGuidId);
+            .IndexGetCoursesAsync(userId);
 
         return this.View(courses);
     }
@@ -34,7 +27,7 @@ public class CourseController(
     [HttpGet]
     public async Task<IActionResult> Details(string id)
     {
-        string? userId = userManager.GetUserId(User);
+        string? userId = User.GetUserId();
 
         var result = await courseService.GetCourseDetailsByIdAsync(id, userId);
 

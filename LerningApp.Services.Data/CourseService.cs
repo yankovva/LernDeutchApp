@@ -12,8 +12,12 @@ public class CourseService(
     IRepository<UserCourse, object> userCourseRepository,
     ITeacherService teacherService) : ICourseService
 {
-    public async Task<IEnumerable<CourseIndexViewModel>> IndexGetCoursesAsync(Guid? userId)
+    public async Task<IEnumerable<CourseIndexViewModel>> IndexGetCoursesAsync(string? userId)
     {
+        Guid? userGuidId = Guid.TryParse(userId, out var parsedId)
+            ? parsedId
+            : null;
+        
         IEnumerable<CourseIndexViewModel> courses = await courseRepository
             .GetAllAttached()
             .AsNoTracking()
@@ -28,7 +32,7 @@ public class CourseService(
                 EnrolledCount = c.CourseParticipants.Count,
                 Price = c.Price,
                 IsEnrolled = userId != null && c.CourseParticipants
-                    .Any(cp => cp.UserId == userId),
+                    .Any(cp => cp.UserId == userGuidId),
             })
             .ToListAsync();
 
