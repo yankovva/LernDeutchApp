@@ -27,11 +27,6 @@ public class LessonEditInputModel
     public int OrderIndex { get; set; }
     
     [Required]
-    [MinLength(GrammarMinLength)]
-    [MaxLength(GrammarMaxLength)]
-    public string Grammar { get; set; } = null!;
-    
-    [Required]
     [MinLength(ExerciseMinLength)]
     [MaxLength(ExerciseMaxLength)]
     public string Exercise { get; set; } = null!;

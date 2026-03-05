@@ -37,8 +37,6 @@ public class Lesson{
     
     [Comment("The status of the Lesson")]
     public bool IsDeleted { get; set; }
-    public virtual ICollection<LessonSection> LessonSections { get; set; }
-        = new List<LessonSection>();
     public virtual ICollection<VocabularyCard> VocabularyCards { get; set; }
         = new HashSet<VocabularyCard>();
     public virtual ICollection<MultipleChoiceExercise> MultipleChoiceExercises { get; set; } 

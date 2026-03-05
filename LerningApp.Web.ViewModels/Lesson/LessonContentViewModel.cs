@@ -1,4 +1,3 @@
-using LerningApp.Web.ViewModels.LessonSection;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.TranslationExercise;
 
@@ -17,7 +16,7 @@ public class LessonContentViewModel
     public string? CourseId { get; set; }
     
     public string? CourseName { get; set; }
-
+    
     public int WordCount { get; set; }
     
     public string Target { get; set; } = null!;
@@ -28,7 +27,4 @@ public class LessonContentViewModel
     
     public IList<IndexTranslationExerciseViewModel> TranslationExercises { get; set; }
         = new List<IndexTranslationExerciseViewModel>();
-    
-    public  IList<LessonSectionViewModel> LessonSections { get; set; } 
-        = new List<LessonSectionViewModel>();
 }

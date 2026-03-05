@@ -4,7 +4,6 @@ using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
-using LerningApp.Web.ViewModels.LessonSection;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.TranslationExercise;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +11,6 @@ using Microsoft.EntityFrameworkCore;
 namespace LerningApp.Services.Data;
 
 public class LessonService(IRepository<Lesson, Guid> lessonRepository,
-    IRepository<LessonSection, Guid> lessonSectionRepository,
     IRepository<Course, Guid> courseRepository,
     IRepository<MultipleChoiceExercise, Guid> multipleExerciseRepository,
     IRepository<TranslationExercise, Guid> translationExersiceRepository,
@@ -23,15 +21,15 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         IEnumerable<LessonIndexViewModel> lessons =  await lessonRepository
             .GetAllAttached()
             .AsNoTracking()
-            .Include(l => l.Course) 
+            .Include(l => l.Course)
             .OrderBy(l => l.Name)
             .Select(l => new LessonIndexViewModel
             {
                 Id = l.Id.ToString(),
                 Name = l.Name,
-                CourseId = l.CourseId.ToString(),
+                CourseId = l.CourseId != null ? l.CourseId.ToString() : null,
                 CourseName = l.Course != null ? l.Course.Name : null,
-                LevelName = l.Course.Level != null ? l.Course.Level.Name : null, 
+                LevelName = l.Course != null ? l.Course.Level.Name : null,
                 CreatedAt = l.CreatedAt.ToString("dd.MM.yyyy"),
             })
             .ToListAsync();
@@ -69,17 +67,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             OrderIndex = lesson.OrderIndex,
             CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
             Target = lesson.Target,
-            LessonSections = await lessonSectionRepository
-                .GetAllAttached()
-                .Where(ls => ls.LessonId == lessonId)
-                .OrderBy(ls => ls.OrderIndex)
-                .Select(ls => new LessonSectionViewModel()
-                {
-                    Type = ls.Type,
-                    OrderIndex = ls.OrderIndex,
-                    Content = ls.Content,
-                })
-                .ToListAsync(),
             MultipleChoiceExercises = await multipleExerciseRepository
                 .GetAllAttached()
                 .Where(ex => ex.LessonId == lessonId)
@@ -222,21 +209,8 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             OrderIndex = model.OrderIndex,
             Target = model.Target,
         };
-        List<LessonSection> sections = new List<LessonSection>()
-        {
-            new LessonSection()
-            {
-                Content = model.Grammar,
-                Type = "grammar",
-                OrderIndex = 1
-            },
-           
-        };
-        
-        lesson.LessonSections = sections;
         
         await  lessonRepository.AddAsync(lesson);
-        
         return ServiceResult.Success();
     }
 
@@ -249,7 +223,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         Lesson? lesson = await lessonRepository
             .GetAllAttached()
-            .Include(l => l.LessonSections)
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
         if (lesson == null)
@@ -265,10 +238,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             OrderIndex = lesson.OrderIndex,
             CourseId = lesson.CourseId?.ToString(),
             Target = lesson.Target,
-            Grammar = lesson.LessonSections?
-                .FirstOrDefault(ls => ls.Type == "grammar")?.Content ?? "Add new grammar",
-            Exercise = lesson.LessonSections?
-                .FirstOrDefault(ls => ls.Type == "exercise")?.Content ?? "Add new exercise" ,
             Courses = new List <CourseOptionsViewModel>{}
         };
         
@@ -285,7 +254,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         Lesson? lessonToChange = await lessonRepository
             .GetAllAttached()
-            .Include(lesson => lesson.LessonSections)
             .FirstOrDefaultAsync(l => l.Id == lessonId);
 
         if (lessonToChange == null)
@@ -311,39 +279,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         lessonToChange.OrderIndex = model.OrderIndex;
         lessonToChange.CourseId = courseId;
         lessonToChange.Target = model.Target;
-        
-        var grammar = lessonToChange.LessonSections
-            .FirstOrDefault(ls => ls.Type == "grammar") ;
-        
-        if (grammar == null)
-        {
-            lessonToChange.LessonSections
-                .Add(new LessonSection
-                {
-                    Type = "grammar",
-                    Content = model.Grammar,
-                    OrderIndex = 1
-                });
-        }
-        else
-            grammar.Content = model.Grammar;
-        
-        var exercise = lessonToChange.LessonSections
-            .FirstOrDefault(ls => ls.Type == "exercise");
-
-        if (exercise == null)
-        {
-            lessonToChange.LessonSections
-                .Add(new LessonSection
-                {
-                    Type = "exercise",
-                    Content = model.Exercise,
-                    OrderIndex = 2
-                });
-        }
-        else
-            exercise.Content = model.Exercise;
-        
+       
         await lessonRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
@@ -357,7 +293,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         Lesson? lesson = await lessonRepository
             .GetAllAttached()
-            .Include(ls => ls.LessonSections)
             .FirstOrDefaultAsync(c => c.Id == lessonId);
 
         if (lesson == null)
@@ -366,11 +301,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         }
         
         lesson.IsDeleted = true;
-
-        foreach (var section in lesson.LessonSections)
-        {
-            section.IsDeleted = true;
-        }
 
         await lessonRepository.SaveChangesAsync();
         return ServiceResult.Success();

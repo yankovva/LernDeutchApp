@@ -316,27 +316,7 @@
             <div class="lesson-content">@Model.Content</div>
         }
     </div>
-
-    @if (Model.LessonSections != null && Model.LessonSections.Any())
-    {
-        <div class="lesson-sections">
-            @foreach (var s in Model.LessonSections.OrderBy(s => s.OrderIndex))
-            {
-                <div class="section-card">
-                    <div class="section-head">
-                        <span class="section-type">@s.Type</span>
-                        <span class="section-order">#@s.OrderIndex</span>
-                    </div>
-                    <div class="section-content">@s.Content</div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <p class="text-muted fst-italic">Няма секции за този урок.</p>
-    }
-
+    
     @if (Model.MultipleChoiceExercises.Any())
     {
         <h4 class="mt-4">Упражнения</h4>

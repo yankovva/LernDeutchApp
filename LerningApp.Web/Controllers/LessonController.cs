@@ -1,15 +1,9 @@
-using System.Diagnostics;
-using LerningApp.Common;
-using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
-using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
-using LerningApp.Web.ViewModels.LessonSection;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 

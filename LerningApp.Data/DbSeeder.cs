@@ -88,23 +88,7 @@ public class DbSeeder
             Course = course,
             PublisherId = teacher.Id,
             Target = "Learn basic home vocabulary",
-            LessonSections = new List<LessonSection>
-            {
-                new LessonSection
-                {
-                    Id = Guid.NewGuid(),
-                    Type = "grammar",
-                    OrderIndex = 1,
-                    Content = "der/die/das – определителен член: der (m), die (f), das (n).",
-                },
-                new LessonSection
-                {
-                    Id = Guid.NewGuid(),
-                    Type = "exercise",
-                    OrderIndex = 2,
-                    Content = "Попълни члена: ___ Haus, ___ Tür, ___ Fenster."
-                }
-            }
+           
         };
 
         var noun = new PartOfSpeech
