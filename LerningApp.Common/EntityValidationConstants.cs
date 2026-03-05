@@ -8,20 +8,16 @@ public static class EntityValidationConstants
         public const int NameMaxLength = 100;
         
         public const int ContentMinLength = 50;
-        public const int ContentMaxLength = 500;
+        public const int ContentMaxLength = 1500;
         
         public const int TargetMinLength = 10;
         public const int TargetMaxLength = 200;
       
         public const int OrderIndexMin = 1;
         public const int OrderIndexMax = 1000;
-        
-        public const int GrammarMinLength = 50;
-        public const int GrammarMaxLength = 500;
-        
+       
         public const int ExerciseMinLength = 50;
         public const int ExerciseMaxLength = 500;
-        
     }
     
     public static class Course
@@ -70,16 +66,6 @@ public static class EntityValidationConstants
         public const int PartOfSpeechMinLength = 3;
         public const int PartOfSpeecheMaxLength = 30;
     }
-
-    public static class LessonSection
-    {
-        public const int TypeMinLength = 5;
-        public const int TypeMaxLength = 20;
-        
-        public const int ContentMinLength = 5;
-        public const int ContentMaxLength = 7000;
-    }
-
     public static class MultipleChoiceExercise
     {
         public const int QuestionMinLength = 10;
