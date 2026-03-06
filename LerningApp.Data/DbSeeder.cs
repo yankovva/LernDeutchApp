@@ -77,7 +77,7 @@ public class DbSeeder
             PublisherId = teacher.Id,
             Price = 20
         };
-
+        
         var lesson1 = new Lesson
         {
             Id = Guid.NewGuid(),
@@ -89,6 +89,53 @@ public class DbSeeder
             PublisherId = teacher.Id,
             Target = "Learn basic home vocabulary",
            
+        };
+        var tEx1 = new TranslationExercise
+        {
+            Id = Guid.NewGuid(),
+            Lesson = lesson1,
+            GermanSentence = "Die Tür ist offen.",
+            BulgarianSentence = "Вратата е отворена.",
+            EnglishSentence = "The door is open.",
+            DifficultyLevel = 1,
+            PublisherId = teacher.Id
+        };
+
+        var tEx2 = new TranslationExercise
+        {
+            Id = Guid.NewGuid(),
+            Lesson = lesson1,
+            GermanSentence = "Das Haus ist groß.",
+            BulgarianSentence = "Къщата е голяма.",
+            EnglishSentence = "The house is big.",
+            DifficultyLevel = 1,
+            PublisherId = teacher.Id
+        };
+        
+        var mc1 = new MultipleChoiceExercise
+        {
+            Id = Guid.NewGuid(),
+            Lesson = lesson1,
+            Question = "Was bedeutet „Haus“?",
+            CorrectAnswer = "къща",
+            FirstWrongAnswer = "врата",
+            SecondWrongAnswer = "куче",
+            ThirdWrongAnswer = "прозорец",
+            DifficultyLevel = 1,
+            PublisherId = teacher.Id
+        };
+
+        var mc2 = new MultipleChoiceExercise
+        {
+            Id = Guid.NewGuid(),
+            Lesson = lesson1,
+            Question = "Was bedeutet „Hund“?",
+            CorrectAnswer = "куче",
+            FirstWrongAnswer = "дом",
+            SecondWrongAnswer = "врата",
+            ThirdWrongAnswer = "прозорец",
+            DifficultyLevel = 1,
+            PublisherId = teacher.Id
         };
 
         var noun = new PartOfSpeech
@@ -209,7 +256,8 @@ public class DbSeeder
         await db.PartsOfSpeech.AddAsync(noun);
         await db.VocabularyCards.AddRangeAsync(item1, item2, item3);
         await db.Teachers.AddAsync(teacher);
-
+        await db.TranslationExercises.AddRangeAsync(tEx1, tEx2);
+        await db.MultipleChoiceExercises.AddRangeAsync(mc1, mc2);
 
         await db.SaveChangesAsync();
     }
