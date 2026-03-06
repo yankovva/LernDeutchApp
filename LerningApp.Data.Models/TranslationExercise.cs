@@ -16,9 +16,6 @@ public class TranslationExercise
     [Comment("The english sentence")]
     public string EnglishSentence { get; set; }  = null!;
     
-    [Comment("The order of the exercise")]
-    public int OrderIndex { get; set; }
-    
     [Comment("Shows if the exercise is deleted")]
     public bool IsDeleted { get; set; } 
     

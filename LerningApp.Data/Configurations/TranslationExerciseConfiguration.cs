@@ -44,9 +44,6 @@ public class TranslationExerciseConfiguration : IEntityTypeConfiguration<Transla
             .OnDelete(DeleteBehavior.Restrict);
 
         builder
-            .HasIndex(x => new { x.LessonId, x.OrderIndex });
-
-        builder
             .HasQueryFilter(x => x.IsDeleted == false);
     }
 }

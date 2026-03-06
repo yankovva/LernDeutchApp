@@ -9,6 +9,4 @@ public class IndexTranslationExerciseViewModel
     public string EnglishSentence { get; set; } = null!;
     
     public string BulgarianSentence { get; set; }  = null!;
-
-    public int OrderIndex { get; set; }
 }

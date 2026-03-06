@@ -69,7 +69,6 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
             FirstWrongAnswer = model.FirstWrongAnswer,
             ThirdWrongAnswer = model.ThirdWrongAnswer ?? null,
             DifficultyLevel = model.DifficultyLevel,
-            OrderIndex = model.OrderIndex,
             PublisherId = teacherId.Value,
         };
         

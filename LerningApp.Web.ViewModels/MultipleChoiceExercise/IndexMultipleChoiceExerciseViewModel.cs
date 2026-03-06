@@ -13,6 +13,4 @@ public class IndexMultipleChoiceExerciseViewModel
     public string? SecondWrongAnswer { get; set; } 
   
     public string? ThirdWrongAnswer { get; set; }
-    
-    public int OrderIndex { get; set; }
 }

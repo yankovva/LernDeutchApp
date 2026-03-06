@@ -64,7 +64,6 @@ public class TranslationExerciseService(
             GermanSentence = model.GermanCorrectTranslation,
             EnglishSentence = model.SentenceEn,
             BulgarianSentence = model.SentenceBg,
-            OrderIndex = model.OrderIndex,
             PublisherId = teacherId.Value,
             DifficultyLevel = model.DifficultyLevel,
         };

@@ -75,7 +75,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                 {
                     Question = ex.Question,
                     Id = ex.Id.ToString(),
-                    OrderIndex = ex.OrderIndex,
                     CorrectAnswer = ex.CorrectAnswer,
                     FirstWrongAnswer = ex.FirstWrongAnswer,
                     SecondWrongAnswer = ex.SecondWrongAnswer,
@@ -91,7 +90,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                     GermanSentence = ex.GermanSentence,
                     EnglishSentence = ex.EnglishSentence,
                     BulgarianSentence = ex.BulgarianSentence,
-                    OrderIndex = ex.OrderIndex
                 }).ToListAsync()
             
         };

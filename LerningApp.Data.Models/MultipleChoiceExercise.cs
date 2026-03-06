@@ -20,9 +20,6 @@ public class MultipleChoiceExercise
    
     [Comment("The Third wrong answer of the exercise if needed")]
     public string? ThirdWrongAnswer { get; set; }
-
-    [Comment("The order of the exercise")]
-    public int OrderIndex { get; set; }
     
     [Comment("The difficulty level of the exercise")]
     public int DifficultyLevel { get; set; }
