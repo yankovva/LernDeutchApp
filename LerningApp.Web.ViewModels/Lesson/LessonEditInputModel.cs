@@ -25,11 +25,6 @@ public class LessonEditInputModel
 
     [Range(OrderIndexMin, OrderIndexMax)]
     public int OrderIndex { get; set; }
-    
-    [Required]
-    [MinLength(ExerciseMinLength)]
-    [MaxLength(ExerciseMaxLength)]
-    public string Exercise { get; set; } = null!;
 
     // optional: 
     public string? CourseId { get; set; }

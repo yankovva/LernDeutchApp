@@ -62,12 +62,6 @@
                         <textarea asp-for="Content" class="form-control" rows="12"></textarea>
                         <span asp-validation-for="Content" class="text-danger"></span>
                     </div>
-                    <div class="mb-3 mt-3">
-                        <label asp-for="Exercise" class="form-label">Упражнения</label>
-                        <textarea asp-for="Exercise" class="form-control" rows="10"
-                                  placeholder="Напиши упражненията към урока..."></textarea>
-                        <span asp-validation-for="Exercise" class="text-danger"></span>
-                    </div>
                     <div class="d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary">💾 Запази</button>
                         <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Отказ</a>
