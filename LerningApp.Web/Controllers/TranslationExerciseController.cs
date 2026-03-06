@@ -3,6 +3,7 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data;
 using LerningApp.Services.Data.Interfaces;
+using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.TranslationExercise;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,17 +14,22 @@ namespace LerningApp.Controllers;
 [Authorize]
 public class TranslationExerciseController(ITranslationExerciseService translationExerciseService,
     UserManager<ApplicationUser> userManager,
-    IRepository<TranslationExercise, Guid> exerciseRepository) : Controller
+    IRepository<TranslationExercise, Guid> exerciseRepository,
+    ITeacherService teacherService) : Controller
 {
+    
     [HttpGet]
-    public  IActionResult Create(string lessonId)
+    public async Task<IActionResult> Create(string lessonId)
     {
-        var model = new CreateTranslationExerciseViewModel()
+        var userId = User.GetUserId();
+        var result = await translationExerciseService.GetAddTranslationExercisesAsync(lessonId, userId!);
+        if (result.Result == false)
         {
-            LessonId = lessonId
-        };
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Index", "Home");
+        }
         
-        return View(model);
+        return View(result.Data);
     }
     
     [HttpPost]
@@ -34,9 +40,10 @@ public class TranslationExerciseController(ITranslationExerciseService translati
         {
             return View(model);
         }
-        var currentUserId = userManager.GetUserId(User)!;
-
-        var result = await translationExerciseService.AddTranslationExerciseAsync(model, currentUserId);
+        
+        var userId = User.GetUserId()!;
+        var result = await translationExerciseService.AddTranslationExerciseAsync(model, userId);
+        
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;

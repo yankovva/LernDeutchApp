@@ -11,6 +11,33 @@ public class TranslationExerciseService(
     IRepository<Lesson, Guid> lessonRepository,
     ITeacherService teacherService) : ITranslationExerciseService
 {
+    public async Task<ServiceResultT<CreateTranslationExerciseViewModel>> GetAddTranslationExercisesAsync(string lessonId, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuid))
+        {
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail("Невалиден урок.");
+        }
+        Lesson? lesson = await lessonRepository
+            .GetByIdAsync(lessonGuid);
+
+        if (lesson == null)
+        {
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail("Невалиден урок.");
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || lesson.PublisherId != teacherId)
+        {
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail("Нямате права.");
+        }
+
+        var model = new CreateTranslationExerciseViewModel()
+        {
+            LessonId = lessonId
+        };
+        return ServiceResultT<CreateTranslationExerciseViewModel>.Success(model);
+    }
+
     public async Task<ServiceResult> AddTranslationExerciseAsync(CreateTranslationExerciseViewModel model, string userId)
     {
         if (string.IsNullOrWhiteSpace(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
@@ -24,11 +51,11 @@ public class TranslationExerciseService(
         {
             return ServiceResult.Fail("Invalid Lesson");
         }
-
+        
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null)
+        if (teacherId == null || lesson.PublisherId != teacherId)
         {
-            return ServiceResult.Fail("Invalid Teacher");
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail("Нямате права.");
         }
         
         TranslationExercise exercise = new TranslationExercise()
