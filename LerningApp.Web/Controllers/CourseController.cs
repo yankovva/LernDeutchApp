@@ -74,7 +74,7 @@ public class CourseController(
             return this.View(model);
         }
         
-        var userId = userManager.GetUserId(User)!;
+        string userId = User.GetUserId()!;
         var result = await courseService.AddCourseAsync(model, userId);
         
         if (result.Result == false)
@@ -100,7 +100,7 @@ public class CourseController(
     [HttpGet]
     public async Task<IActionResult> Edit(string id)
     {
-        var userId = userManager.GetUserId(User)!;
+        string userId = User.GetUserId()!;
         
         var result = await courseService.GetCourseEditByIdAsync(id, userId);
 
@@ -125,7 +125,7 @@ public class CourseController(
             return this.View(model);
         }
         
-        var userId = userManager.GetUserId(User)!;
+        string userId = User.GetUserId()!;
        
         var result = await courseService.PostEditCourseAsync(model, id, userId);
         if (result.Result == false)
@@ -151,7 +151,7 @@ public class CourseController(
     [HttpPost]
     public async Task<IActionResult> Deactivate(string id)
     {
-        var userId = userManager.GetUserId(User)!;
+        string userId = User.GetUserId()!;
         
         var result = await courseService.DeactivateCourseAsync(id,userId);
         if (result.Result == false)
@@ -168,7 +168,7 @@ public class CourseController(
     [HttpPost]
     public async Task<IActionResult> Restore(string id)
     {
-        var userId = userManager.GetUserId(User)!;
+        string userId = User.GetUserId()!;
       
         var result = await courseService.RestoreCourseAsync(id, userId);
         if (result.Result == false)
@@ -185,7 +185,7 @@ public class CourseController(
     [HttpPost]
     public async Task<IActionResult> Enroll(string courseId)
     {
-        var userId = Guid.Parse(userManager.GetUserId(User)!);
+        Guid userId = Guid.Parse(User.GetUserId()!);
         var result = await courseService.EnrollInCourseAsync(courseId, userId);
         if (result.Result == false)
         {
@@ -201,7 +201,7 @@ public class CourseController(
     [HttpPost]
     public async Task<IActionResult> SoftDelete(string id)
     {
-        var userId = userManager.GetUserId(User)!;
+        string userId = User.GetUserId()!;
         
         var result = await courseService.SoftDeleteCourseAsync(id, userId);
         if (result.Result == false)
