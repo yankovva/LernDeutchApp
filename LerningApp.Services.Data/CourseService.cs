@@ -128,7 +128,7 @@ public class CourseService(
         return ServiceResultT<CourseDetailsViewModel>.Success(model);
     }
 
-    public async Task<ServiceResultT<CourseEditViewModel>> GetCourseEditByIdAsync(string id)
+    public async Task<ServiceResultT<CourseEditViewModel>> GetCourseEditByIdAsync(string id, string userId)
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
@@ -141,6 +141,13 @@ public class CourseService(
         if (course == null)
         {
             return ServiceResultT<CourseEditViewModel>.Fail("Курсът не е намерен.");
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        
+        if (teacherId == null || course.PublisherId != teacherId)
+        {
+            return ServiceResultT<CourseEditViewModel>.Fail("Нямате права.");
         }
 
         CourseEditViewModel model = new CourseEditViewModel()
@@ -155,9 +162,8 @@ public class CourseService(
         return ServiceResultT<CourseEditViewModel>.Success(model);
     }
 
-    public async Task<ServiceResult> PostEditCourseAsync(CourseEditViewModel model, string id)
+    public async Task<ServiceResult> PostEditCourseAsync(CourseEditViewModel model, string id, string userId)
     {
-        
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid courseId))
         {
             return ServiceResult.Fail("Невалиден курс.", nameof(id));
@@ -169,6 +175,12 @@ public class CourseService(
         if (courseToChange == null)
         {
             return ServiceResult.Fail("Курсът не е намерен.", nameof(id));
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || courseToChange.PublisherId != teacherId)
+        {
+            return ServiceResultT<CourseEditViewModel>.Fail("Нямате права.");
         }
 
         if (string.IsNullOrEmpty(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
@@ -194,7 +206,7 @@ public class CourseService(
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> DeactivateCourseAsync(string id)
+    public async Task<ServiceResult> DeactivateCourseAsync(string id,string userId)
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
@@ -208,6 +220,12 @@ public class CourseService(
         {
             return ServiceResult.Fail("Невалиден курс.");
         }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || course.PublisherId != teacherId)
+        {
+            return ServiceResult.Fail("Нямате права.");
+        }
 
         course.IsPublished = false;
         await courseRepository.SaveChangesAsync();
@@ -215,7 +233,7 @@ public class CourseService(
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> RestoreCourseAsync(string id)
+    public async Task<ServiceResult> RestoreCourseAsync(string id, string userId)
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
@@ -228,6 +246,12 @@ public class CourseService(
         if (course == null)
         {
             return ServiceResult.Fail("Курсът не е намерен.");
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || course.PublisherId != teacherId)
+        {
+            return ServiceResult.Fail("Нямате права.");
         }
 
         course.IsPublished = true;
@@ -272,7 +296,7 @@ public class CourseService(
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> SoftDeleteCourseAsync(string id)
+    public async Task<ServiceResult> SoftDeleteCourseAsync(string id, string userId)
     {
         if (!Guid.TryParse(id, out var courseId))
         {
@@ -289,7 +313,13 @@ public class CourseService(
         {
             return ServiceResult.Fail("Курсът не е намерен.");
         }
-
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || course.PublisherId != teacherId)
+        {
+            return ServiceResult.Fail("Нямате права.");
+        }
+        
         course.IsDeleted = true;
 
         foreach (var lesson in course.LessonsForCourse)

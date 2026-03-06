@@ -101,13 +101,8 @@ public class CourseController(
     public async Task<IActionResult> Edit(string id)
     {
         var userId = userManager.GetUserId(User)!;
-        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
-        if (!isTeacher)
-        {
-            TempData["ErrorMessage"] = "Нямате права.";
-        }
         
-        var result = await courseService.GetCourseEditByIdAsync(id);
+        var result = await courseService.GetCourseEditByIdAsync(id, userId);
 
         if (result.Result == false)
         {
@@ -131,13 +126,8 @@ public class CourseController(
         }
         
         var userId = userManager.GetUserId(User)!;
-        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
-        if (!isTeacher)
-        {
-            TempData["ErrorMessage"] = "Нямате права.";
-        }
-        
-        var result = await courseService.PostEditCourseAsync(model, id);
+       
+        var result = await courseService.PostEditCourseAsync(model, id, userId);
         if (result.Result == false)
         {
             if (string.IsNullOrWhiteSpace(result.Field))
@@ -162,13 +152,8 @@ public class CourseController(
     public async Task<IActionResult> Deactivate(string id)
     {
         var userId = userManager.GetUserId(User)!;
-        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
-        if (!isTeacher)
-        {
-            TempData["ErrorMessage"] = "Нямате права.";
-        }
         
-        var result = await courseService.DeactivateCourseAsync(id);
+        var result = await courseService.DeactivateCourseAsync(id,userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
@@ -184,12 +169,8 @@ public class CourseController(
     public async Task<IActionResult> Restore(string id)
     {
         var userId = userManager.GetUserId(User)!;
-        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
-        if (!isTeacher)
-        {
-            TempData["ErrorMessage"] = "Нямате права.";
-        }
-        var result = await courseService.RestoreCourseAsync(id);
+      
+        var result = await courseService.RestoreCourseAsync(id, userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
@@ -221,13 +202,8 @@ public class CourseController(
     public async Task<IActionResult> SoftDelete(string id)
     {
         var userId = userManager.GetUserId(User)!;
-        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
-        if (!isTeacher)
-        {
-            TempData["ErrorMessage"] = "Нямате права.";
-        }
         
-        var result = await courseService.SoftDeleteCourseAsync(id);
+        var result = await courseService.SoftDeleteCourseAsync(id, userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
