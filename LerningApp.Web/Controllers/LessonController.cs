@@ -1,5 +1,6 @@
 using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
+using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.Lesson;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -9,13 +10,13 @@ namespace LerningApp.Controllers;
 
 public class LessonController(ILessonService lessonService,
     ICourseService courseService,
-    UserManager<ApplicationUser> userManager) : BaseController
+    UserManager<ApplicationUser> userManager,
+    ITeacherService teacherService) : BaseController
 {
     [HttpGet]
     public async Task<IActionResult> Index()
     { 
         var lessons = await lessonService.IndexGetLessonsAsync();
-        
         return View(lessons);
     }
 
@@ -33,9 +34,12 @@ public class LessonController(ILessonService lessonService,
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> AddToCourse(string id)
     {
-        var result = await lessonService.GetAddLessonToCourseByIdAsync(id);
+        string userId = User.GetUserId()!;
+        
+        var result = await lessonService.GetAddLessonToCourseByIdAsync(id, userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
@@ -46,14 +50,16 @@ public class LessonController(ILessonService lessonService,
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> AddToCourse(AddLessonToCourseViewModel model)
     {
         if (!this.ModelState.IsValid)
         {
             return this.View(model);
         }
+        string userId = User.GetUserId()!;
         
-        var result = await lessonService.AddLessonToCourseAsync(model);
+        var result = await lessonService.AddLessonToCourseAsync(model, userId);
         if (result.Result == false)
         {
             if (result.Field != null)
@@ -72,8 +78,16 @@ public class LessonController(ILessonService lessonService,
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<IActionResult> Create()
     {
+        string userId = User.GetUserId()!;
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (!isTeacher)
+        {
+            TempData["ErrorMessage"] = "Нямате права";
+            return RedirectToAction(nameof(Index));
+        }
         AddLessonInputModel model = new AddLessonInputModel
         {
             Courses = await courseService.GetCourseOptionsAsync()
@@ -85,14 +99,13 @@ public class LessonController(ILessonService lessonService,
     [HttpPost]
     public async Task<IActionResult> Create(AddLessonInputModel model)
     {
-        string userId = userManager.GetUserId(User);
-        
         if (!this.ModelState.IsValid)
         {
             model.Courses = await courseService.GetCourseOptionsAsync();
             return View(model);
         }
-
+        
+        string userId = User.GetUserId()!;
         var result = await  lessonService.AddLessonAsync(model, userId);
         if (result.Result == false)
         {
@@ -109,19 +122,21 @@ public class LessonController(ILessonService lessonService,
     [HttpGet]
     public async Task<IActionResult> Edit(string id)
     {
-       var result = await lessonService.GetLessonEditInputModelAsync(id);
+        string userId = User.GetUserId()!;
+       var result = await lessonService.GetLessonEditInputModelAsync(id, userId);
        if (result.Result == false)
        {
            TempData["ErrorMessage"] = result.Message;
            return RedirectToAction(nameof(Index));
        }
 
-       result.Data.Courses = await courseService.GetCourseOptionsAsync();
+       result.Data!.Courses = await courseService.GetCourseOptionsAsync();
 
        return View(result.Data);
     }
     
     [HttpPost]
+    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     {
@@ -130,8 +145,8 @@ public class LessonController(ILessonService lessonService,
             model.Courses = await courseService.GetCourseOptionsAsync();
             return View(model);
         }
-
-        var result = await lessonService.PostLessonEditInputModelAsync(model, id);
+        string userId = User.GetUserId()!;
+        var result = await lessonService.PostLessonEditInputModelAsync(model, id, userId);
         if (result.Result == false)
         {
             ModelState.AddModelError(string.Empty, result.Message);
@@ -147,7 +162,8 @@ public class LessonController(ILessonService lessonService,
     [HttpPost]
     public async Task<IActionResult> SoftDelete(string id)
     {
-        var result = await lessonService.SoftDeleteLessonAsync(id);
+        string userId = User.GetUserId()!;
+        var result = await lessonService.SoftDeleteLessonAsync(id, userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;

@@ -99,8 +99,14 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         return ServiceResultT<LessonContentViewModel>.Success(model);
     }
 
-    public async Task<ServiceResultT<AddLessonToCourseViewModel>> GetAddLessonToCourseByIdAsync(string id)
+    public async Task<ServiceResultT<AddLessonToCourseViewModel>> GetAddLessonToCourseByIdAsync(string id,string userId)
     {
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (!isTeacher)
+        {
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail("Нямате права.");
+        }
+        
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
             return ServiceResultT<AddLessonToCourseViewModel>.Fail("Невалиден урок.");
@@ -131,8 +137,14 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         return ServiceResultT<AddLessonToCourseViewModel>.Success(model);
     }
 
-    public async Task<ServiceResult> AddLessonToCourseAsync(AddLessonToCourseViewModel model)
+    public async Task<ServiceResult> AddLessonToCourseAsync(AddLessonToCourseViewModel model, string userId)
     {
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (!isTeacher)
+        {
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail("Нямате права.");
+        }
+        
         if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
             return ServiceResult.Fail("Урокът не е намерен.");
@@ -196,7 +208,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         if (teacherId == null)
         {
-            return ServiceResult.Fail("Невалиден учител.");
+            return ServiceResult.Fail("Нямате права.");
         }
         
         Lesson lesson = new Lesson
@@ -214,8 +226,14 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResultT<LessonEditInputModel>> GetLessonEditInputModelAsync(string id)
+    public async Task<ServiceResultT<LessonEditInputModel>> GetLessonEditInputModelAsync(string id, string userId)
     {
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (!isTeacher)
+        {
+            return ServiceResultT<LessonEditInputModel>.Fail("Нямате права.");
+        }
+        
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
             return ServiceResultT<LessonEditInputModel>.Fail("Урокът не е намерен.");
@@ -229,7 +247,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         {
             return ServiceResultT<LessonEditInputModel>.Fail("Урокът не е намерен.");
         }
-        
+
         var model = new LessonEditInputModel
         {
             Id = lesson.Id.ToString(),
@@ -244,9 +262,9 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         return ServiceResultT<LessonEditInputModel>.Success(model);
     }
 
-    public async Task<ServiceResult> PostLessonEditInputModelAsync(LessonEditInputModel model, string id)
+    public async Task<ServiceResult> PostLessonEditInputModelAsync(LessonEditInputModel model, string id, string userId)
     {
-       
+        
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid lessonId))
         {
             return ServiceResult.Fail("Невалиден урок.");
@@ -273,7 +291,13 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
             courseId = parsedCourseId;
         }
-
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId != lessonToChange.PublisherId)
+        {
+            return ServiceResultT<LessonEditInputModel>.Fail("Нямате права.");
+        }
+        
         lessonToChange.Name = model.Name;
         lessonToChange.Content = model.Content;
         lessonToChange.OrderIndex = model.OrderIndex;
@@ -284,7 +308,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> SoftDeleteLessonAsync(string id)
+    public async Task<ServiceResult> SoftDeleteLessonAsync(string id, string userId)
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
@@ -300,8 +324,13 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             return ServiceResult.Fail("Урокът не е намерен.");
         }
         
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId != lesson.PublisherId)
+        {
+            return ServiceResultT<LessonEditInputModel>.Fail("Нямате права.");
+        }
+        
         lesson.IsDeleted = true;
-
         await lessonRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
