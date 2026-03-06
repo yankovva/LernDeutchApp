@@ -58,9 +58,38 @@
     </main>
 </div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - LerningApp.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+<footer class="footer-mid">
+    <div class="footer-mid-wrap">
+        <div class="footer-mid-brand">
+            <div class="brand-circle">L</div>
+            <div>
+                <div class="brand-name">LernEasy Deutsch</div>
+                <div class="brand-sub">Онлайн учене на немски</div>
+            </div>
+        </div>
+
+        <div class="footer-mid-links">
+            <a asp-controller="Home" asp-action="About">
+                <svg viewBox="0 0 24 24"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0-5 3 4h-6l3-4Z"/></svg>
+                About
+            </a>
+            <a asp-controller="Course" asp-action="Index">
+                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM6 7v10h12V7z"/></svg>
+                Курсове
+            </a>
+            <a asp-controller="Lesson" asp-action="Index">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16v4H4zM4 10h10v4H4zM4 16h16v4H4z"/></svg>
+                Уроци
+            </a>
+            <a asp-controller="Home" asp-action="Privacy">
+                <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V5l-8-3Z"/></svg>
+                Privacy
+            </a>
+        </div>
+
+        <div class="footer-mid-copy">
+            © @DateTime.Now.Year • DeutchBuddy 
+        </div>
     </div>
 </footer>
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
@@ -102,4 +131,83 @@
         padding: 6px 14px;
     }
 
+    .footer-mid {
+        border-top: 1px solid #ff6800;
+        background: #fff7ed;
+        padding: 18px 16px;
+    }
+
+    .footer-mid-wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 16px;
+        align-items: center;
+    }
+
+    .footer-mid-brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    .brand-circle {
+        width: 40px;
+        height: 40px;
+        border-radius: 999px;
+        background: #f97316;
+        color: #fff;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        box-shadow: 0 8px 16px rgba(234, 88, 12, 0.25);
+    }
+
+    .brand-name {
+        font-weight: 800;
+        color: #7c2d12;
+        font-size: 1rem;
+    }
+
+    .brand-sub {
+        color: #9a3412;
+        font-size: 0.85rem;
+    }
+
+    .footer-mid-links {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+
+    .footer-mid-links a {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #9a3412;
+        font-weight: 600;
+        text-decoration: none;
+        font-size: 0.95rem;
+    }
+
+    .footer-mid-links a:hover {
+        color: #ea580c;
+    }
+
+    .footer-mid-links svg {
+        width: 16px;
+        height: 16px;
+        fill: currentColor;
+    }
+
+    .footer-mid-copy {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: #9a3412;
+        font-size: 0.85rem;
+        margin-top: 6px;
+    }
 </style>
+    
