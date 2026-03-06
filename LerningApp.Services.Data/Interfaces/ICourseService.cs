@@ -5,9 +5,9 @@ namespace LerningApp.Services.Data.Interfaces;
 
 public interface ICourseService
 { 
-    Task<IEnumerable<CourseIndexViewModel>> IndexGetCoursesAsync(Guid? userId);
+    Task<IEnumerable<CourseIndexViewModel>> IndexGetCoursesAsync(string? userId);
     
-    Task<ServiceResult> AddCourseAsync(AddCourseViewModel model,string userId);
+    Task<ServiceResult> AddCourseAsync(AddCourseViewModel model, string userId);
     
     Task<ServiceResultT<CourseDetailsViewModel>> GetCourseDetailsByIdAsync(string id, string? userId);
 

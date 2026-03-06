@@ -11,7 +11,8 @@ namespace LerningApp.Controllers;
 public class CourseController(
     UserManager<ApplicationUser> userManager,
     ICourseService courseService,
-    ILevelService levelService) : BaseController
+    ILevelService levelService,
+    ITeacherService teacherService) : BaseController
 {
     [HttpGet]
     public async Task<IActionResult> Index()
@@ -44,6 +45,16 @@ public class CourseController(
     [HttpGet]
     public async Task<IActionResult> Create()
     {
+        string userId = User.GetUserId()!;
+        
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+
+        if (!isTeacher)
+        {
+            TempData["ErrorMessage"] = "Нямате права.";
+            return RedirectToAction(nameof(Index));
+        }
+       
         AddCourseViewModel model = new AddCourseViewModel
         {
             Levels =  await levelService.GetAllLevelOptionsAsync()
@@ -54,6 +65,7 @@ public class CourseController(
 
     [Authorize]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(AddCourseViewModel model)
     {
         if (!ModelState.IsValid)
@@ -88,6 +100,13 @@ public class CourseController(
     [HttpGet]
     public async Task<IActionResult> Edit(string id)
     {
+        var userId = userManager.GetUserId(User)!;
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (!isTeacher)
+        {
+            TempData["ErrorMessage"] = "Нямате права.";
+        }
+        
         var result = await courseService.GetCourseEditByIdAsync(id);
 
         if (result.Result == false)
@@ -96,7 +115,7 @@ public class CourseController(
             return RedirectToAction(nameof(Index));
         }
 
-        result.Data.Levels = await levelService.GetAllLevelOptionsAsync();
+        result.Data!.Levels = await levelService.GetAllLevelOptionsAsync();
         return View(result.Data);
     }
 
@@ -110,7 +129,14 @@ public class CourseController(
             model.Levels = await levelService.GetAllLevelOptionsAsync();
             return this.View(model);
         }
-
+        
+        var userId = userManager.GetUserId(User)!;
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (!isTeacher)
+        {
+            TempData["ErrorMessage"] = "Нямате права.";
+        }
+        
         var result = await courseService.PostEditCourseAsync(model, id);
         if (result.Result == false)
         {
@@ -135,6 +161,13 @@ public class CourseController(
     [HttpPost]
     public async Task<IActionResult> Deactivate(string id)
     {
+        var userId = userManager.GetUserId(User)!;
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (!isTeacher)
+        {
+            TempData["ErrorMessage"] = "Нямате права.";
+        }
+        
         var result = await courseService.DeactivateCourseAsync(id);
         if (result.Result == false)
         {
@@ -150,6 +183,12 @@ public class CourseController(
     [HttpPost]
     public async Task<IActionResult> Restore(string id)
     {
+        var userId = userManager.GetUserId(User)!;
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (!isTeacher)
+        {
+            TempData["ErrorMessage"] = "Нямате права.";
+        }
         var result = await courseService.RestoreCourseAsync(id);
         if (result.Result == false)
         {
@@ -181,6 +220,13 @@ public class CourseController(
     [HttpPost]
     public async Task<IActionResult> SoftDelete(string id)
     {
+        var userId = userManager.GetUserId(User)!;
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (!isTeacher)
+        {
+            TempData["ErrorMessage"] = "Нямате права.";
+        }
+        
         var result = await courseService.SoftDeleteCourseAsync(id);
         if (result.Result == false)
         {

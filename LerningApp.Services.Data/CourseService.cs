@@ -54,12 +54,12 @@ public class CourseService(
         {
             return ServiceResult.Fail("Невалидно ниво.");
         }
-
-        var teacherGuid = await teacherService.GetTeacherIdAsync(userId);
-
-        if (teacherGuid == null)
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        
+        if (teacherId == null)
         {
-            return ServiceResult.Fail("Невалиден учител.");
+            return ServiceResult.Fail("Нямате права.");
         }
         
         var course = new Course
@@ -69,8 +69,8 @@ public class CourseService(
             Description = model.Description,
             LevelId = levelId,
             IsPublished = true,
-            CreatedAt = DateTime.Now,
-            PublisherId = teacherGuid.Value,
+            CreatedAt = DateTime.UtcNow,
+            PublisherId = teacherId.Value,
             Price = model.Price
         };
 
@@ -157,6 +157,7 @@ public class CourseService(
 
     public async Task<ServiceResult> PostEditCourseAsync(CourseEditViewModel model, string id)
     {
+        
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid courseId))
         {
             return ServiceResult.Fail("Невалиден курс.", nameof(id));
