@@ -3,6 +3,7 @@ using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Services.Data;
 using LerningApp.Services.Data.Interfaces;
+using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,18 +14,22 @@ namespace LerningApp.Controllers;
 
 [Authorize]
 public class MultipleChoiceExerciseController(UserManager<ApplicationUser> userManager,
-    IMultipleChoiceExerciseService exerciseService ) : Controller
+    IMultipleChoiceExerciseService exerciseService,
+    ITeacherService teacherService) : Controller
 {
     
     [HttpGet]
-    public IActionResult Create(string lessonId)
+    public async Task<IActionResult> Create(string lessonId)
     {
-        var model = new CreateMultipleChoiceExerciseViewModel()
+        string userId = User.GetUserId()!;
+        var result = await exerciseService.GetCreateAsync(lessonId, userId!);
+        if (result.Result == false)
         {
-          LessonId = lessonId
-        };
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Index", "Home");
+        }
         
-        return View(model);
+        return View(result.Data);
     }
 
     [HttpPost]
@@ -35,8 +40,9 @@ public class MultipleChoiceExerciseController(UserManager<ApplicationUser> userM
         {
             return View(model);
         }
-        string currentUserId = userManager.GetUserId(User)!;
-        var result = await exerciseService.CreateAsync(model, currentUserId);
+        string userId = User.GetUserId()!;
+        var result = await exerciseService.CreateAsync(model, userId);
+        
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;

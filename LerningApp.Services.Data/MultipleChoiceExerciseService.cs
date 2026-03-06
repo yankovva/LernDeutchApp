@@ -11,6 +11,34 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
     IRepository<MultipleChoiceExercise, Guid> exerciseRepository,
     ITeacherService teacherService) : IMultipleChoiceExerciseService
 {
+    public async  Task<ServiceResultT<CreateMultipleChoiceExerciseViewModel>> GetCreateAsync(string lessonId, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuid))
+        {
+            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail("Невалиден урок.");
+        }
+        Lesson? lesson = await lessonRepository
+            .GetByIdAsync(lessonGuid);
+
+        if (lesson == null)
+        {
+            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail("Невалиден урок.");
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || lesson.PublisherId != teacherId)
+        {
+            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail("Нямате права.");
+        }
+       
+        var model = new CreateMultipleChoiceExerciseViewModel()
+        {
+            LessonId = lessonId
+        };
+        
+        return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Success(model);
+    }
+
     public async Task<ServiceResult> CreateAsync(CreateMultipleChoiceExerciseViewModel model, string userId)
     {
         if (string.IsNullOrWhiteSpace(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
@@ -21,20 +49,18 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         Lesson? lesson = await lessonRepository
             .GetByIdAsync(lessonId);
         
-            if (lesson == null)
-            {
+        if (lesson == null)
+        {
                 return ServiceResult.Fail("Невалиден урок.");
-
-            }
-
-            Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-
-            if (teacherId == null)
-            {
-                return ServiceResult.Fail("Невалиден учител.");
-            }
+        }
         
-            MultipleChoiceExercise exercise = new MultipleChoiceExercise()
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || lesson.PublisherId != teacherId)
+        {
+            return ServiceResult.Fail("Нямате права.");
+        }
+        
+        MultipleChoiceExercise exercise = new MultipleChoiceExercise()
         {
             LessonId = lessonId,
             Question = model.Question,
@@ -47,8 +73,8 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
             PublisherId = teacherId.Value,
         };
         
-            await exerciseRepository.AddAsync(exercise);
-            return ServiceResult.Success();
+        await exerciseRepository.AddAsync(exercise);
+        return ServiceResult.Success();
     }
 
     public async Task<(bool isCorrect, string correctAnswer)?> CheckMultipleChoice(string exerciseId, string selectedAnswer)
