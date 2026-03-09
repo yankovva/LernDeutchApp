@@ -3,6 +3,11 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
+using static LerningApp.Common.EntityErrorMessages.Level;
+using static LerningApp.Common.EntityErrorMessages.Common;
+using static LerningApp.Common.EntityErrorMessages.Course;
+
+
 using Microsoft.EntityFrameworkCore;
 namespace LerningApp.Services.Data;
 
@@ -44,7 +49,7 @@ public class CourseService(
     {
         if (string.IsNullOrWhiteSpace(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
         {
-            return ServiceResult.Fail("Невалидно ниво.");
+            return ServiceResult.Fail(InvalidLevelIdMessage);
         }
 
         Level? level = await levelRepository
@@ -52,14 +57,14 @@ public class CourseService(
 
         if (level == null)
         {
-            return ServiceResult.Fail("Невалидно ниво.");
+            return ServiceResult.Fail(LevelNotFoundMessage);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         
         if (teacherId == null)
         {
-            return ServiceResult.Fail("Нямате права.");
+            return ServiceResult.Fail(AccessDeniedMessage);
         }
         
         var course = new Course
@@ -83,7 +88,7 @@ public class CourseService(
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResultT<CourseDetailsViewModel>.Fail(("Невалиден курс."));
+            return ServiceResultT<CourseDetailsViewModel>.Fail((InvalidCourseIdMessage));
         }
 
         Course? course = await courseRepository
@@ -95,7 +100,7 @@ public class CourseService(
 
         if (course == null)
         {
-            return ServiceResultT<CourseDetailsViewModel>.Fail(("Курсът не е намерен."));
+            return ServiceResultT<CourseDetailsViewModel>.Fail((CourseNotFoundMessage));
         }
 
         CourseDetailsViewModel model = new CourseDetailsViewModel()
@@ -132,7 +137,7 @@ public class CourseService(
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResultT<CourseEditViewModel>.Fail("Невалиден курс.");
+            return ServiceResultT<CourseEditViewModel>.Fail(InvalidCourseIdMessage);
         }
 
         Course? course = await courseRepository
@@ -140,14 +145,14 @@ public class CourseService(
 
         if (course == null)
         {
-            return ServiceResultT<CourseEditViewModel>.Fail("Курсът не е намерен.");
+            return ServiceResultT<CourseEditViewModel>.Fail(CourseNotFoundMessage);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         
         if (teacherId == null || course.PublisherId != teacherId)
         {
-            return ServiceResultT<CourseEditViewModel>.Fail("Нямате права.");
+            return ServiceResultT<CourseEditViewModel>.Fail(AccessDeniedMessage);
         }
 
         CourseEditViewModel model = new CourseEditViewModel()
@@ -166,7 +171,7 @@ public class CourseService(
     {
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResult.Fail("Невалиден курс.", nameof(id));
+            return ServiceResult.Fail(InvalidCourseIdMessage, nameof(id));
         }
 
         Course? courseToChange = await courseRepository
@@ -174,18 +179,18 @@ public class CourseService(
 
         if (courseToChange == null)
         {
-            return ServiceResult.Fail("Курсът не е намерен.", nameof(id));
+            return ServiceResult.Fail(CourseNotFoundMessage, nameof(id));
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null || courseToChange.PublisherId != teacherId)
         {
-            return ServiceResultT<CourseEditViewModel>.Fail("Нямате права.");
+            return ServiceResultT<CourseEditViewModel>.Fail(AccessDeniedMessage);
         }
 
         if (string.IsNullOrEmpty(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
         {
-            return ServiceResult.Fail("Невалидно ниво.", nameof(model.LevelId));
+            return ServiceResult.Fail(InvalidLevelIdMessage, nameof(model.LevelId));
         }
 
         var levelExists = await levelRepository
@@ -193,7 +198,7 @@ public class CourseService(
 
         if (levelExists == null)
         {
-            return ServiceResult.Fail("Избраното ниво не съществува.", nameof(model.LevelId));
+            return ServiceResult.Fail(LevelNotFoundMessage, nameof(model.LevelId));
         }
 
         courseToChange.Name = model.Name;
@@ -210,7 +215,7 @@ public class CourseService(
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResult.Fail("Невалиден курс.");
+            return ServiceResult.Fail(InvalidCourseIdMessage);
         }
 
         var course = await courseRepository
@@ -218,13 +223,13 @@ public class CourseService(
 
         if (course == null)
         {
-            return ServiceResult.Fail("Невалиден курс.");
+            return ServiceResult.Fail(CourseNotFoundMessage);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null || course.PublisherId != teacherId)
         {
-            return ServiceResult.Fail("Нямате права.");
+            return ServiceResult.Fail(AccessDeniedMessage);
         }
 
         course.IsPublished = false;
@@ -237,7 +242,7 @@ public class CourseService(
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResult.Fail("Курсът не е намерен.");
+            return ServiceResult.Fail(InvalidCourseIdMessage);
         }
 
         var course = await courseRepository
@@ -245,13 +250,13 @@ public class CourseService(
 
         if (course == null)
         {
-            return ServiceResult.Fail("Курсът не е намерен.");
+            return ServiceResult.Fail(CourseNotFoundMessage);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null || course.PublisherId != teacherId)
         {
-            return ServiceResult.Fail("Нямате права.");
+            return ServiceResult.Fail(AccessDeniedMessage);
         }
 
         course.IsPublished = true;
@@ -264,7 +269,7 @@ public class CourseService(
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResult.Fail("Невалиден курс.");
+            return ServiceResult.Fail(InvalidCourseIdMessage);
         }
 
         Course? course = await courseRepository
@@ -272,7 +277,7 @@ public class CourseService(
 
         if (course == null)
         {
-            return ServiceResult.Fail("Курсът не е намерен.");
+            return ServiceResult.Fail(CourseNotFoundMessage);
         }
         
         bool alreadyEnrolled = await userCourseRepository
@@ -281,7 +286,7 @@ public class CourseService(
 
         if (alreadyEnrolled)
         {
-            return ServiceResult.Fail("Вече сте записани за този курс.");
+            return ServiceResult.Fail(AlreadyEnrolled);
         }
 
         UserCourse newUserCourse = new UserCourse
@@ -300,7 +305,7 @@ public class CourseService(
     {
         if (!Guid.TryParse(id, out var courseId))
         {
-            return ServiceResult.Fail("Невалиден курс.");
+            return ServiceResult.Fail(InvalidCourseIdMessage);
         }
 
         var course = await courseRepository
@@ -311,13 +316,13 @@ public class CourseService(
 
         if (course == null)
         {
-            return ServiceResult.Fail("Курсът не е намерен.");
+            return ServiceResult.Fail(CourseNotFoundMessage);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null || course.PublisherId != teacherId)
         {
-            return ServiceResult.Fail("Нямате права.");
+            return ServiceResult.Fail(AccessDeniedMessage);
         }
         
         course.IsDeleted = true;

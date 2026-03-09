@@ -1,4 +1,5 @@
 using LerningApp.Services.Data.Interfaces;
+using static LerningApp.Common.EntityErrorMessages.File;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 
@@ -9,7 +10,7 @@ public class FileService(IWebHostEnvironment environment) : IFileService
     public async Task<string> UploadFileAsync(IFormFile file, string folderName, string uniqueFileName)
     {
         if (file == null || file.Length == 0)
-            throw new ArgumentException("Файлът липсва");
+            throw new ArgumentException(MissingFileMessage);
 
         string uploadFolder = Path.Combine(environment.WebRootPath, folderName);
         if (!Directory.Exists(uploadFolder))

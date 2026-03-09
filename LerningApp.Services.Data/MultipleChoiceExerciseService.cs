@@ -1,9 +1,10 @@
-using System.Text.Json.Nodes;
 using LerningApp.Common;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
+using static LerningApp.Common.EntityErrorMessages.Lesson;
+using static LerningApp.Common.EntityErrorMessages.Common;
 
 namespace LerningApp.Services.Data;
 
@@ -43,7 +44,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
     {
         if (string.IsNullOrWhiteSpace(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
-                return ServiceResult.Fail("Невалиден урок.");
+                return ServiceResult.Fail(InvalidLessonIdMessage);
         }
 
         Lesson? lesson = await lessonRepository
@@ -51,13 +52,13 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         
         if (lesson == null)
         {
-                return ServiceResult.Fail("Невалиден урок.");
+                return ServiceResult.Fail(LessonNotFoundMessage);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null || lesson.PublisherId != teacherId)
         {
-            return ServiceResult.Fail("Нямате права.");
+            return ServiceResult.Fail(AccessDeniedMessage);
         }
         
         MultipleChoiceExercise exercise = new MultipleChoiceExercise()

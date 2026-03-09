@@ -5,6 +5,12 @@ using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.VocabularyCard;
 using Microsoft.EntityFrameworkCore;
 
+using static LerningApp.Common.EntityErrorMessages.Lesson;
+using static LerningApp.Common.EntityErrorMessages.File;
+using static LerningApp.Common.EntityErrorMessages.PartOfSpeech;
+using static LerningApp.Common.EntityErrorMessages.Card;
+
+
 using static LerningApp.Common.ApplicationConstants;
 namespace LerningApp.Services.Data;
 
@@ -17,7 +23,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
     {
         if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuidId))
         {
-            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail("Урокът не е намерен.");
+            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(InvalidLessonIdMessage);
         }
         
         var lesson = await lessonRepository
@@ -25,7 +31,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
           
         if (lesson == null)
         {
-            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail("Урокът не е намерен.");
+            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(LessonNotFoundMessage);
         }
         
         var cards = await vocabularyCardRepository
@@ -57,7 +63,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
     {
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid cardGuid))
         {
-            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail("Картата не е намерена."); 
+            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(InvalidCardIdMessage); 
         }
 
         VocabularyCard? card = await vocabularyCardRepository
@@ -70,7 +76,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
 
         if (card == null)
         {
-            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail("Картата не е намерена.");
+            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(CardNotFoundMessage);
         }
         
         var de = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "de");
@@ -105,22 +111,22 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
     {
         if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
-         return ServiceResult.Fail("Невалиден урок.", string.Empty);
+         return ServiceResult.Fail(InvalidLessonIdMessage, string.Empty);
         }
 
         if (await lessonRepository.GetByIdAsync(lessonId) == null)
         {
-            return ServiceResult.Fail("Урокът не е намерен.", string.Empty);
+            return ServiceResult.Fail(LessonNotFoundMessage, string.Empty);
         }
 
         if (string.IsNullOrEmpty(model.PartOfSpeechId) || !Guid.TryParse(model.PartOfSpeechId, out Guid partOfSpeechId))
         {
-            return ServiceResult.Fail("Невалидна част на речта.", nameof(model.PartOfSpeechId));
+            return ServiceResult.Fail(InvalidPartOfSpeechIdMessage, nameof(model.PartOfSpeechId));
         }
 
         if (await partOfSpeechrRepository.GetByIdAsync(partOfSpeechId) == null)
         {
-            return ServiceResult.Fail("Невалидна част на речта.",nameof(model.PartOfSpeechId));
+            return ServiceResult.Fail(PartOfSpeechNotFoundMessage,nameof(model.PartOfSpeechId));
         }
         
         string imagePath = DefaultCardImagePath;
@@ -132,7 +138,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
 
             if (!fileService.IsFileValid(model.Image, allowedExtensions, maxSize))
             {
-                return ServiceResult.Fail("Невалиден файл или твърде голям файл.", nameof(model.Image));
+                return ServiceResult.Fail(InvalidFileMessage, nameof(model.Image));
 
             }
             string extension = Path.GetExtension(model.Image.FileName);
@@ -183,7 +189,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
-            return ServiceResultT<VocabularyCardEditInputModel>.Fail("Невалидна карта.");
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(InvalidCardIdMessage);
         }
         
         var card = await vocabularyCardRepository
@@ -194,7 +200,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
        
         if (card == null)
         {
-            return ServiceResultT<VocabularyCardEditInputModel>.Fail("Невалидна карта.");
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(CardNotFoundMessage);
         }
         
         var de = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "de");
@@ -220,7 +226,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
-            return ServiceResult.Fail("Невалидна карта.");
+            return ServiceResult.Fail(InvalidCardIdMessage);
         }
         
         var card = await vocabularyCardRepository
@@ -231,12 +237,12 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
        
         if (card == null)
         {
-            return ServiceResult.Fail("Невалидна карта.");
+            return ServiceResult.Fail(CardNotFoundMessage);
         }
         
         if (string.IsNullOrEmpty(model.PartOfSpeechId) || !Guid.TryParse(model.PartOfSpeechId, out Guid partOfSpeechId))
         {
-            return ServiceResult.Fail("Невалидна част на речта.",nameof(model.PartOfSpeechId));
+            return ServiceResult.Fail(InvalidPartOfSpeechIdMessage,nameof(model.PartOfSpeechId));
         }
 
         var partOfSpeech = await partOfSpeechrRepository
@@ -244,7 +250,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
        
         if (partOfSpeech == null)
         {
-            return ServiceResult.Fail("Невалидна част на речта.", nameof(model.PartOfSpeechId));
+            return ServiceResult.Fail(PartOfSpeechNotFoundMessage, nameof(model.PartOfSpeechId));
         }
         
         if (model.Image?.Length > 0)
@@ -254,7 +260,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
 
             if (!fileService.IsFileValid(model.Image, allowedExtensions, maxSize))
             {
-                return ServiceResult.Fail("Невалиден файл или твърде голям файл.", nameof(model.Image));
+                return ServiceResult.Fail(InvalidFileMessage, nameof(model.Image));
             }
 
             string extension = Path.GetExtension(model.Image.FileName);
@@ -290,14 +296,14 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
-            return ServiceResult.Fail("Невалидна карта.");
+            return ServiceResult.Fail(InvalidCardIdMessage);
         }
 
         var card = await vocabularyCardRepository
             .GetByIdAsync(cardId);
         if (card == null)
         {
-            return ServiceResult.Fail("Невалидна карта.");
+            return ServiceResult.Fail(CardNotFoundMessage);
         }
 
         if (card.ImagePath != DefaultCardImagePath)
@@ -312,7 +318,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
-            return ServiceResult.Fail("Невалидна карта.");
+            return ServiceResult.Fail(InvalidCardIdMessage);
         }
 
         VocabularyCard? card = await vocabularyCardRepository
@@ -322,7 +328,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
 
         if (card == null)
         {
-            return ServiceResult.Fail("Картата не е намерена.");
+            return ServiceResult.Fail(CardNotFoundMessage);
         }
         
         card.IsDeleted = true;

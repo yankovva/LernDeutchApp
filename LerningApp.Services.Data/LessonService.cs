@@ -6,7 +6,12 @@ using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.TranslationExercise;
+using static LerningApp.Common.EntityErrorMessages.Lesson;
+using static LerningApp.Common.EntityErrorMessages.Course;
+using static LerningApp.Common.EntityErrorMessages.Common;
+
 using Microsoft.EntityFrameworkCore;
+
 
 namespace LerningApp.Services.Data;
 
@@ -41,7 +46,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResultT<LessonContentViewModel>.Fail("Невалиден урок.");
+            return ServiceResultT<LessonContentViewModel>.Fail(InvalidLessonIdMessage);
         }
         
         Lesson? lesson = await lessonRepository
@@ -53,7 +58,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lesson == null)
         {
-            return ServiceResultT<LessonContentViewModel>.Fail("Урокът не е намерен.");
+            return ServiceResultT<LessonContentViewModel>.Fail(LessonNotFoundMessage);
         }
 
         LessonContentViewModel model = new LessonContentViewModel()
@@ -102,12 +107,12 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
         if (!isTeacher)
         {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail("Нямате права.");
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
         }
         
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail("Невалиден урок.");
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail(InvalidLessonIdMessage);
         }
 
         Lesson? lesson = await lessonRepository
@@ -115,7 +120,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lesson == null) 
         {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail("Урокът не е намерен.");
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail(LessonNotFoundMessage);
         }
 
         AddLessonToCourseViewModel model = new AddLessonToCourseViewModel()
@@ -140,12 +145,12 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
         if (!isTeacher)
         {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail("Нямате права.");
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
         }
         
         if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
-            return ServiceResult.Fail("Урокът не е намерен.");
+            return ServiceResult.Fail(InvalidLessonIdMessage);
         }
 
         Lesson? lesson = await lessonRepository
@@ -153,7 +158,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lesson == null)
         {
-            return ServiceResult.Fail("Урокът не е намерен.");
+            return ServiceResult.Fail(LessonNotFoundMessage);
         }
         
         if (string.IsNullOrWhiteSpace(model.SelectedCourseId))
@@ -165,7 +170,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
            
         if (string.IsNullOrEmpty(model.SelectedCourseId) || !Guid.TryParse(model.SelectedCourseId, out Guid courseId))
         {
-            return ServiceResult.Fail("Невалиден Курс.", nameof(model.SelectedCourseId));
+            return ServiceResult.Fail(InvalidCourseIdMessage, nameof(model.SelectedCourseId));
         }
 
         Course? course = await courseRepository
@@ -173,7 +178,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         
         if (course == null)
         {
-            return ServiceResult.Fail("Невалиден Курс.",nameof(model.SelectedCourseId));
+            return ServiceResult.Fail(CourseNotFoundMessage,nameof(model.SelectedCourseId));
         }
 
         lesson.CourseId = courseId;
@@ -190,7 +195,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         {
             if (!Guid.TryParse(model.CourseId, out  courseId))
             {
-                return ServiceResult.Fail("Невалиден Курс.", nameof(model.CourseId));
+                return ServiceResult.Fail(InvalidCourseIdMessage, nameof(model.CourseId));
             }
             
             Course? course = await courseRepository
@@ -198,7 +203,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             
             if (course == null)
             {
-                return ServiceResult.Fail("Невалиден Курс.", nameof(model.CourseId));
+                return ServiceResult.Fail(CourseNotFoundMessage, nameof(model.CourseId));
             }
         }
         
@@ -206,7 +211,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         if (teacherId == null)
         {
-            return ServiceResult.Fail("Нямате права.");
+            return ServiceResult.Fail(AccessDeniedMessage);
         }
         
         Lesson lesson = new Lesson
@@ -229,12 +234,12 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
         if (!isTeacher)
         {
-            return ServiceResultT<LessonEditInputModel>.Fail("Нямате права.");
+            return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
         }
         
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResultT<LessonEditInputModel>.Fail("Урокът не е намерен.");
+            return ServiceResultT<LessonEditInputModel>.Fail(InvalidLessonIdMessage);
         }
 
         Lesson? lesson = await lessonRepository
@@ -243,7 +248,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lesson == null)
         {
-            return ServiceResultT<LessonEditInputModel>.Fail("Урокът не е намерен.");
+            return ServiceResultT<LessonEditInputModel>.Fail(LessonNotFoundMessage);
         }
 
         var model = new LessonEditInputModel
@@ -265,7 +270,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResult.Fail("Невалиден урок.");
+            return ServiceResult.Fail(InvalidLessonIdMessage);
         }
 
         Lesson? lessonToChange = await lessonRepository
@@ -274,18 +279,18 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lessonToChange == null)
         {
-            return ServiceResult.Fail("Урокът не е намерен.");
+            return ServiceResult.Fail(LessonNotFoundMessage);
         }
 
         Guid? courseId = null;
         if (!string.IsNullOrWhiteSpace(model.CourseId))
         {
             if (!Guid.TryParse(model.CourseId, out var parsedCourseId))
-                return ServiceResult.Fail("Невалиден курс.");
+                return ServiceResult.Fail(InvalidCourseIdMessage);
 
             var courseExists = await courseRepository.GetByIdAsync(parsedCourseId);
             if (courseExists == null)
-                return ServiceResult.Fail("Избраният курс не съществува.");
+                return ServiceResult.Fail(CourseNotFoundMessage);
 
             courseId = parsedCourseId;
         }
@@ -293,7 +298,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId != lessonToChange.PublisherId)
         {
-            return ServiceResultT<LessonEditInputModel>.Fail("Нямате права.");
+            return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
         }
         
         lessonToChange.Name = model.Name;
@@ -310,7 +315,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResult.Fail("Невалиден урок.");
+            return ServiceResult.Fail(InvalidLessonIdMessage);
         }
 
         Lesson? lesson = await lessonRepository
@@ -319,13 +324,13 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lesson == null)
         {
-            return ServiceResult.Fail("Урокът не е намерен.");
+            return ServiceResult.Fail(LessonNotFoundMessage);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId != lesson.PublisherId)
         {
-            return ServiceResultT<LessonEditInputModel>.Fail("Нямате права.");
+            return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
         }
         
         lesson.IsDeleted = true;

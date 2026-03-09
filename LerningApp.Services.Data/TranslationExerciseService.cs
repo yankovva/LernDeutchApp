@@ -3,6 +3,8 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.TranslationExercise;
+using static LerningApp.Common.EntityErrorMessages.Lesson;
+using static LerningApp.Common.EntityErrorMessages.Common;
 
 namespace LerningApp.Services.Data;
 
@@ -15,20 +17,20 @@ public class TranslationExerciseService(
     {
         if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuid))
         {
-            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail("Невалиден урок.");
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(InvalidLessonIdMessage);
         }
         Lesson? lesson = await lessonRepository
             .GetByIdAsync(lessonGuid);
 
         if (lesson == null)
         {
-            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail("Невалиден урок.");
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(LessonNotFoundMessage);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null || lesson.PublisherId != teacherId)
         {
-            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail("Нямате права.");
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(AccessDeniedMessage);
         }
 
         var model = new CreateTranslationExerciseViewModel()
@@ -42,20 +44,20 @@ public class TranslationExerciseService(
     {
         if (string.IsNullOrWhiteSpace(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
-            return ServiceResult.Fail("Invalid Lesson");
+            return ServiceResult.Fail(InvalidLessonIdMessage);
         }
 
         Lesson? lesson = await lessonRepository
             .GetByIdAsync(lessonId);
         if (lesson == null)
         {
-            return ServiceResult.Fail("Invalid Lesson");
+            return ServiceResult.Fail(LessonNotFoundMessage);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null || lesson.PublisherId != teacherId)
         {
-            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail("Нямате права.");
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(AccessDeniedMessage);
         }
         
         TranslationExercise exercise = new TranslationExercise()
