@@ -26,7 +26,7 @@ public class VocabularyCardCreateInputModel
     [MaxLength(500)]
     public string? ImageUrl { get; set; } 
     
-    public IFormFile Image { get; set; } = null!;
+    public IFormFile? Image { get; set; } 
     
     [MinLength(GenderdMinLength)]
     [MaxLength(GenderMaxLength)]
