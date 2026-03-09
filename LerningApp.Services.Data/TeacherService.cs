@@ -12,7 +12,7 @@ public class TeacherService(IRepository<Teacher, Guid> teacherRepository) : ITea
     {
         bool result = await  teacherRepository
             .GetAllAttached()
-            .AnyAsync(t => t.UserId.ToString().ToLower() == userId.ToLower() && t.IsApproved == true);
+            .AnyAsync(t => t.UserId.ToString()== userId && t.IsApproved == true);
 
         return result;
     }
