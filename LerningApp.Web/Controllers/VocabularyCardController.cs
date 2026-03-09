@@ -52,6 +52,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         return this.View(model);
     }
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(VocabularyCardCreateInputModel model)
     {
         if (!ModelState.IsValid)
@@ -86,6 +87,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     }
     
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(VocabularyCardEditInputModel model,string id)
     {
         var result = await vocabularyCardService.PostCardEditByIdAsync(model,id);
@@ -99,6 +101,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     }
     
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id, string lessonId)
     {
         var result = await vocabularyCardService.DeleteCardByIdAsync(id);
@@ -112,6 +115,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     }
     
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> SoftDelete(string id, string lessonId)
     {
         var result = await vocabularyCardService.SoftDeleteCardAsync(id);

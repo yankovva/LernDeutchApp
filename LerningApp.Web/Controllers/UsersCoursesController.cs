@@ -12,8 +12,7 @@ public class UsersCoursesController(IUsersCoursesService usersCoursesService,
     UserManager<ApplicationUser> userManager)
     : BaseController
 {
- 
-    [Authorize]
+    
     [HttpGet]
     public async Task<IActionResult> Index()
     {  

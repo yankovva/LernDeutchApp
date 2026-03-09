@@ -149,6 +149,7 @@ public class CourseController(
 
     [Authorize]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Deactivate(string id)
     {
         string userId = User.GetUserId()!;
@@ -166,6 +167,7 @@ public class CourseController(
 
     [Authorize]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Restore(string id)
     {
         string userId = User.GetUserId()!;
@@ -183,6 +185,7 @@ public class CourseController(
 
     [Authorize]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Enroll(string courseId)
     {
         Guid userId = Guid.Parse(User.GetUserId()!);
@@ -199,6 +202,7 @@ public class CourseController(
 
     [Authorize]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> SoftDelete(string id)
     {
         string userId = User.GetUserId()!;

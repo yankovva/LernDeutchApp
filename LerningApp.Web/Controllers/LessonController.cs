@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LerningApp.Controllers;
 
+[Authorize]
 public class LessonController(ILessonService lessonService,
     ICourseService courseService,
     UserManager<ApplicationUser> userManager,
@@ -34,7 +35,6 @@ public class LessonController(ILessonService lessonService,
     }
 
     [HttpGet]
-    [Authorize]
     public async Task<IActionResult> AddToCourse(string id)
     {
         string userId = User.GetUserId()!;
@@ -50,7 +50,7 @@ public class LessonController(ILessonService lessonService,
     }
 
     [HttpPost]
-    [Authorize]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> AddToCourse(AddLessonToCourseViewModel model)
     {
         if (!this.ModelState.IsValid)
@@ -78,7 +78,7 @@ public class LessonController(ILessonService lessonService,
     }
 
     [HttpGet]
-    [Authorize]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create()
     {
         string userId = User.GetUserId()!;
@@ -94,9 +94,9 @@ public class LessonController(ILessonService lessonService,
         };
         return this.View(model);
     }
-
-    [Authorize]
+    
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(AddLessonInputModel model)
     {
         if (!this.ModelState.IsValid)
@@ -117,8 +117,7 @@ public class LessonController(ILessonService lessonService,
         TempData["SuccessMessage"] = $"Успешно създадохте {model.Name}.";
         return this.RedirectToAction(nameof(this.Index));
     }
-
-    [Authorize]
+    
     [HttpGet]
     public async Task<IActionResult> Edit(string id)
     {
@@ -136,7 +135,6 @@ public class LessonController(ILessonService lessonService,
     }
     
     [HttpPost]
-    [Authorize]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     {
@@ -158,8 +156,8 @@ public class LessonController(ILessonService lessonService,
         TempData["SuccessMessage"] = $"Успешно редактирахте {model.Name}.";
         return RedirectToAction(nameof(Details), new { id });
     }
-    [Authorize]
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> SoftDelete(string id)
     {
         string userId = User.GetUserId()!;
