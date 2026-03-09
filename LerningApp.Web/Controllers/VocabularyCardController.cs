@@ -1,10 +1,7 @@
-using LerningApp.Data;
-using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.VocabularyCard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Controllers;
 

@@ -1,9 +1,7 @@
-using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.Lesson;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LerningApp.Controllers;
@@ -11,7 +9,6 @@ namespace LerningApp.Controllers;
 [Authorize]
 public class LessonController(ILessonService lessonService,
     ICourseService courseService,
-    UserManager<ApplicationUser> userManager,
     ITeacherService teacherService) : BaseController
 {
     [HttpGet]

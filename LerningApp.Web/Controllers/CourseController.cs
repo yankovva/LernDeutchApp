@@ -1,16 +1,12 @@
-using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.Course;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LerningApp.Controllers;
 
-public class CourseController(
-    UserManager<ApplicationUser> userManager,
-    ICourseService courseService,
+public class CourseController(ICourseService courseService,
     ILevelService levelService,
     ITeacherService teacherService) : BaseController
 {

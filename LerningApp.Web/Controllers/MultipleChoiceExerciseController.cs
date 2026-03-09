@@ -1,21 +1,14 @@
-using LerningApp.Common;
-using LerningApp.Data;
-using LerningApp.Data.Models;
-using LerningApp.Services.Data;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 
 namespace LerningApp.Controllers;
 
 [Authorize]
-public class MultipleChoiceExerciseController(UserManager<ApplicationUser> userManager,
-    IMultipleChoiceExerciseService exerciseService,
-    ITeacherService teacherService) : Controller
+public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exerciseService) : Controller
 {
     
     [HttpGet]

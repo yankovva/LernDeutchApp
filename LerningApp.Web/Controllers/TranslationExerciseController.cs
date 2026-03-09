@@ -1,21 +1,13 @@
-using LerningApp.Data;
-using LerningApp.Data.Models;
-using LerningApp.Data.Repository.Interfaces;
-using LerningApp.Services.Data;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.TranslationExercise;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LerningApp.Controllers;
 
 [Authorize]
-public class TranslationExerciseController(ITranslationExerciseService translationExerciseService,
-    UserManager<ApplicationUser> userManager,
-    IRepository<TranslationExercise, Guid> exerciseRepository,
-    ITeacherService teacherService) : Controller
+public class TranslationExerciseController(ITranslationExerciseService translationExerciseService) : Controller
 {
     
     [HttpGet]
