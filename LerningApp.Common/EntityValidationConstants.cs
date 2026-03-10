@@ -75,6 +75,15 @@ public static class EntityValidationConstants
         public const int AnswerMaxLength = 100;
     }
     
+    public static class ListeningExercise
+    {
+        public const int QuestionMinLength = 10;
+        public const int QuestionMaxLength = 250;
+        
+        public const int AnswerMinLength = 2;
+        public const int AnswerMaxLength = 100;
+    }
+    
     public static class TranslationExercise
     {
         public const int SentenceMinLength = 10;
