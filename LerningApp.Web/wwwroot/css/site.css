@@ -16,6 +16,16 @@ body {
   margin: 0;
 }
 
+body > .container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+body > .container > main {
+  flex: 1;
+}
+
 main {
   flex: 1;
 }
