@@ -24,13 +24,14 @@ public class LerningAppContext : IdentityDbContext<ApplicationUser, IdentityRole
     public virtual DbSet<PartOfSpeech> PartsOfSpeech { get; set; } = null!;
     
     public virtual DbSet<UserCourse> UsersCourses { get; set; } = null!;
-    
     public virtual DbSet<MultipleChoiceExercise> MultipleChoiceExercises { get; set; } = null!;
-    
     public virtual DbSet<TranslationExercise> TranslationExercises { get; set; } = null!;
     public virtual DbSet<Teacher> Teachers { get; set; } = null!;
-
-
+    
+    public virtual DbSet<ListeningExercise> ListeningExercises { get; set; } = null!;
+    
+    public virtual DbSet<ListeningExerciseOption> ListeningExerciseOptions { get; set; } = null!;
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

@@ -43,4 +43,7 @@ public class Lesson{
         = new HashSet<MultipleChoiceExercise>();
     public virtual ICollection<TranslationExercise> TranslationExercises { get; set; } 
         = new HashSet<TranslationExercise>();
+
+    public virtual ICollection<ListeningExercise> ListeningExercises { get; set; } 
+        = new HashSet<ListeningExercise>();
 }
