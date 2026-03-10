@@ -29,13 +29,14 @@ public class ListeningExerciseController(LerningAppContext dbContext, ITeacherSe
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null || lesson.PublisherId != teacherId)
         {
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Details", "Lesson");
         }
        
         var model = new CreateListeningExerciseViewModel()
         {
             LessonId = lessonId
         };
+        
         return View(model);
     }
     
