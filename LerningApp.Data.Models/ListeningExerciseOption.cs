@@ -9,15 +9,15 @@ public class ListeningExerciseOption
     [Comment("The answer of the exercise")]
     public string Answer { get; set; } = null!;
     
-    [Comment("Whether the answer is true or false")]
+    [Comment("Whether the answer is correct or not")]
     public bool isCorrect { get; set; } 
     
     [Comment("Order index of the answer")]
     public int OrderIndex { get; set; }
     
-    [Comment("Foreign key to ListeningExercise")]
-    public Guid ListeningExerciseId { get; set; }
+    [Comment("Foreign key to the Listening Question")]
+    public Guid ListeningQuestionId { get; set; }
     
-    [Comment("ListeningExercise Reference")]
-    public ListeningExercise ListeningExercise { get; set; } = null!;
+    [Comment("ListeningQuestion Reference")]
+    public ListeningQuestion ListeningQuestion { get; set; } = null!;
 }

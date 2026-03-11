@@ -5,12 +5,8 @@ namespace LerningApp.Data.Models;
 public class ListeningExercise
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-
-    [Comment("The Question for the exercise")]
-    public string Question { get; set; } = null!;
     
     [Comment("The Audio path of the exercise")]
-
     public string AudioPath { get; set; } = null!;
     
     [Comment("The difficulty level of the exercise")]
@@ -31,6 +27,6 @@ public class ListeningExercise
     [Comment("ApplicationUser Reference")]
     public Teacher Publisher { get; set; } = null!;
 
-    public ICollection<ListeningExerciseOption> AnswerOptions { get; set; } 
-        = new HashSet<ListeningExerciseOption>();
+    public ICollection<ListeningQuestion> Questions { get; set; } 
+        = new HashSet<ListeningQuestion>();
 }

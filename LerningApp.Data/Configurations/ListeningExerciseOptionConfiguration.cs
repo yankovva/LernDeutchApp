@@ -24,15 +24,15 @@ public class ListeningExerciseOptionConfiguration : IEntityTypeConfiguration<Lis
             .IsRequired();
 
         builder
-            .HasOne(x => x.ListeningExercise)
-            .WithMany(x => x.AnswerOptions)
-            .HasForeignKey(x => x.ListeningExerciseId)
+            .HasOne(x => x.ListeningQuestion)
+            .WithMany(x => x.Options)
+            .HasForeignKey(x => x.ListeningQuestionId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
-            .HasQueryFilter(o => !o.ListeningExercise.IsDeleted);
+            .HasQueryFilter(o => !o.ListeningQuestion.IsDeleted);
 
-        builder.HasIndex(x => x.ListeningExerciseId);
-        builder.HasIndex(x => new { x.ListeningExerciseId, x.OrderIndex }).IsUnique();
+        builder.HasIndex(x => x.ListeningQuestionId);
+        builder.HasIndex(x => new { x.ListeningQuestionId, x.OrderIndex }).IsUnique();
     }
 }

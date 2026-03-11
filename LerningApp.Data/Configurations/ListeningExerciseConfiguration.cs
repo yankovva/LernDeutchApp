@@ -11,11 +11,6 @@ public class ListeningExerciseConfiguration : IEntityTypeConfiguration<Listening
         builder.HasKey(x => x.Id);
 
         builder
-            .Property(x => x.Question)
-            .IsRequired()
-            .HasMaxLength(250);
-
-        builder
             .Property(x => x.AudioPath)
             .IsRequired()
             .HasMaxLength(500);

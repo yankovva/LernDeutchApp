@@ -32,6 +32,8 @@ public class LerningAppContext : IdentityDbContext<ApplicationUser, IdentityRole
     
     public virtual DbSet<ListeningExerciseOption> ListeningExerciseOptions { get; set; } = null!;
     
+    public virtual DbSet<ListeningQuestion> ListeningQuestions { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
