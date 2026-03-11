@@ -10,10 +10,9 @@ public class VocabularyCardConfiguration: IEntityTypeConfiguration<VocabularyCar
     {
         builder
             .HasKey(vc => vc.Id);
-        
+
         builder.Property(vc => vc.ImagePath)
-            .HasMaxLength(500)
-            .HasDefaultValue("/images/VocabularyCardsImages/defaultcardimage.png");
+            .HasMaxLength(500);
         
         builder.HasQueryFilter(vc => vc.IsDeleted == false);
 

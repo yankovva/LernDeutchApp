@@ -128,8 +128,8 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         {
             return ServiceResult.Fail(PartOfSpeechNotFoundMessage,nameof(model.PartOfSpeechId));
         }
-        
-        string imagePath = DefaultCardImagePath;
+
+        string imagePath = string.Empty;
 
         if (model.Image?.Length > 0)
         {
@@ -177,7 +177,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             LessonId = lessonId,
             PartOfSpeechId = partOfSpeechId,
             Terms = terms,
-            ImagePath = $"/{imagePath}",
+            ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath
         };
          
         await vocabularyCardRepository.AddAsync(newCard);
@@ -267,12 +267,12 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             string uniqueFileName = $"{Guid.NewGuid()}{extension}";
             string imagePath = await fileService.UploadFileAsync(model.Image, DefaultCardDirectoryPath, uniqueFileName);
            
-            if (card.ImagePath != null && card.ImagePath != DefaultCardImagePath)
+            if (card.ImagePath != null)
             {
                 fileService.DeleteFile(card.ImagePath);
             }
 
-            card.ImagePath = $"/{imagePath}";
+            card.ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath;
         }
 
         card.PartOfSpeechId = partOfSpeechId;
@@ -306,7 +306,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             return ServiceResult.Fail(CardNotFoundMessage);
         }
 
-        if (card.ImagePath != DefaultCardImagePath)
+        if (card.ImagePath != null)
         {
             fileService.DeleteFile(card.ImagePath);
         }
