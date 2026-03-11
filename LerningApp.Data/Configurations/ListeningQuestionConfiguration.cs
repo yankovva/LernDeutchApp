@@ -16,10 +16,6 @@ public class ListeningQuestionConfiguration : IEntityTypeConfiguration<Listening
             .HasMaxLength(250);
 
         builder
-            .Property(x => x.DifficultyLevel)
-            .IsRequired();
-
-        builder
             .HasOne(x => x.ListeningExercise)
             .WithMany(x => x.Questions)
             .HasForeignKey(x => x.ListeningExerciseId)
