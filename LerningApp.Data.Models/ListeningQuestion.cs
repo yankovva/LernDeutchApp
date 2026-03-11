@@ -10,8 +10,6 @@ public class ListeningQuestion
     
     public ApplicationUser Publisher { get; set; } = null!;
     
-    public int DifficultyLevel { get; set; }
-    
     public Guid ListeningExerciseId { get; set; }
     public ListeningExercise ListeningExercise { get; set; }= null!;
     public ICollection<ListeningExerciseOption> Options { get; set; } = new List<ListeningExerciseOption>();
