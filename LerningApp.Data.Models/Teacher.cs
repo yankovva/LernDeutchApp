@@ -23,7 +23,8 @@ public class Teacher
     public virtual ICollection<Course> CreatedCourses { get; set; } = new HashSet<Course>();
     public virtual ICollection<Lesson> CreatedLessons { get; set; } = new HashSet<Lesson>();
     public virtual ICollection<MultipleChoiceExercise> CreatedMultipleChoiceExercises { get; set; } = new HashSet<MultipleChoiceExercise>();
-   
     public virtual ICollection<ListeningExercise> ListeningExercises { get; set; } = new HashSet<ListeningExercise>();
+    
+    public virtual ICollection<ListeningQuestion> ListeningQuestions { get; set; } = new HashSet<ListeningQuestion>();
     public virtual ICollection<TranslationExercise> CreatedTranslationExercises { get; set; } = new HashSet<TranslationExercise>();
 }

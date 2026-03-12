@@ -28,6 +28,7 @@ public class ListeningExerciseOptionConfiguration : IEntityTypeConfiguration<Lis
             .WithMany(x => x.Options)
             .HasForeignKey(x => x.ListeningQuestionId)
             .OnDelete(DeleteBehavior.Cascade);
+        
 
         builder
             .HasQueryFilter(o => !o.ListeningQuestion.IsDeleted);

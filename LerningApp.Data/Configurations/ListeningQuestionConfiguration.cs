@@ -26,6 +26,12 @@ public class ListeningQuestionConfiguration : IEntityTypeConfiguration<Listening
             .WithOne(x => x.ListeningQuestion)
             .HasForeignKey(x => x.ListeningQuestionId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        builder
+            .HasOne(x => x.Publisher)
+            .WithMany(x => x.ListeningQuestions)
+            .HasForeignKey(x => x.PublisherId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder
             .HasQueryFilter(x => !x.ListeningExercise.IsDeleted);
