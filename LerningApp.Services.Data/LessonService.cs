@@ -4,6 +4,7 @@ using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
+using LerningApp.Web.ViewModels.ListeningExercise;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.TranslationExercise;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
@@ -11,6 +12,7 @@ using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.EntityErrorMessages.Common;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 
 namespace LerningApp.Services.Data;
@@ -19,6 +21,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     IRepository<Course, Guid> courseRepository,
     IRepository<MultipleChoiceExercise, Guid> multipleExerciseRepository,
     IRepository<TranslationExercise, Guid> translationExersiceRepository,
+    IRepository<ListeningExercise, Guid> listeningExerciseRepository,
     ITeacherService teacherService) : ILessonService
 {
     public async Task<IEnumerable<LessonIndexViewModel>> IndexGetLessonsAsync()
@@ -61,6 +64,28 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             return ServiceResultT<LessonContentViewModel>.Fail(LessonNotFoundMessage);
         }
 
+        List<IndexListeningExerciseViewModel> listeningExercises = await listeningExerciseRepository
+            .GetAllAttached()
+            .AsNoTracking()
+            .Where(ex => ex.LessonId == lessonId)
+            .OrderBy(ex => ex.DifficultyLevel)
+            .Select(ex => new IndexListeningExerciseViewModel
+            {
+                Id = ex.Id.ToString(),
+                AudioPath = ex.AudioPath,
+                Qestions = ex.Questions
+                    .Select(q => new IndexListeningQestionViewModel()
+                    {
+                        Question = q.Question,
+                        Options = q.Options
+                            .Select(op => new IndexListeningOptionsViewModel()
+                            {
+                                AnswerText = op.Answer,
+                                IsCorrect = op.isCorrect
+                            }).ToList()
+                    }).ToList()
+            }).ToListAsync();
+        
         LessonContentViewModel model = new LessonContentViewModel()
         {
             Id = lesson.Id.ToString(),
@@ -95,7 +120,8 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                     GermanSentence = ex.GermanSentence,
                     EnglishSentence = ex.EnglishSentence,
                     BulgarianSentence = ex.BulgarianSentence,
-                }).ToListAsync()
+                }).ToListAsync(),
+            ListeningExercises = listeningExercises
             
         };
         
