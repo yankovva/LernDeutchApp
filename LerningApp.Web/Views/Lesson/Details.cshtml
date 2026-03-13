@@ -1,4 +1,5 @@
 @using System.Security.Claims
+@using LerningApp.Data.Migrations
 @using LerningApp.Services.Data.Interfaces
 @using LerningApp.Web.Infrastructure.Extensions
 @using static LerningApp.Common.Enums
@@ -355,6 +356,43 @@
             </form>
         }
     }
+    @if (Model.ListeningExercises.Any())
+    {
+        <h4 class="mt-4">Слушане с разбиране</h4>
+       
+        @foreach (var ex in Model.ListeningExercises)
+        {
+            <audio controls preload="metadata">
+                <source src="@Url.Content(ex.AudioPath)" type="audio/mpeg" />
+            </audio>
+
+            foreach (var question in ex.Qestions)
+            {
+               
+                <form asp-action="CheckListeningExercise" method="post"
+                      asp-controller="ListeningExercise" data-correct="@question.Options.Find(o => o.IsCorrect).AnswerText" class="exercise-box">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="exerciseId" value="@ex.Id" />
+                    <input type="hidden" name="lessonId" value="@Model.Id" />
+
+                    <div class="question">@question.Question</div>
+
+                    @for (int i = 0; i < question.Options.Count; i++)
+                    {
+                        <div class="form-check answer-row">
+                            <input class="form-check-input"
+                                   type="radio"
+                                   name="selectedAnswer"
+                                   value="@question.Options.[i]" />
+                            <label class="form-check-label">@question.Options[i].AnswerText</label>
+                        </div>
+                    }
+                    <button type="button" class="btn btn-sm btn-primary mt-2 check-btn">Провери</button>
+                </form>
+            }
+           
+        }
+    }
     @if (Model.TranslationExercises.Any())
     {
         <h4 class="mt-4">Преведете на немски от избраният от вас език.</h4>
@@ -362,7 +400,6 @@
         @foreach (var ex in Model.TranslationExercises)
         {
             
-
             <form asp-action="CheckTranslationExercise" method="post"
                   asp-controller="TranslationExercise" data-correct="@ex.GermanSentence" class="exercise-box">
                 @Html.AntiForgeryToken()
