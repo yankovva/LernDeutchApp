@@ -99,7 +99,7 @@ public class ListeningExerciseController(LerningAppContext dbContext,
             LessonId = lessonId,
             DifficultyLevel = model.DifficultyLevel,
             PublisherId = teacherId.Value,
-            AudioPath = audioPath,
+            AudioPath = $"/{audioPath}",
         };
         
         List<ListeningQuestion> questions = new List<ListeningQuestion>();
