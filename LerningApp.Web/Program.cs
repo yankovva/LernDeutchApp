@@ -10,7 +10,8 @@ using LerningApp.Web.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
-
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Blazor;
 using ApplicationUser = LerningApp.Data.Models.ApplicationUser;
 using LerningAppContext = LerningApp.Data.LerningAppContext;
 using NoOpEmailSender = LerningApp.Web.Infrastructure.NoOpEmailSender;
@@ -63,12 +64,22 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.MapStaticAssets();
+var provider = new FileExtensionContentTypeProvider();
+provider.Mappings[".mp3"] = "audio/mpeg";
+provider.Mappings[".m4a"] = "audio/mp4";
+provider.Mappings[".wav"] = "audio/wav";
+provider.Mappings[".ogg"] = "audio/ogg";
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    ContentTypeProvider = provider
+});
+
+
 
 app.MapControllerRoute(
         name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+        pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.MapRazorPages();
 
