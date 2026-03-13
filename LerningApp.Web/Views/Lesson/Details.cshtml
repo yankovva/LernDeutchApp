@@ -267,11 +267,15 @@
                 </form>
                 <a asp-action="Create" asp-controller="MultipleChoiceExercise"
                    asp-route-lessonId="@Model.Id" class="btn btn-primary">
-                    + Добави multi choice упражненуе 
+                    + Add multi choice exercise 
+                </a>
+                <a asp-action="Create" asp-controller="ListeningExercise"
+                   asp-route-lessonId="@Model.Id" class="btn btn-primary">
+                    + Add listening exercise 
                 </a>
                 <a asp-action="Create" asp-controller="TranslationExercise"
                    asp-route-lessonId="@Model.Id" class="btn btn-primary">
-                    + Добави translation упражнение
+                    + Add translation exercise
                 </a>
             }
 
@@ -368,11 +372,10 @@
 
             foreach (var question in ex.Qestions)
             {
-               
                 <form asp-action="CheckListeningExercise" method="post"
                       asp-controller="ListeningExercise" data-correct="@question.Options.Find(o => o.IsCorrect).AnswerText" class="exercise-box">
                     @Html.AntiForgeryToken()
-                    <input type="hidden" name="exerciseId" value="@ex.Id" />
+                    <input type="hidden" name="questionId" value="@question.Id" />
                     <input type="hidden" name="lessonId" value="@Model.Id" />
 
                     <div class="question">@question.Question</div>
@@ -383,11 +386,11 @@
                             <input class="form-check-input"
                                    type="radio"
                                    name="selectedAnswer"
-                                   value="@question.Options.[i]" />
+                                   value="@question.Options[i].AnswerText" />
                             <label class="form-check-label">@question.Options[i].AnswerText</label>
                         </div>
                     }
-                    <button type="button" class="btn btn-sm btn-primary mt-2 check-btn">Провери</button>
+                    <button type="button" class="btn btn-sm btn-primary mt-2 check-listening-btn">Провери</button>
                 </form>
             }
            
@@ -457,6 +460,50 @@
                 formData.append("selectedAnswer", selected.value);
 
                 const res = await fetch('/MultipleChoiceExercise/CheckMultipleChoice', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': token
+                    },
+                    body: formData
+                });
+                const data = await res.json();
+
+                const selectedRow = selected.closest('.answer-row');
+                if (data.isCorrect) {
+                    selectedRow.classList.add('correct');
+                } else {
+                    selectedRow.classList.add('wrong');
+                    box.querySelectorAll('input[type="radio"]').forEach(r => {
+                        if (r.value === data.correctAnswer) {
+                            r.closest('.answer-row').classList.add('correct');
+                        }
+                    });
+                }
+            });
+        });
+
+        // Listening choice
+        document.querySelectorAll('.exercise-box').forEach(box => {
+            const checkBtn = box.querySelector('.check-listening-btn');
+            if (!checkBtn) return;
+
+            checkBtn.addEventListener('click', async () => {
+                box.querySelectorAll('.answer-row').forEach(r => r.classList.remove('correct', 'wrong'));
+
+                const selected = box.querySelector('input[type="radio"]:checked');
+                if (!selected) return;
+
+                const lessonId = box.querySelectorAll('input[name="lessonId"]').value;
+                const questionId = box.querySelector('input[name="questionId"]').value;
+                const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                const formData = new URLSearchParams();
+                formData.append("questionId", questionId);
+                formData.append("selectedAnswer", selected.value);
+                formData.append("lessonId", lessonId)
+
+                const res = await fetch('/ListeningExercise/CheckListeningExercise', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
