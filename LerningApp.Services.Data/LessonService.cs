@@ -77,6 +77,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                     .Select(q => new IndexListeningQestionViewModel()
                     {
                         Question = q.Question,
+                        Id = q.Id.ToString(),
                         Options = q.Options
                             .Select(op => new IndexListeningOptionsViewModel()
                             {

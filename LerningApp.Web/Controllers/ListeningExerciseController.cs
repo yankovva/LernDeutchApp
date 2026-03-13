@@ -5,7 +5,7 @@ using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.ListeningExercise;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-
+using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.ApplicationConstants;
 namespace LerningApp.Controllers;
 
@@ -173,5 +173,45 @@ public class ListeningExerciseController(LerningAppContext dbContext,
         await dbContext.SaveChangesAsync();
         
         return RedirectToAction("Details", "Lesson", new { id = model.LessonId });
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CheckListeningExercise(string questionId, string lessonId, string selectedAnswer)
+    {
+        if (!Guid.TryParse(questionId, out var queId))
+        {
+            return RedirectToAction("Index", "Home");
+        }
+        
+        var question = await dbContext.ListeningQuestions
+            .Include(q => q.Options)
+            .FirstOrDefaultAsync(q => q.Id == queId);
+
+        if (question == null)
+        {
+            TempData["ErrorMessage"] = "Невалидно упражнение.";
+            return RedirectToAction("Index", "Home");
+        }
+        
+        bool isCorrect;
+        var correctanwer = question.Options.FirstOrDefault(op => op.isCorrect);
+        
+        if (correctanwer == null)
+        {
+            return Json(new { isCorrect = false, correctAnswer = "" });
+        }
+        
+        if (correctanwer.Answer == selectedAnswer)
+        {
+            isCorrect = true;
+        } else
+            isCorrect = false;
+        
+        return Json(new
+        {
+            isCorrect,
+            correctAnswer = correctanwer.Answer,
+        });
     }
 }
