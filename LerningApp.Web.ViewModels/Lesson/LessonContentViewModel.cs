@@ -1,3 +1,4 @@
+using LerningApp.Web.ViewModels.ListeningExercise;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.TranslationExercise;
 
@@ -27,4 +28,7 @@ public class LessonContentViewModel
     
     public IList<IndexTranslationExerciseViewModel> TranslationExercises { get; set; }
         = new List<IndexTranslationExerciseViewModel>();
+    
+    public IList<IndexListeningExerciseViewModel> ListeningExercises { get; set; }
+        = new List<IndexListeningExerciseViewModel>();
 }
