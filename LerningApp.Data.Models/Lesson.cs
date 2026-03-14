@@ -46,4 +46,7 @@ public class Lesson{
 
     public virtual ICollection<ListeningExercise> ListeningExercises { get; set; } 
         = new HashSet<ListeningExercise>();
+    
+    public virtual ICollection<UserLessonProgress> UsersLessonProgresses { get; set; } 
+        = new HashSet<UserLessonProgress>();
 }
