@@ -15,7 +15,9 @@ public class CourseService(
     IRepository<Course, Guid> courseRepository,
     IRepository<Level, Guid> levelRepository,
     IRepository<UserCourse, object> userCourseRepository,
-    ITeacherService teacherService) : ICourseService
+    ITeacherService teacherService,
+    IUserLessonProgressService userLessonProgressService,
+    IRepository<UserLessonProgress, Guid> userProgressRepository) : ICourseService
 {
     public async Task<IEnumerable<CourseIndexViewModel>> IndexGetCoursesAsync(string? userId)
     {
@@ -102,6 +104,7 @@ public class CourseService(
         {
             return ServiceResultT<CourseDetailsViewModel>.Fail((CourseNotFoundMessage));
         }
+        
 
         CourseDetailsViewModel model = new CourseDetailsViewModel()
         {
@@ -122,14 +125,15 @@ public class CourseService(
                     LessonTarget = cl.Target
                 }).ToList()
         };
-
+        
+       
         if (Guid.TryParse(userId, out var userGuidId))
         {
             model.IsEnrolled = await userCourseRepository
                 .GetAllAttached()
                 .AnyAsync(uc => uc.UserId == userGuidId && uc.CourseId == courseId);
         }
-
+        
         return ServiceResultT<CourseDetailsViewModel>.Success(model);
     }
 
@@ -273,7 +277,9 @@ public class CourseService(
         }
 
         Course? course = await courseRepository
-            .FirstorDefaultAsync(c => c.Id == courseId);
+            .GetAllAttached()
+            .Include(c => c.LessonsForCourse)
+            .FirstOrDefaultAsync(c => c.Id == courseId);
 
         if (course == null)
         {
@@ -296,7 +302,24 @@ public class CourseService(
             StartedAt = DateTime.UtcNow
         };
 
+        var lessons = course.LessonsForCourse
+            .OrderBy(l => l.OrderIndex)
+            .ToList();
+
+        var firstLessonId = lessons.FirstOrDefault()?.Id;
+
+        var progresses = lessons
+            .Select(l => new UserLessonProgress
+        {
+            UserId = userId,
+            LessonId = l.Id,
+            IsCompleted = false,
+            IsUnlocked = firstLessonId != null && l.Id == firstLessonId
+        }).ToList();
+
         await userCourseRepository.AddAsync(newUserCourse);
+        await userProgressRepository.AddRangeAsync(progresses);
+        await userProgressRepository.SaveChangesAsync();
 
         return ServiceResult.Success();
     }
