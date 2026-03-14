@@ -2,7 +2,6 @@ namespace LerningApp.Web.ViewModels.MultipleChoiceExercise;
 
 public class IndexMultipleChoiceExerciseViewModel
 {
-    
     public string Id { get; set; } = null!;
     public string Question { get; set; } = null!;
     

@@ -204,6 +204,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             return ServiceResult.Fail(LessonNotFoundMessage);
         }
         
+        //TODO: Delete UserLessonProgress records for enrolled users when a lesson is removed from a course (decide: hard delete vs soft delete).
         if (string.IsNullOrWhiteSpace(model.SelectedCourseId))
         {
             lesson.CourseId = null;

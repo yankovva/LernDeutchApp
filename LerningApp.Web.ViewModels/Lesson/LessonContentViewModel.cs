@@ -1,6 +1,7 @@
 using LerningApp.Web.ViewModels.ListeningExercise;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.TranslationExercise;
+using LerningApp.Web.ViewModels.UserLessonProgress;
 
 namespace LerningApp.Web.ViewModels.Lesson;
 
@@ -22,7 +23,8 @@ public class LessonContentViewModel
     
     public string Target { get; set; } = null!;
     public string PublisherId { get; set; } = null!;
-
+    
+    public IndexUserLessonProgressViewModel UserLessonProgress { get; set; } = new IndexUserLessonProgressViewModel();
     public IList<IndexMultipleChoiceExerciseViewModel> MultipleChoiceExercises { get; set; }
         = new List<IndexMultipleChoiceExerciseViewModel>();
     
