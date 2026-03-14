@@ -21,7 +21,8 @@ public class LessonController(ILessonService lessonService,
     [HttpGet]
     public async Task<IActionResult> Details(string id)
     {
-        var result = await  lessonService.GetLessonDetailsAsync(id);
+        string? userId = User.GetUserId();
+        var result = await  lessonService.GetLessonDetailsAsync(id, userId);
         if (result.Result == false )
         {
             TempData["ErrorMessage"] = result.Message;
@@ -75,7 +76,6 @@ public class LessonController(ILessonService lessonService,
     }
 
     [HttpGet]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create()
     {
         string userId = User.GetUserId()!;
