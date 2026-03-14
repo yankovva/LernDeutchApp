@@ -8,9 +8,9 @@
 @{
     ViewData["Title"] = "Course Details";
 }
+
 <div class="row g-4">
     <div class="col-lg-8">
-
         <div class="course-page">
             <div class="course-hero">
                 <div class="hero-left">
@@ -24,6 +24,7 @@
 
                 <div class="hero-right">
                     <a asp-action="Index" class="btn btn-outline-secondary">← Всички курсове</a>
+
                     @if (User.Identity?.IsAuthenticated == true && await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                     {
                         if (Model.IsActive)
@@ -66,7 +67,7 @@
             <div class="course-actions">
                 @if (User.Identity?.IsAuthenticated == true && await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                 {
-                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
+                    <a asp-action="Edit" asp-controller="Course" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
 
                     <form asp-action="SoftDelete" method="post"
                           onsubmit="return confirm('Сигурни ли сте, че искате да изтриете този курс?');"
@@ -105,17 +106,37 @@
                     <div class="lesson-grid">
                         @foreach (var lesson in Model.CourseLessons)
                         {
-                            <div class="lesson-card">
+                            var isUnlocked = lesson.UserLessonProgress?.IsUnlocked ?? false;
+                            var isCompleted = lesson.UserLessonProgress?.IsCompleted ?? false;
+
+                            <div class="lesson-card @(isUnlocked ? "" : "lesson-card-locked")">
                                 <div class="lesson-title">@lesson.LessonName</div>
                                 <div class="lesson-desc">@lesson.LessonTarget</div>
                                 <div class="lesson-meta">@lesson.WordsInLesson думи</div>
 
-                                <a asp-controller="Lesson"
-                                   asp-action="Details"
-                                   asp-route-id="@lesson.LessinId"
-                                   class="btn btn-outline-primary btn-sm">
-                                    Отвори урок →
-                                </a>
+                                @if (isCompleted)
+                                {
+                                    <span class="badge bg-success mb-2">Completed</span>
+                                }
+
+                                @if (isUnlocked)
+                                {
+                                    <a asp-controller="Lesson"
+                                       asp-action="Details"
+                                       asp-route-id="@lesson.LessinId"
+                                       class="btn btn-outline-primary btn-sm">
+                                        Отвори урок →
+                                    </a>
+                                }
+                                else
+                                {
+                                    <button type="button"
+                                            class="btn btn-sm btn-locked"
+                                            disabled
+                                            title="Завърши предишния урок, за да отключиш този.">
+                                        Заключен урок
+                                    </button>
+                                }
                             </div>
                         }
                     </div>
@@ -129,165 +150,181 @@
     </div>
 </div>
 
-
 <style>
-.course-page {
-    padding: 18px 0 30px 0;
-}
+    .course-page {
+        padding: 18px 0 30px 0;
+    }
 
-.course-hero {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 14px;
-    padding: 18px 20px;
-    background: linear-gradient(135deg, rgba(255, 245, 235, 1), rgba(255, 255, 255, 1));
-    border-radius: 18px;
-    border: 1px solid #f1e4d7;
-    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
-    margin-bottom: 14px;
-}
+    .course-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        padding: 18px 20px;
+        background: linear-gradient(135deg, rgba(255, 245, 235, 1), rgba(255, 255, 255, 1));
+        border-radius: 18px;
+        border: 1px solid #f1e4d7;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
+        margin-bottom: 14px;
+    }
 
-.eyebrow {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: .12em;
-    color: #8b93a6;
-    margin-bottom: 4px;
-}
+    .eyebrow {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        color: #8b93a6;
+        margin-bottom: 4px;
+    }
 
-.title {
-    font-size: 2rem;
-    font-weight: 800;
-    margin: 0 0 6px 0;
-}
+    .title {
+        font-size: 2rem;
+        font-weight: 800;
+        margin: 0 0 6px 0;
+    }
 
-.meta-line {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
+    .meta-line {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-.meta-label {
-    color: #6b7280;
-    font-size: 0.9rem;
-}
+    .meta-label {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
 
-.level-pill {
-    background: rgba(255, 230, 210, 1);
-    color: #9a4a1a;
-    padding: 4px 10px;
-    border-radius: 999px;
-    font-weight: 600;
-    font-size: 0.85rem;
-}
+    .level-pill {
+        background: rgba(255, 230, 210, 1);
+        color: #9a4a1a;
+        padding: 4px 10px;
+        border-radius: 999px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
 
-.course-stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
-    margin: 10px 0 16px 0;
-}
+    .course-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        margin: 10px 0 16px 0;
+    }
 
-.stat-card {
-    background: #fff7ed;
-    border: 1px solid #fed7aa;
-    border-radius: 14px;
-    padding: 12px 14px;
-    box-shadow: 0 6px 14px rgba(255, 122, 48, 0.08);
-}
+    .stat-card {
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+        border-radius: 14px;
+        padding: 12px 14px;
+        box-shadow: 0 6px 14px rgba(255, 122, 48, 0.08);
+    }
 
-.stat-label {
-    font-size: 0.75rem;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    color: #9a4a1a;
-}
+    .stat-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #9a4a1a;
+    }
 
-.stat-value {
-    font-size: 1.6rem;
-    font-weight: 800;
-    color: #7c2d12;
-}
+    .stat-value {
+        font-size: 1.6rem;
+        font-weight: 800;
+        color: #7c2d12;
+    }
 
-.course-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin: 10px 0 18px 0;
-}
+    .course-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 10px 0 18px 0;
+    }
 
-.btn-accent {
-    background: linear-gradient(180deg, rgba(255, 138, 76, 1), rgba(255, 122, 48, 1));
-    color: white;
-    border: none;
-    box-shadow: 0 8px 18px rgba(255, 122, 48, 0.25);
-}
+    .section-card {
+        background: #ffffff;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        padding: 16px;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+        margin-bottom: 14px;
+    }
 
-.badge-success {
-    background: #ecfdf5;
-    color: #065f46;
-    border: 1px solid #a7f3d0;
-    padding: 6px 10px;
-    border-radius: 999px;
-    font-weight: 600;
-}
+    .section-title {
+        margin: 0 0 10px 0;
+        font-weight: 700;
+    }
 
-.section-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 16px;
-    padding: 16px;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
-    margin-bottom: 14px;
-}
+    .section-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+    }
 
-.section-title {
-    margin: 0 0 10px 0;
-    font-weight: 700;
-}
+    .lesson-count {
+        font-size: 0.85rem;
+        color: #6b7280;
+    }
 
-.section-head {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
+    .lesson-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 14px;
+    }
 
-.lesson-count {
-    font-size: 0.85rem;
-    color: #6b7280;
-}
+    .lesson-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 14px;
+        padding: 14px;
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    }
 
-.lesson-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 14px;
-}
+    .lesson-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.10);
+    }
 
-.lesson-card {
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 14px;
-    padding: 14px;
-    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
-}
+    .lesson-title {
+        font-weight: 700;
+        margin-bottom: 4px;
+    }
 
-.lesson-title {
-    font-weight: 700;
-    margin-bottom: 4px;
-}
+    .lesson-desc {
+        color: #475569;
+        font-size: 0.95rem;
+        min-height: 38px;
+        margin-bottom: 8px;
+    }
 
-.lesson-desc {
-    color: #475569;
-    font-size: 0.95rem;
-    min-height: 38px;
-    margin-bottom: 8px;
-}
+    .lesson-meta {
+        font-size: 0.85rem;
+        color: #6b7280;
+        margin-bottom: 10px;
+    }
 
-.lesson-meta {
-    font-size: 0.85rem;
-    color: #6b7280;
-    margin-bottom: 10px;
-}
+    .lesson-card-locked {
+        position: relative;
+        opacity: .82;
+        background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+        border: 1px solid #dbe4ef;
+    }
+
+    .lesson-card-locked::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: repeating-linear-gradient(
+            -45deg,
+            rgba(148,163,184,.08) 0 8px,
+            rgba(148,163,184,.02) 8px 16px
+        );
+        pointer-events: none;
+    }
+
+    .btn-locked {
+        background: #e2e8f0;
+        border-color: #cbd5e1;
+        color: #475569;
+        font-weight: 700;
+    }
 </style>
