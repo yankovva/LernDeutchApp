@@ -4,6 +4,7 @@ namespace LerningApp.Data.Repository.Interfaces;
 
 public interface IRepository<TType, TId> 
 {
+    //TODO add soft delete
     TType? GetById(TId id);
     Task<TType?> GetByIdAsync(TId id);
 
@@ -16,6 +17,8 @@ public interface IRepository<TType, TId>
 
     void Add(TType item);
     Task AddAsync(TType item);
+   Task AddRangeAsync(IEnumerable<TType> items);
+
 
     Task SaveChangesAsync();
 

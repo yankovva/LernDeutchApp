@@ -74,6 +74,13 @@ public class Repository<TType, TId>
         await dbContext.SaveChangesAsync();
     }
 
+    public Task AddRangeAsync(IEnumerable<TType> items)
+    {
+        dbSet.AddRange(items);
+        return Task.CompletedTask;
+    }
+
+
     public async Task SaveChangesAsync()
     {
         await this.dbContext.SaveChangesAsync();
