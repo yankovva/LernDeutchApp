@@ -232,6 +232,81 @@
         border-color: #ef4444;
     }
 
+    .exercises-section {
+        margin-top: 28px;
+    }
+
+    .exercise-section-title {
+        margin: 0 0 10px 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--ink);
+        letter-spacing: -0.01em;
+        padding: 8px 14px;
+        border-radius: 999px;
+        border: 1px solid #fed7aa;
+        background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .exercise-section-title::before {
+        content: "";
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 0 4px rgba(234, 88, 12, 0.18);
+    }
+
+    .exercise-section-subtitle {
+        color: var(--muted);
+        margin-bottom: 8px;
+        font-size: 0.95rem;
+    }
+
+    .audio-frame {
+        margin-top: 10px;
+        margin-bottom: 8px;
+        padding: 10px 12px;
+        border: 1px solid #fed7aa;
+        border-radius: 14px;
+        background: linear-gradient(180deg, #fff 0%, #fff7ed 100%);
+        box-shadow: var(--shadow-soft);
+    }
+
+    .audio-frame audio {
+        width: 100%;
+        max-width: 560px;
+    }
+
+    .lesson-progress-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 12px;
+        border-radius: 999px;
+        border: 1px solid #86efac;
+        background: #f0fdf4;
+        color: #166534;
+        font-size: 0.92rem;
+        box-shadow: 0 6px 16px rgba(22, 101, 52, 0.08);
+    }
+
+    .lesson-progress-badge .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #16a34a;
+    }
+
+    .lesson-progress-badge .date {
+        color: #15803d;
+        opacity: 0.9;
+    }
+
 </style>
 
 <div class="lesson-wrap">
@@ -256,7 +331,7 @@
 
         <div class="d-flex flex-wrap gap-2">
             @if (User.Identity?.IsAuthenticated == true &&
-                await teacherService.IsUserTeacherAsync(User.GetUserId()!))
+                 await teacherService.IsUserTeacherAsync(User.GetUserId()!))
             {
                 <form asp-action="SoftDelete" method="post"
                       onsubmit="return confirm('Сигурне ли сте, че искате да изтриете този урок?');"
@@ -297,6 +372,18 @@
             </a>
         </div>
     </div>
+    
+    @if (Model.UserLessonProgress.IsCompleted)
+    {
+        <div class="lesson-progress-badge mb-3">
+            <span class="dot"></span>
+            <strong>Урокът е завършен</strong>
+            @if (!string.IsNullOrWhiteSpace(Model.UserLessonProgress.CompletedAt))
+            {
+                <span class="date">на @Model.UserLessonProgress.CompletedAt</span>
+            }
+        </div>
+    }
 
     <div class="lesson-section">
         <div class="section-label">Цел на урока</div>
@@ -324,7 +411,9 @@
     
     @if (Model.MultipleChoiceExercises.Any())
     {
-        <h4 class="mt-4">Упражнения</h4>
+        <section class="exercises-section">
+        <h4 class="exercise-section-title">Упражнения</h4>
+        <div class="exercise-section-subtitle">Избери верния отговор и провери резултата.</div>
 
         @foreach (var ex in Model.MultipleChoiceExercises)
         {
@@ -359,18 +448,23 @@
                 <button type="button" class="btn btn-sm btn-primary mt-2 check-btn">Провери</button>
             </form>
         }
+        </section>
     }
     @if (Model.ListeningExercises.Any())
     {
-        <h4 class="mt-4">Слушане с разбиране</h4>
+        <section class="exercises-section">
+        <h4 class="exercise-section-title">Слушане с разбиране</h4>
+        <div class="exercise-section-subtitle">Пусни аудиото и отговори на въпросите под него.</div>
        
         @foreach (var ex in Model.ListeningExercises)
         {
-            <audio controls preload="metadata">
-                <source src="@Url.Content(ex.AudioPath)" type="audio/mpeg" />
-            </audio>
+            <div class="audio-frame">
+                <audio controls preload="metadata">
+                    <source src="@Url.Content(ex.AudioPath)" type="audio/mpeg" />
+                </audio>
+            </div>
 
-            foreach (var question in ex.Qestions)
+            @foreach (var question in ex.Qestions)
             {
                 <form asp-action="CheckListeningExercise" method="post"
                       asp-controller="ListeningExercise" data-correct="@question.Options.Find(o => o.IsCorrect).AnswerText" class="exercise-box">
@@ -395,10 +489,13 @@
             }
            
         }
+        </section>
     }
     @if (Model.TranslationExercises.Any())
     {
-        <h4 class="mt-4">Преведете на немски от избраният от вас език.</h4>
+        <section class="exercises-section">
+        <h4 class="exercise-section-title">Превод</h4>
+        <div class="exercise-section-subtitle">Избери език и преведи изречението на немски.</div>
 
         @foreach (var ex in Model.TranslationExercises)
         {
@@ -435,6 +532,7 @@
                 <button type="button" class="btn btn-sm btn-primary mt-2 check-translation-btn">Провери</button>
             </form>
         }
+        </section>
     }
 </div>
 
@@ -580,4 +678,3 @@
         });
     });
 </script>
-
