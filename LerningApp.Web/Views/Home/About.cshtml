@@ -4,229 +4,378 @@
 
 <style>
     :root {
-        --accent-soft-2: #ffe7d2;
-        --shadow: 0 28px 60px rgba(15, 23, 42, 0.18);
-        --radius: 28px;
+        --about-bg: #fff6ef;
+        --about-surface: #ffffff;
+        --about-surface-soft: #fff1e3;
+        --about-primary: #d9480f;
+        --about-primary-strong: #9a3412;
+        --about-text: #1f2937;
+        --about-muted: #5b6472;
+        --about-border: #ffd8b0;
+        --about-shadow: 0 24px 52px rgba(40, 24, 8, 0.14);
+        --about-radius-lg: 30px;
+        --about-radius-md: 22px;
     }
 
     body {
-        background: #fff7f0;
+        background:
+            radial-gradient(circle at 8% 12%, rgba(255, 205, 156, 0.28), transparent 42%),
+            radial-gradient(circle at 88% 18%, rgba(255, 228, 180, 0.36), transparent 45%),
+            var(--about-bg);
     }
 
     .about-wrap {
         display: flex;
         flex-direction: column;
-        gap: 56px;
-        padding: 24px 0 60px 0;
+        gap: 34px;
+        padding: 24px 0 60px;
     }
 
     .hero {
+        position: relative;
+        overflow: hidden;
         border-radius: 36px;
-        background: linear-gradient(135deg, #ffedd5 0%, #fff7ed 40%, #ffffff 100%);
-        padding: 48px;
+        background: linear-gradient(125deg, #fff0dc 0%, #fff7ef 55%, #ffffff 100%);
+        border: 1px solid #ffdcb9;
+        box-shadow: var(--about-shadow);
         display: grid;
-        grid-template-columns: 1.1fr 0.9fr;
-        gap: 32px;
+        grid-template-columns: 1.15fr 0.85fr;
+        gap: 36px;
         align-items: center;
-        box-shadow: var(0 28px 60px rgba(15, 23, 42, 0.18));
+        padding: 50px;
+        isolation: isolate;
+    }
+
+    .hero::before {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        right: -120px;
+        top: -120px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(217, 72, 15, 0.18), rgba(217, 72, 15, 0));
+        z-index: -1;
     }
 
     .hero h1 {
-        font-size: 2.9rem;
-        font-weight: 900;
+        margin: 0 0 14px;
+        font-size: clamp(2.15rem, 4vw, 3.25rem);
+        line-height: 1.05;
         letter-spacing: -0.02em;
-        margin-bottom: 14px;
-        color: var(#1b1b1b);
+        color: var(--about-text);
+        font-weight: 900;
     }
 
     .hero p {
-        font-size: 1.15rem;
-        color: var(#5b6575);
-        line-height: 1.8;
-        margin-bottom: 22px;
+        margin: 0 0 22px;
+        font-size: 1.08rem;
+        line-height: 1.78;
+        color: var(--about-muted);
+        max-width: 62ch;
     }
 
     .hero-badges {
         display: flex;
-        gap: 12px;
+        gap: 10px;
         flex-wrap: wrap;
     }
 
     .badge-pill {
-        background: #ffceac;
-        color: #ff6800;
-        padding: 10px 16px;
         border-radius: 999px;
+        padding: 10px 15px;
+        border: 1px solid #ffc993;
+        background: linear-gradient(180deg, #fff2e2 0%, #ffe6ca 100%);
+        color: var(--about-primary-strong);
         font-weight: 700;
-        box-shadow: 0 10px 22px rgba(255, 215, 195, 0.25);
+        font-size: 0.92rem;
+        box-shadow: 0 8px 16px rgba(217, 72, 15, 0.1);
+    }
+
+    .hero-img {
+        transform: rotate(1deg);
     }
 
     .hero-img img {
-        height: 300px;
+        display: block;
         width: 100%;
-        border-radius: 26px;
-        border: 2px solid #ffcc9e;
-        object-fit: cover;
-        box-shadow: 0 18px 38px rgba(15, 23, 42, 0.2);
+        height: 320px;
         min-height: 280px;
+        object-fit: cover;
+        border-radius: 24px;
+        border: 2px solid #ffcd9f;
+        box-shadow: 0 24px 35px rgba(18, 16, 13, 0.22);
     }
 
     .section {
-        padding: 38px;
-        border-radius: var(#ffffff);
-        background: #fff;
-        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.1);
-        border: 2px solid #ffe2c3;
+        background: var(--about-surface);
+        border: 1px solid #ffe3c6;
+        border-radius: var(--about-radius-lg);
+        box-shadow: 0 12px 30px rgba(45, 27, 10, 0.09);
+        padding: 34px;
     }
 
     .section-title {
-        font-size: 1.7rem;
-        font-weight: 900;
-        margin-bottom: 14px;
-        color: var(#1b1b1b);
+        margin: 0 0 10px;
+        font-size: clamp(1.45rem, 2.8vw, 1.95rem);
+        color: var(--about-text);
+        font-weight: 850;
+        letter-spacing: -0.01em;
     }
 
     .section-text {
-        color: var(#5b6575);
-        line-height: 1.8;
-        font-size: 1.05rem;
+        margin: 0;
+        color: var(--about-muted);
+        font-size: 1.03rem;
+        line-height: 1.78;
     }
 
     .progress-steps {
+        margin-top: 22px;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 24px;
-        margin-top: 20px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
     }
 
     .step {
-        background: var(#fff0e3);
-        border-radius: 22px;
-        padding: 22px;
-        border: 2px solid #ffd6b0;
+        background: var(--about-surface-soft);
+        border: 1px solid var(--about-border);
+        border-radius: var(--about-radius-md);
+        padding: 20px;
+        transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .step:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 24px rgba(70, 39, 12, 0.12);
     }
 
     .step-num {
-        width: 44px;
-        height: 44px;
-        border-radius: 999px;
-        background: var(#ea580c);
-        color: #fff;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
         display: grid;
         place-items: center;
-        font-weight: 800;
         margin-bottom: 12px;
-        font-size: 1.05rem;
+        font-weight: 800;
+        color: #fff;
+        background: linear-gradient(180deg, #ea580c 0%, #c2410c 100%);
+        box-shadow: 0 8px 18px rgba(194, 65, 12, 0.32);
     }
 
     .grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-        gap: 26px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
     }
 
     .info-card {
         background: #fff;
-        border-radius: 24px;
-        padding: 26px;
-        border: 2px solid #ffe2c3;
-        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08);
+        border: 1px solid #ffe3c6;
+        border-radius: var(--about-radius-md);
+        padding: 24px;
+        box-shadow: 0 10px 24px rgba(48, 26, 8, 0.08);
     }
 
     .info-card h5 {
+        margin: 0 0 8px;
+        font-size: 1.1rem;
         font-weight: 800;
-        margin-bottom: 10px;
-        color: var(#1b1b1b);
+        color: var(--about-text);
     }
 
     .info-card p {
-        color: var(#5b6575);
-        line-height: 1.7;
         margin: 0;
+        color: var(--about-muted);
+        line-height: 1.7;
     }
 
     .team-grid {
+        margin-top: 18px;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 24px;
-        margin-top: 20px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
     }
 
     .team-card {
         background: #fff;
-        border-radius: 22px;
-        border: 2px solid #ffe2c3;
-        padding: 20px;
+        border: 1px solid #ffe3c6;
+        border-radius: var(--about-radius-md);
+        padding: 16px;
         text-align: center;
-        box-shadow: 0 12px 26px rgba(15, 23, 42, 0.08);
+        box-shadow: 0 10px 22px rgba(42, 25, 11, 0.08);
+        transition: transform 180ms ease;
+    }
+
+    .team-card:hover {
+        transform: translateY(-3px);
     }
 
     .team-card img {
+        display: block;
         width: 100%;
         height: 220px;
         object-fit: cover;
-        border-radius: 16px;
-        border: 2px solid #ffd6b0;
-        margin-bottom: 12px;
+        border-radius: 15px;
+        border: 1px solid #ffd5ad;
+        margin-bottom: 10px;
     }
 
     .slider {
         position: relative;
-        border-radius: 28px;
+        border-radius: var(--about-radius-lg);
         overflow: hidden;
+        border: 1px solid #ffdcb9;
         background: #fff;
-        border: 2px solid #ffe2c3;
-        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.12);
+        box-shadow: 0 16px 35px rgba(36, 23, 9, 0.13);
     }
 
     .slides {
         display: flex;
-        transition: transform 0.6s ease;
+        transition: transform 550ms ease;
     }
 
     .slide {
         min-width: 100%;
-        padding: 30px;
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 24px;
         align-items: center;
+        gap: 20px;
+        padding: 28px 72px;
+    }
+
+    .slide h5 {
+        margin: 0 0 10px;
+        font-size: 1.3rem;
+        font-weight: 850;
+        color: var(--about-text);
+    }
+
+    .slide p {
+        margin: 0;
+        color: var(--about-muted);
+        line-height: 1.7;
     }
 
     .slide img {
         width: 100%;
-        height: 220px;
+        height: 240px;
         object-fit: cover;
-        border-radius: 18px;
-        border: 2px solid #ffd6b0;
+        border-radius: 16px;
+        border: 1px solid #ffd5ad;
     }
 
     .slider-nav {
         position: absolute;
         top: 50%;
         transform: translateY(-50%);
-        width: 46px;
-        height: 46px;
-        border-radius: 999px;
-        border: 2px solid #ffd6b0;
-        background: #fff;
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        border: 1px solid #ffc892;
+        background: rgba(255, 255, 255, 0.92);
+        color: #b45309;
         display: grid;
         place-items: center;
-        cursor: pointer;
+        font-size: 1.25rem;
         font-weight: 700;
+        cursor: pointer;
+        transition: background 150ms ease, transform 150ms ease;
     }
-    
-    .prev { left: 14px; }
-    .next { right: 14px; }
+
+    .slider-nav:hover {
+        background: #fff6eb;
+        transform: translateY(-50%) scale(1.04);
+    }
+
+    .prev {
+        left: 14px;
+    }
+
+    .next {
+        right: 14px;
+    }
+
+    @@media (max-width: 1080px) {
+        .hero {
+            grid-template-columns: 1fr;
+            padding: 34px;
+            gap: 20px;
+        }
+
+        .hero-img {
+            transform: none;
+        }
+
+        .grid,
+        .team-grid,
+        .progress-steps {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .slide {
+            grid-template-columns: 1fr;
+            padding: 24px 56px;
+        }
+    }
+
+    @@media (max-width: 700px) {
+        .about-wrap {
+            gap: 22px;
+            padding-top: 16px;
+        }
+
+        .hero {
+            border-radius: 24px;
+            padding: 24px;
+        }
+
+        .section {
+            border-radius: 22px;
+            padding: 22px;
+        }
+
+        .grid,
+        .team-grid,
+        .progress-steps {
+            grid-template-columns: 1fr;
+        }
+
+        .slide {
+            padding: 20px 18px 62px;
+        }
+
+        .slide img {
+            height: 200px;
+        }
+
+        .slider-nav {
+            top: auto;
+            bottom: 12px;
+            transform: none;
+        }
+
+        .slider-nav:hover {
+            transform: none;
+        }
+
+        .prev {
+            left: calc(50% - 52px);
+        }
+
+        .next {
+            right: calc(50% - 52px);
+        }
+    }
 </style>
 
 <div class="about-wrap">
-    <div class="hero">
+    <section class="hero">
         <div>
             <h1>Немският вече е по‑лесен</h1>
             <p>
                 LernEasy Deutsch е онлайн платформа, която превръща ученето на немски в ясен и приятен процес.
-                Всичко е подредено: уроци → упражнения → тест → сертификат.
+                Всичко е подредено: уроци -> упражнения -> тест -> сертификат.
             </p>
             <div class="hero-badges">
                 <span class="badge-pill">Доживотен достъп</span>
@@ -234,117 +383,120 @@
                 <span class="badge-pill">Професионален екип</span>
             </div>
         </div>
-        <div  class="hero-img">
+        <div class="hero-img">
             <img src="/images/Common/default-course-img.png" alt="course" />
-
         </div>
-    </div>
+    </section>
 
-    <div class="section">
-        <div class="section-title">Как работи</div>
-        <div class="section-text">
+    <section class="section">
+        <h3 class="section-title">Как работи</h3>
+        <p class="section-text">
             Първо избираш курс по ниво. След това минаваш през подредени уроци, решаваш упражнения и трупаш увереност.
-            Накрая има финален тест – ако го вземеш, получаваш сертификат.
-        </div>
+            Накрая има финален тест - ако го вземеш, получаваш сертификат.
+        </p>
         <div class="progress-steps">
-            <div class="step">
+            <article class="step">
                 <div class="step-num">1</div>
                 <strong>Уроци</strong>
-                <div class="section-text">Кратки, ясни и фокусирани теми.</div>
-            </div>
-            <div class="step">
+                <p class="section-text">Кратки, ясни и фокусирани теми.</p>
+            </article>
+            <article class="step">
                 <div class="step-num">2</div>
                 <strong>Упражнения</strong>
-                <div class="section-text">Практика след всеки урок за стабилни знания.</div>
-            </div>
-            <div class="step">
+                <p class="section-text">Практика след всеки урок за стабилни знания.</p>
+            </article>
+            <article class="step">
                 <div class="step-num">3</div>
                 <strong>Тест + сертификат</strong>
-                <div class="section-text">Финален тест и официално завършване.</div>
-            </div>
+                <p class="section-text">Финален тест и официално завършване.</p>
+            </article>
         </div>
-    </div>
+    </section>
 
-    <div class="grid">
-        <div class="info-card">
+    <section class="grid">
+        <article class="info-card">
             <h5>Изцяло онлайн</h5>
             <p>Учи от всяко място и време. Няма нужда от присъствени занятия.</p>
-        </div>
-        <div class="info-card">
+        </article>
+        <article class="info-card">
             <h5>Упражнения</h5>
-            <p>Граматика, думи, четене, слушане – всичко в единна система.</p>
-        </div>
-        <div class="info-card">
+            <p>Граматика, думи, четене, слушане - всичко в единна система.</p>
+        </article>
+        <article class="info-card">
             <h5>Доживотен достъп</h5>
             <p>Всяка лекция остава при теб и можеш да я преглеждаш по всяко време.</p>
-        </div>
-    </div>
+        </article>
+    </section>
 
-    <div class="section">
-        <div class="section-title">История</div>
-        <div class="section-text">
-            Идеята за LernEasy Deutsch се роди от реални трудности при учене на език –
-            твърде много разхвърляни материали и липса на ясен път. 
+    <section class="section">
+        <h3 class="section-title">История</h3>
+        <p class="section-text">
+            Идеята за LernEasy Deutsch се роди от реални трудности при учене на език -
+            твърде много разхвърляни материали и липса на ясен път.
             Целта ни е да дадем точно тази структура, която прави ученето по‑лесно.
-        </div>
-    </div>
+        </p>
+    </section>
 
-    <div class="section">
-        <div class="section-title">Нашият екип</div>
-        <div class="section-text">
-            Съдържанието е подготвено от професионалисти – преподаватели и специалисти по езиково обучение.
-        </div>
+    <section class="section">
+        <h3 class="section-title">Нашият екип</h3>
+        <p class="section-text">
+            Съдържанието е подготвено от професионалисти - преподаватели и специалисти по езиково обучение.
+        </p>
         <div class="team-grid">
-            <div class="team-card">
+            <article class="team-card">
                 <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=60" alt="Team member" />
-                <strong>Анна Петрова</strong><br/>
+                <strong>Анна Петрова</strong><br />
                 Немски преподавател
-            </div>
-            <div class="team-card">
+            </article>
+            <article class="team-card">
                 <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=60" alt="Team member" />
-                <strong>Мартин Иванов</strong><br/>
+                <strong>Мартин Иванов</strong><br />
                 Методолог
-            </div>
-            <div class="team-card">
+            </article>
+            <article class="team-card">
                 <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=800&q=60" alt="Team member" />
-                <strong>Елица Георгиева</strong><br/>
+                <strong>Елица Георгиева</strong><br />
                 Курсов дизайнер
-            </div>
+            </article>
         </div>
-    </div>
+    </section>
 
-    <div class="slider" id="aboutSlider">
+    <section class="slider" id="aboutSlider">
         <div class="slides">
-            <div class="slide">
+            <article class="slide">
                 <div>
                     <h5>Курсове по ниво</h5>
-                    <p>Избираш A1–B2 и следваш стъпка по стъпка ясна структура.</p>
+                    <p>Избираш A1-B2 и следваш стъпка по стъпка ясна структура.</p>
                 </div>
                 <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?auto=format&fit=crop&w=1200&q=60" alt="Levels" />
-            </div>
-            <div class="slide">
+            </article>
+            <article class="slide">
                 <div>
                     <h5>Практика и упражнения</h5>
                     <p>След всеки урок има упражнения, за да затвърдиш наученото.</p>
                 </div>
                 <img src="/images/Common/learn-progress.jpg" alt="Practice" />
-            </div>
-            <div class="slide">
+            </article>
+            <article class="slide">
                 <div>
                     <h5>Финален тест и сертификат</h5>
                     <p>След финалния тест получаваш сертификат за успешно завършен курс.</p>
                 </div>
                 <img src="/images/Common/smart.jpg" alt="Certificate" />
-            </div>
+            </article>
         </div>
-        <button class="slider-nav prev" type="button">‹</button>
-        <button class="slider-nav next" type="button">›</button>
-    </div>
+        <button class="slider-nav prev" type="button" aria-label="Previous">&#8249;</button>
+        <button class="slider-nav next" type="button" aria-label="Next">&#8250;</button>
+    </section>
 </div>
 
 <script>
     (function () {
         const slider = document.getElementById('aboutSlider');
+        if (!slider) {
+            return;
+        }
+
         const slides = slider.querySelector('.slides');
         const total = slides.children.length;
         let index = 0;
@@ -353,12 +505,12 @@
             slides.style.transform = `translateX(-${index * 100}%)`;
         }
 
-        const next = () => {
+        function next() {
             index = (index + 1) % total;
             update();
-        };
+        }
 
-        slider.querySelector('.prev').addEventListener('click', () => {
+        slider.querySelector('.prev').addEventListener('click', function () {
             index = (index - 1 + total) % total;
             update();
         });
