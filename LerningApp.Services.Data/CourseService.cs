@@ -3,6 +3,7 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
+using LerningApp.Web.ViewModels.UserLessonProgress;
 using static LerningApp.Common.EntityErrorMessages.Level;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Course;
@@ -105,7 +106,6 @@ public class CourseService(
             return ServiceResultT<CourseDetailsViewModel>.Fail((CourseNotFoundMessage));
         }
         
-
         CourseDetailsViewModel model = new CourseDetailsViewModel()
         {
             Id = course.Id.ToString(),
@@ -132,6 +132,25 @@ public class CourseService(
             model.IsEnrolled = await userCourseRepository
                 .GetAllAttached()
                 .AnyAsync(uc => uc.UserId == userGuidId && uc.CourseId == courseId);
+        }
+
+        if (model.IsEnrolled)
+        {
+            foreach (var lesson in model.CourseLessons)
+            {
+                var result = await userLessonProgressService
+                    .GetUserLessonProgress(Guid.Parse(lesson.LessinId), userId);
+
+                
+                if (result.Result)
+                {
+                    lesson.UserLessonProgress = result.Data;
+                }
+                else
+                {
+                    lesson.UserLessonProgress = new IndexUserLessonProgressViewModel();
+                }
+            }
         }
         
         return ServiceResultT<CourseDetailsViewModel>.Success(model);
