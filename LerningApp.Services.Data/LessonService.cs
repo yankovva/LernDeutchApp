@@ -7,6 +7,7 @@ using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.ListeningExercise;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.TranslationExercise;
+
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.EntityErrorMessages.Common;
@@ -22,7 +23,10 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     IRepository<MultipleChoiceExercise, Guid> multipleExerciseRepository,
     IRepository<TranslationExercise, Guid> translationExersiceRepository,
     IRepository<ListeningExercise, Guid> listeningExerciseRepository,
-    ITeacherService teacherService) : ILessonService
+    IRepository<UserLessonProgress, Guid> lessonProgressRepository,
+    IRepository<UserCourse, object> userCourseRepository,
+    ITeacherService teacherService,
+    IUserLessonProgressService userLessonProgressService) : ILessonService
 {
     public async Task<IEnumerable<LessonIndexViewModel>> IndexGetLessonsAsync()
     {
@@ -45,7 +49,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         return lessons;
     }
 
-    public async Task<ServiceResultT<LessonContentViewModel>> GetLessonDetailsAsync(string id)
+    public async Task<ServiceResultT<LessonContentViewModel>> GetLessonDetailsAsync(string id, string? userId)
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
@@ -86,6 +90,40 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                             }).ToList()
                     }).ToList()
             }).ToListAsync();
+
+        List<IndexMultipleChoiceExerciseViewModel> multipleChoiceExerciseViewModels = await multipleExerciseRepository
+            .GetAllAttached()
+            .Where(ex => ex.LessonId == lessonId)
+            .OrderBy(ex => ex.DifficultyLevel)
+            .Select(ex => new IndexMultipleChoiceExerciseViewModel()
+            {
+                Question = ex.Question,
+                Id = ex.Id.ToString(),
+                CorrectAnswer = ex.CorrectAnswer,
+                FirstWrongAnswer = ex.FirstWrongAnswer,
+                SecondWrongAnswer = ex.SecondWrongAnswer,
+                ThirdWrongAnswer = ex.ThirdWrongAnswer,
+            }).ToListAsync();
+
+        List<IndexTranslationExerciseViewModel> translationExerciseViewModels = await translationExersiceRepository
+            .GetAllAttached()
+            .Where(ex => ex.LessonId == lessonId)
+            .OrderBy(ex => ex.DifficultyLevel)
+            .Select(ex => new IndexTranslationExerciseViewModel()
+            {
+                Id = ex.Id.ToString(),
+                GermanSentence = ex.GermanSentence,
+                EnglishSentence = ex.EnglishSentence,
+                BulgarianSentence = ex.BulgarianSentence,
+            }).ToListAsync();
+        
+        var userProgressResult = await userLessonProgressService
+            .GetUserLessonProgress(lessonId, userId);
+
+        if (userProgressResult.Result == false)
+        {
+            return ServiceResultT<LessonContentViewModel>.Fail(userProgressResult.Message ?? "Invalid operation.");
+        }
         
         LessonContentViewModel model = new LessonContentViewModel()
         {
@@ -95,35 +133,13 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             Content = lesson.Content,
             WordCount = lesson.VocabularyCards.Count(),
             PublisherId = lesson.PublisherId.ToString(),
+            UserLessonProgress = userProgressResult.Data,
             OrderIndex = lesson.OrderIndex,
             CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
             Target = lesson.Target,
-            MultipleChoiceExercises = await multipleExerciseRepository
-                .GetAllAttached()
-                .Where(ex => ex.LessonId == lessonId)
-                .OrderBy(ex => ex.DifficultyLevel)
-                .Select(ex => new IndexMultipleChoiceExerciseViewModel()
-                {
-                    Question = ex.Question,
-                    Id = ex.Id.ToString(),
-                    CorrectAnswer = ex.CorrectAnswer,
-                    FirstWrongAnswer = ex.FirstWrongAnswer,
-                    SecondWrongAnswer = ex.SecondWrongAnswer,
-                    ThirdWrongAnswer = ex.ThirdWrongAnswer,
-                }).ToListAsync(),
-            TranslationExercises = await translationExersiceRepository
-                .GetAllAttached()
-                .Where(ex => ex.LessonId == lessonId)
-                .OrderBy(ex => ex.DifficultyLevel)
-                .Select(ex => new IndexTranslationExerciseViewModel()
-                {
-                    Id = ex.Id.ToString(),
-                    GermanSentence = ex.GermanSentence,
-                    EnglishSentence = ex.EnglishSentence,
-                    BulgarianSentence = ex.BulgarianSentence,
-                }).ToListAsync(),
+            MultipleChoiceExercises = multipleChoiceExerciseViewModels,
+            TranslationExercises = translationExerciseViewModels,
             ListeningExercises = listeningExercises
-            
         };
         
         return ServiceResultT<LessonContentViewModel>.Success(model);
@@ -201,13 +217,39 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         }
 
         Course? course = await courseRepository
-            .GetByIdAsync(courseId);
+            .GetAllAttached()
+            .Include(c => c.CourseParticipants)
+            .FirstOrDefaultAsync(c => c.Id == courseId);    
         
         if (course == null)
         {
             return ServiceResult.Fail(CourseNotFoundMessage,nameof(model.SelectedCourseId));
         }
+        
+        var userGuid = Guid.TryParse(userId, out Guid userGuidparsed) ? userGuidparsed : Guid.Empty;
+        
+        var isEnrolled = await userCourseRepository
+            .GetAllAttached()
+            .AnyAsync(x => x.UserId == userGuid && x.CourseId == courseId);
 
+        if (isEnrolled)
+        {
+            var participantInCourse = await lessonProgressRepository
+                .GetAllAttached()
+                .FirstOrDefaultAsync(l => l.LessonId == lessonId && l.UserId == userGuid);
+            
+            if (participantInCourse == null)
+            {
+                UserLessonProgress userLessonProgress = new UserLessonProgress()
+                {
+                    LessonId = lessonId,
+                    UserId = userGuid,
+                };
+
+                await lessonProgressRepository.AddAsync(userLessonProgress);
+            }
+        }
+        
         lesson.CourseId = courseId;
 
         await lessonRepository.SaveChangesAsync();
