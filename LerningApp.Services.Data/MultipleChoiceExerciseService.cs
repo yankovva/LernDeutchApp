@@ -73,7 +73,9 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
             PublisherId = teacherId.Value,
         };
         
-        await exerciseRepository.AddAsync(exercise);
+        exerciseRepository.Add(exercise);
+        await exerciseRepository.SaveChangesAsync();
+
         return ServiceResult.Success();
     }
 

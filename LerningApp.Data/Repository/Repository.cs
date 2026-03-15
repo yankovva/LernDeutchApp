@@ -65,28 +65,14 @@ public class Repository<TType, TId>
     public void Add(TType item)
     {
         dbSet.Add(item);
-        dbContext.SaveChanges();
     }
-
-    public async Task AddAsync(TType item)
-    {
-        dbSet.Add(item);
-        await dbContext.SaveChangesAsync();
-    }
-
-    public Task AddRangeAsync(IEnumerable<TType> items)
+    
+    public void AddRange(IEnumerable<TType> items)
     {
         dbSet.AddRange(items);
-        return Task.CompletedTask;
     }
 
-
-    public async Task SaveChangesAsync()
-    {
-        await this.dbContext.SaveChangesAsync();
-    }
-
-    public bool Delete(TId id)
+    public bool DeleteById(TId id)
     {
         TType? entity = GetById(id);
         if (entity == null)
@@ -94,58 +80,24 @@ public class Repository<TType, TId>
             return false;
         }
         dbSet.Remove(entity);
-        dbContext.SaveChanges();
 
         return true;
     }
-	
-    public async Task<bool> DeleteAsync(TId id)
-    {
-        TType? entity = await GetByIdAsync(id);
-        if (entity == null)
-        {
-            return false;
-        }
-        dbSet.Remove(entity);
-        await dbContext.SaveChangesAsync();
-
-        return true;
-    }
-    public async Task DeleteAsync(TType entity)
+   
+    public void DeleteByEntity(TType entity)
     {
         dbSet.Remove(entity);
-        await dbContext.SaveChangesAsync();
     }
 
     public bool Update(TType item)
     {
-        try
-        {
-            dbSet.Attach(item);
-            dbContext.Entry(item)
-                .State = EntityState.Modified;
-            dbContext.SaveChanges();
-            return true;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
+        dbSet.Update(item);
+        return true;
     }
-
-    public async Task<bool> UpdateAsync(TType item)
+    
+    public async Task SaveChangesAsync()
     {
-        try
-        {
-            dbSet.Attach(item);
-            dbContext.Entry(item)
-                .State = EntityState.Modified;
-            await dbContext.SaveChangesAsync();
-            return true;
-        }
-        catch (Exception e)
-        {
-            return false;
-        }
+        await this.dbContext.SaveChangesAsync();
     }
+  
 }

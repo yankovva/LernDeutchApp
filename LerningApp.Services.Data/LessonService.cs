@@ -125,6 +125,12 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             return ServiceResultT<LessonContentViewModel>.Fail(userProgressResult.Message ?? "Invalid operation.");
         }
         
+        if (userId != null && userProgressResult.Data != null && !userProgressResult.Data.IsUnlocked)
+        {
+            return ServiceResultT<LessonContentViewModel>.Fail("Lesson is locked.");
+        }
+
+        
         LessonContentViewModel model = new LessonContentViewModel()
         {
             Id = lesson.Id.ToString(),
@@ -247,7 +253,8 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                     UserId = userGuid,
                 };
 
-                await lessonProgressRepository.AddAsync(userLessonProgress);
+                lessonProgressRepository.Add(userLessonProgress);
+                await lessonProgressRepository.SaveChangesAsync();
             }
         }
         
@@ -258,6 +265,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         return ServiceResult.Success();
     }
 
+    //TODO add logic for the order of the lessons in a course
     public async Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, string userId)
     {
         Guid courseId = Guid.Empty;
@@ -295,7 +303,8 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             Target = model.Target,
         };
         
-        await  lessonRepository.AddAsync(lesson);
+        lessonRepository.Add(lesson);
+        await lessonRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
 

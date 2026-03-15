@@ -167,7 +167,8 @@ public class ListeningExerciseService(
         }
 
         exercise.Questions = questions;
-        await listeningExerciseRepository.AddAsync(exercise);
+        listeningExerciseRepository.Add(exercise);
+        await listeningExerciseRepository.SaveChangesAsync();
 
         return ServiceResult.Success();
     }

@@ -16,16 +16,13 @@ public interface IRepository<TType, TId>
     Task<TType?> FirstorDefaultAsync(Expression<Func<TType, bool>> predicate);
 
     void Add(TType item);
-    Task AddAsync(TType item);
-   Task AddRangeAsync(IEnumerable<TType> items);
-
+   void AddRange(IEnumerable<TType> items);
 
     Task SaveChangesAsync();
 
-    bool Delete(TId id);
-    Task<bool> DeleteAsync(TId id);
-    Task DeleteAsync(TType entity);
+    bool DeleteById(TId id);
+    void DeleteByEntity(TType entity);
 
     bool Update(TType item);
-    Task<bool> UpdateAsync(TType item);
+   
 }

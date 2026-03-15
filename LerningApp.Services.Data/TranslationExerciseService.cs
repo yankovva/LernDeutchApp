@@ -70,7 +70,8 @@ public class TranslationExerciseService(
             DifficultyLevel = model.DifficultyLevel,
         };
 
-        await exerciseRepository.AddAsync(exercise);
+        exerciseRepository.Add(exercise);
+        await exerciseRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
 

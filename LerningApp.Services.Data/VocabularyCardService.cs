@@ -180,7 +180,8 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath
         };
          
-        await vocabularyCardRepository.AddAsync(newCard);
+        vocabularyCardRepository.Add(newCard);
+        await vocabularyCardRepository.SaveChangesAsync();
         
         return ServiceResult.Success();        
     }
@@ -310,7 +311,8 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         {
             fileService.DeleteFile(card.ImagePath);
         }
-        await vocabularyCardRepository.DeleteAsync(card);
+        vocabularyCardRepository.DeleteByEntity(card);
+        await vocabularyCardRepository.SaveChangesAsync();
         
         return ServiceResult.Success();
     }
