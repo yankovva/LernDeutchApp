@@ -69,7 +69,6 @@ public class ListeningExerciseService(
 
         if (model.AudioFile.Length == 0)
         {
-            // ModelState.AddModelError(nameof(model.AudioFile), "Audio file is required.");
             return ServiceResult.Fail("Audio file is required.", nameof(model.AudioFile));
         }
 
@@ -81,7 +80,6 @@ public class ListeningExerciseService(
 
             if (!fileService.IsFileValid(model.AudioFile, allowedExtensions, maxSize))
             {
-                // ModelState.AddModelError(nameof(model.AudioFile), "Please upload a valid audio file (.mp3, .wav, .ogg, .m4a) up to 5 MB.");
                 return ServiceResult.Fail("Please upload a valid audio file (.mp3, .wav, .ogg, .m4a) up to 5 MB.",
                     nameof(model.AudioFile));
             }
@@ -104,7 +102,6 @@ public class ListeningExerciseService(
 
         if (model.Questions.Count == 0)
         {
-            // ModelState.AddModelError(nameof(model.Questions), "Add at least one question for the exercise.");
             return ServiceResult.Fail("Add at least one question for the exercise.", nameof(model.Questions));
         }
 
@@ -122,11 +119,10 @@ public class ListeningExerciseService(
 
                 var filledOptions = question.Options?
                     .Where(op => !string.IsNullOrWhiteSpace(op.AnswerText))
-                    .ToList();
+                    .ToList() ?? new List<CreateListeningQuestionOptionInputModel>();
 
-                if (filledOptions.Count() <= 1)
+                if (filledOptions.Count <= 1)
                 {
-                    // ModelState.AddModelError(nameof(model.Questions), "Add at least two options for the question.");
                     return ServiceResult.Fail("Add at least two options for the question.", nameof(model.Questions));
                 }
 
@@ -135,7 +131,6 @@ public class ListeningExerciseService(
 
                 if (selectedCorrectOptionsCount != 1)
                 {
-                    //  ModelState.AddModelError(nameof(model.Questions), "Choose one correct option for the question.");
                     return ServiceResult.Fail("Choose one correct option for the question.", nameof(model.Questions));
                 }
 
