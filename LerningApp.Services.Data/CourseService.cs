@@ -117,14 +117,14 @@ public class CourseService(
             PublisherId = course.PublisherId.ToString(),
             IsActive = course.IsPublished,
             CourseLessons = course.LessonsForCourse
+                .OrderBy(l =>l.OrderIndex)
                 .Select(cl => new CourseLessonsViewModel()
                 {
                     LessinId = cl.Id.ToString(),
                     LessonName = cl.Name,
-                    OrderIndex = cl.OrderIndex,
                     WordsInLesson = cl.VocabularyCards.Count(),
                     LessonTarget = cl.Target
-                }).OrderBy(l => l.OrderIndex)
+                })
                 .ToList()
         };
         
