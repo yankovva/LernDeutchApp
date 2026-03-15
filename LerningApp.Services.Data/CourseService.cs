@@ -82,8 +82,8 @@ public class CourseService(
             Price = model.Price
         };
 
-        await courseRepository.AddAsync(course);
-
+        courseRepository.Add(course);
+        await courseRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
 
@@ -121,9 +121,11 @@ public class CourseService(
                 {
                     LessinId = cl.Id.ToString(),
                     LessonName = cl.Name,
+                    OrderIndex = cl.OrderIndex,
                     WordsInLesson = cl.VocabularyCards.Count(),
                     LessonTarget = cl.Target
-                }).ToList()
+                }).OrderBy(l => l.OrderIndex)
+                .ToList()
         };
         
        
@@ -336,9 +338,9 @@ public class CourseService(
             IsUnlocked = firstLessonId != null && l.Id == firstLessonId
         }).ToList();
 
-        await userCourseRepository.AddAsync(newUserCourse);
-        await userProgressRepository.AddRangeAsync(progresses);
-        await userProgressRepository.SaveChangesAsync();
+         userCourseRepository.Add(newUserCourse);
+         userProgressRepository.AddRange(progresses);
+         await userProgressRepository.SaveChangesAsync();
 
         return ServiceResult.Success();
     }

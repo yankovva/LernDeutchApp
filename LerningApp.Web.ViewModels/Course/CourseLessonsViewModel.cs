@@ -10,6 +10,8 @@ public class CourseLessonsViewModel
     
     public string LessonTarget { get; set; } = null!;
     
+    public int OrderIndex { get; set; }
+    
     public int WordsInLesson { get; set; }
     
     public IndexUserLessonProgressViewModel UserLessonProgress { get; set; } = new IndexUserLessonProgressViewModel();
