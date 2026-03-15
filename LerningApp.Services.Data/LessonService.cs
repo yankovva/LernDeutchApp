@@ -191,8 +191,8 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
     public async Task<ServiceResult> AddLessonToCourseAsync(AddLessonToCourseViewModel model, string userId)
     {
-        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
-        if (!isTeacher)
+        var teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null)
         {
             return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
         }
@@ -208,6 +208,11 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         if (lesson == null)
         {
             return ServiceResult.Fail(LessonNotFoundMessage);
+        }
+
+        if (lesson.PublisherId != teacherId )
+        {
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
         }
         
         //TODO: Delete UserLessonProgress records for enrolled users when a lesson is removed from a course (decide: hard delete vs soft delete).
@@ -225,7 +230,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
         Course? course = await courseRepository
             .GetAllAttached()
-            .Include(c => c.CourseParticipants)
             .FirstOrDefaultAsync(c => c.Id == courseId);    
         
         if (course == null)
@@ -233,33 +237,35 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             return ServiceResult.Fail(CourseNotFoundMessage,nameof(model.SelectedCourseId));
         }
         
-        var userGuid = Guid.TryParse(userId, out Guid userGuidparsed) ? userGuidparsed : Guid.Empty;
-        
-        var isEnrolled = await userCourseRepository
+        var participantsInCourseIds = await userCourseRepository
             .GetAllAttached()
-            .AnyAsync(x => x.UserId == userGuid && x.CourseId == courseId);
+            .Where(uc => uc.CourseId == courseId)
+            .Select(uc=> uc.UserId)
+            .ToListAsync();
+        
+        var userLessonProgressIds = await lessonProgressRepository
+            .GetAllAttached()
+            .Where(ul => ul.LessonId == lessonId)
+            .Select(ul => ul.UserId)
+            .ToListAsync();
 
-        if (isEnrolled)
+        foreach (var participantId in participantsInCourseIds)
         {
-            var participantInCourse = await lessonProgressRepository
-                .GetAllAttached()
-                .FirstOrDefaultAsync(l => l.LessonId == lessonId && l.UserId == userGuid);
-            
-            if (participantInCourse == null)
+            if (!userLessonProgressIds.Contains(participantId))
             {
                 UserLessonProgress userLessonProgress = new UserLessonProgress()
                 {
                     LessonId = lessonId,
-                    UserId = userGuid,
+                    UserId = participantId,
+                    IsCompleted = false,
+                    IsUnlocked = false
                 };
 
                 lessonProgressRepository.Add(userLessonProgress);
-                await lessonProgressRepository.SaveChangesAsync();
             }
         }
         
         lesson.CourseId = courseId;
-
         await lessonRepository.SaveChangesAsync();
         
         return ServiceResult.Success();
