@@ -4,6 +4,8 @@ using LerningApp.Web.ViewModels.Lesson;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using static LerningApp.Common.EntityErrorMessages.Common;
+
 namespace LerningApp.Controllers;
 
 [Authorize]
@@ -14,6 +16,12 @@ public class LessonController(ILessonService lessonService,
     [HttpGet]
     public async Task<IActionResult> Index()
     { 
+        string userId = User.GetUserId()!;
+        if (await teacherService.IsUserTeacherAsync(userId))
+        {
+            TempData["ErrorMessage"] = AccessDeniedMessage;
+            return RedirectToAction("Index", "Home");
+        }
         var lessons = await lessonService.IndexGetLessonsAsync();
         return View(lessons);
     }
@@ -26,7 +34,7 @@ public class LessonController(ILessonService lessonService,
         if (result.Result == false )
         {
             TempData["ErrorMessage"] = result.Message;
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Home");
         }
         
         return this.View(result.Data);
@@ -41,7 +49,7 @@ public class LessonController(ILessonService lessonService,
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Home");
         }
         
         return this.View(result.Data);
@@ -82,8 +90,8 @@ public class LessonController(ILessonService lessonService,
         bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
         if (!isTeacher)
         {
-            TempData["ErrorMessage"] = "Нямате права";
-            return RedirectToAction(nameof(Index));
+            TempData["ErrorMessage"] = AccessDeniedMessage;
+            return RedirectToAction("Index", "Home");
         }
         AddLessonInputModel model = new AddLessonInputModel
         {
@@ -96,7 +104,7 @@ public class LessonController(ILessonService lessonService,
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(AddLessonInputModel model)
     {
-        if (!this.ModelState.IsValid)
+        if (ModelState.IsValid)
         {
             model.Courses = await courseService.GetCourseOptionsAsync();
             return View(model);
@@ -123,7 +131,7 @@ public class LessonController(ILessonService lessonService,
        if (result.Result == false)
        {
            TempData["ErrorMessage"] = result.Message;
-           return RedirectToAction(nameof(Index));
+           return RedirectToAction("Index", "Home");
        }
 
        result.Data!.Courses = await courseService.GetCourseOptionsAsync();

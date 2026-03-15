@@ -164,12 +164,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
     public async Task<ServiceResultT<AddLessonToCourseViewModel>> GetAddLessonToCourseByIdAsync(string id,string userId)
     {
-        var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null)
-        {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
-        }
-        
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
             return ServiceResultT<AddLessonToCourseViewModel>.Fail(InvalidLessonIdMessage);
@@ -182,8 +176,9 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         {
             return ServiceResultT<AddLessonToCourseViewModel>.Fail(LessonNotFoundMessage);
         }
-
-        if (lesson.PublisherId != teacherId)
+        
+        var teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || lesson.PublisherId != teacherId)
         {
             return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
         }
@@ -207,12 +202,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
     public async Task<ServiceResult> AddLessonToCourseAsync(AddLessonToCourseViewModel model, string userId)
     {
-        var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null)
-        {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
-        }
-        
         if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
             return ServiceResult.Fail(InvalidLessonIdMessage);
@@ -225,12 +214,13 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         {
             return ServiceResult.Fail(LessonNotFoundMessage);
         }
-
-        if (lesson.PublisherId != teacherId )
+        
+        var teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || lesson.PublisherId != teacherId)
         {
             return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
         }
-        
+       
         //TODO: Delete UserLessonProgress records for enrolled users when a lesson is removed from a course (decide: hard delete vs soft delete).
         if (string.IsNullOrWhiteSpace(model.SelectedCourseId))
         {
@@ -289,7 +279,13 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
     //TODO add logic for the order of the lessons in a course
     public async Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, string userId)
-    {
+    { 
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null)
+        {
+            return ServiceResult.Fail(AccessDeniedMessage);
+        }
+        
         Guid courseId = Guid.Empty;
         if (!string.IsNullOrWhiteSpace(model.CourseId))
         {
@@ -305,13 +301,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             {
                 return ServiceResult.Fail(CourseNotFoundMessage, nameof(model.CourseId));
             }
-        }
-        
-        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-
-        if (teacherId == null)
-        {
-            return ServiceResult.Fail(AccessDeniedMessage);
         }
         
         Lesson lesson = new Lesson
@@ -332,12 +321,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
     public async Task<ServiceResultT<LessonEditInputModel>> GetLessonEditInputModelAsync(string id, string userId)
     {
-        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
-        if (!isTeacher)
-        {
-            return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
-        }
-        
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
             return ServiceResultT<LessonEditInputModel>.Fail(InvalidLessonIdMessage);
@@ -350,6 +333,12 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         if (lesson == null)
         {
             return ServiceResultT<LessonEditInputModel>.Fail(LessonNotFoundMessage);
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || lesson.PublisherId != teacherId)
+        {
+            return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
         }
 
         var model = new LessonEditInputModel
@@ -397,7 +386,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId != lessonToChange.PublisherId)
+        if (teacherId == null || teacherId != lessonToChange.PublisherId)
         {
             return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
         }
@@ -429,7 +418,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId != lesson.PublisherId)
+        if (teacherId == null || teacherId != lesson.PublisherId)
         {
             return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
         }

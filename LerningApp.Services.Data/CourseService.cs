@@ -50,6 +50,12 @@ public class CourseService(
 
     public async Task<ServiceResult> AddCourseAsync(AddCourseViewModel model, string userId)
     {
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null)
+        {
+            return ServiceResult.Fail(AccessDeniedMessage);
+        }
+        
         if (string.IsNullOrWhiteSpace(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
         {
             return ServiceResult.Fail(InvalidLevelIdMessage);
@@ -61,13 +67,6 @@ public class CourseService(
         if (level == null)
         {
             return ServiceResult.Fail(LevelNotFoundMessage);
-        }
-        
-        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        
-        if (teacherId == null)
-        {
-            return ServiceResult.Fail(AccessDeniedMessage);
         }
         
         var course = new Course
@@ -127,7 +126,6 @@ public class CourseService(
                 })
                 .ToList()
         };
-        
        
         if (Guid.TryParse(userId, out var userGuidId))
         {
@@ -183,7 +181,6 @@ public class CourseService(
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        
         if (teacherId == null || course.PublisherId != teacherId)
         {
             return ServiceResultT<CourseEditViewModel>.Fail(AccessDeniedMessage);
