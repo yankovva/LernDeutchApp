@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using LerningApp.Services.Data.Interfaces
+@using LerningApp.Web.Infrastructure.Extensions
+@inject ITeacherService teacherService
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8"/>
@@ -34,15 +37,19 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Course" asp-action="Index">Courses</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Lesson" asp-action="Index">Lessons</a>
-                    </li>
-                    @if (this.User?.Identity?.IsAuthenticated ?? false)
+                    @if (User.Identity?.IsAuthenticated ?? false)
                     {
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="UsersCourses" asp-action="Index">My Courses</a>
-                        </li> 
+                        </li>
+                        if (await teacherService.IsUserTeacherAsync(User.GetUserId()!))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Lesson" asp-action="Index">Lessons</a>
+                            </li>
+                        }
                     }
+                   
                 </ul>
 
                 <div class="ms-auto">
@@ -73,10 +80,16 @@
                 <svg viewBox="0 0 24 24"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0-5 3 4h-6l3-4Z"/></svg>
                 About
             </a>
-            <a asp-controller="Course" asp-action="Index">
-                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM6 7v10h12V7z"/></svg>
-                Курсове
-            </a>
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                if (await teacherService.IsUserTeacherAsync(User.GetUserId()!))
+                {
+                    <a asp-controller="Course" asp-action="Index">
+                        <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM6 7v10h12V7z"/></svg>
+                        Курсове
+                    </a>
+                }
+            }
             <a asp-controller="Lesson" asp-action="Index">
                 <svg viewBox="0 0 24 24"><path d="M4 4h16v4H4zM4 10h10v4H4zM4 16h16v4H4z"/></svg>
                 Уроци
