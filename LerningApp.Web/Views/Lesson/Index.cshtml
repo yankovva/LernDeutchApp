@@ -122,12 +122,14 @@ else
                                asp-route-id="@row.Id">
                                 Урок
                             </a>
-                            @if(Guid.Parse(row.Publisher) == await teacherService.GetTeacherIdAsync(User.GetUserId()!))
-                            <a class="btn btn-sm btn-primary"
-                               asp-action="AddToCourse"
-                               asp-route-id="@row.Id">
-                                Добави към курс
-                            </a>
+                            @if (Guid.Parse(row.Publisher) == await teacherService.GetTeacherIdAsync(User.GetUserId()!))
+                            {
+                                <a class="btn btn-sm btn-primary"
+                                   asp-action="AddToCourse"
+                                   asp-route-id="@row.Id">
+                                    Добави към курс
+                                </a>
+                            }
                         </div>
                     </td>
                 </tr>
