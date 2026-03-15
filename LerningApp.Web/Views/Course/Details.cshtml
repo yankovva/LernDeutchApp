@@ -67,24 +67,27 @@
                 </div>
             </section>
 
-            <section class="progress-card">
-                <div class="progress-head">
-                    <div>
-                        <h5 class="progress-title">Прогрес в курса</h5>
-                        <p class="progress-subtitle">Завършени уроци спрямо всички уроци</p>
+            @if (Model.IsEnrolled)
+            {
+                <section class="progress-card">
+                    <div class="progress-head">
+                        <div>
+                            <h5 class="progress-title">Прогрес в курса</h5>
+                            <p class="progress-subtitle">Завършени уроци спрямо всички уроци</p>
+                        </div>
+                        <div class="progress-value">@progress%</div>
                     </div>
-                    <div class="progress-value">@progress%</div>
-                </div>
 
-                <div class="progress progress-custom"
-                     role="progressbar"
-                     aria-label="Course progress"
-                     aria-valuenow="@progress"
-                     aria-valuemin="0"
-                     aria-valuemax="100">
-                    <div class="progress-bar progress-bar-custom" style="width: @progress%;"></div>
-                </div>
-            </section>
+                    <div class="progress progress-custom"
+                         role="progressbar"
+                         aria-label="Course progress"
+                         aria-valuenow="@progress"
+                         aria-valuemin="0"
+                         aria-valuemax="100">
+                        <div class="progress-bar progress-bar-custom" style="width: @progress%;"></div>
+                    </div>
+                </section>
+            }
 
             @if (isTeacher)
             {
