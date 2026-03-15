@@ -1,0 +1,398 @@
+@{
+    ViewData["Title"] = "Contact";
+}
+
+<div class="contact-shell">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <section class="contact-hero">
+        <div class="hero-text">
+            <span class="eyebrow">WE ARE HERE TO HELP</span>
+            <h1>Let’s Talk About Your German Learning Journey</h1>
+            <p>
+                Questions about courses, lessons, access, or progress?
+                Send us a message and we’ll get back to you quickly.
+            </p>
+
+            <div class="quick-badges">
+                <span>Fast Response</span>
+                <span>Real Support</span>
+                <span>Mon–Fri 09:00–18:00</span>
+            </div>
+        </div>
+
+        <div class="hero-photo">
+            <img src="/images/Common/default-course-img.png" alt="Contact support" />
+        </div>
+    </section>
+
+    <section class="contact-grid">
+        <aside class="info-card">
+            <h3>Contact Details</h3>
+
+            <div class="info-item">
+                <div class="icon">✉</div>
+                <div>
+                    <div class="label">Email</div>
+                    <div class="value">support@lerneasy.com</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="icon">☎</div>
+                <div>
+                    <div class="label">Phone</div>
+                    <div class="value">+359 888 123 456</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="icon">📍</div>
+                <div>
+                    <div class="label">Address</div>
+                    <div class="value">Sofia, Bulgaria</div>
+                </div>
+            </div>
+
+            <div class="info-item">
+                <div class="icon">🕘</div>
+                <div>
+                    <div class="label">Working Hours</div>
+                    <div class="value">Mon–Fri, 09:00–18:00</div>
+                </div>
+            </div>
+
+            <div class="socials">
+                <a href="#" aria-label="Instagram">Instagram</a>
+                <a href="#" aria-label="Facebook">Facebook</a>
+                <a href="#" aria-label="YouTube">YouTube</a>
+            </div>
+        </aside>
+
+        <div class="form-card">
+            <h3>Send a Message</h3>
+
+            <form method="post" asp-controller="Home" asp-action="Contact">
+                @Html.AntiForgeryToken()
+
+                <div class="field-row">
+                    <div class="field">
+                        <label for="name">Name</label>
+                        <input id="name" name="Name" class="form-control" required />
+                    </div>
+                    <div class="field">
+                        <label for="email">Email</label>
+                        <input id="email" name="Email" type="email" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="subject">Subject</label>
+                    <input id="subject" name="Subject" class="form-control" required />
+                </div>
+
+                <div class="field">
+                    <label for="message">Message</label>
+                    <textarea id="message" name="Message" rows="6" class="form-control" required></textarea>
+                </div>
+
+                <button type="submit" class="btn-send">Send Message</button>
+            </form>
+
+            <div class="mini-map">
+                <iframe
+                    title="Office map"
+                    src="https://maps.google.com/maps?q=Sofia%20Bulgaria&t=&z=12&ie=UTF8&iwloc=&output=embed"
+                    loading="lazy">
+                </iframe>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    :root {
+        --ink: #0f172a;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --paper: #ffffff;
+        --accent: #ea580c;
+        --accent-2: #fb923c;
+        --accent-soft: #fff7ed;
+        --shadow: 0 20px 40px rgba(15, 23, 42, 0.10);
+    }
+
+    .contact-shell {
+        position: relative;
+        max-width: 1150px;
+        margin: 24px auto 48px;
+        padding: 0 12px;
+        overflow: hidden;
+    }
+
+    .bg-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(6px);
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    .orb-1 {
+        width: 280px;
+        height: 280px;
+        background: rgba(251, 146, 60, 0.20);
+        top: -80px;
+        left: -80px;
+    }
+
+    .orb-2 {
+        width: 320px;
+        height: 320px;
+        background: rgba(56, 189, 248, 0.16);
+        right: -110px;
+        bottom: 120px;
+    }
+
+    .contact-hero, .contact-grid {
+        position: relative;
+        z-index: 2;
+    }
+
+    .contact-hero {
+        display: grid;
+        grid-template-columns: 1.15fr .85fr;
+        gap: 16px;
+        margin-bottom: 16px;
+    }
+
+    .hero-text {
+        background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
+        border: 1px solid #fed7aa;
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: var(--shadow);
+    }
+
+    .eyebrow {
+        display: inline-block;
+        font-size: .75rem;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+        color: #9a3412;
+        margin-bottom: 10px;
+        font-weight: 700;
+    }
+
+    .hero-text h1 {
+        margin: 0 0 10px;
+        font-size: 2.05rem;
+        line-height: 1.2;
+        font-weight: 900;
+        color: var(--ink);
+    }
+
+    .hero-text p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.75;
+    }
+
+    .quick-badges {
+        margin-top: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .quick-badges span {
+        border: 1px solid #fdba74;
+        color: #9a3412;
+        background: #fff;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: .85rem;
+        font-weight: 600;
+    }
+
+    .hero-photo {
+        border-radius: 20px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+        box-shadow: var(--shadow);
+        min-height: 240px;
+    }
+
+    .hero-photo img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .contact-grid {
+        display: grid;
+        grid-template-columns: .95fr 1.25fr;
+        gap: 16px;
+    }
+
+    .info-card, .form-card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 18px;
+        box-shadow: var(--shadow);
+    }
+
+    .info-card h3, .form-card h3 {
+        margin: 0 0 14px;
+        font-weight: 800;
+        color: var(--ink);
+    }
+
+    .info-item {
+        display: grid;
+        grid-template-columns: 40px 1fr;
+        gap: 10px;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #f1f5f9;
+        border-radius: 12px;
+        margin-bottom: 8px;
+        background: #fff;
+    }
+
+    .icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background: var(--accent-soft);
+        color: #9a3412;
+        font-weight: 700;
+    }
+
+    .label {
+        font-size: .78rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: .07em;
+    }
+
+    .value {
+        color: #1e293b;
+        font-weight: 600;
+    }
+
+    .socials {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .socials a {
+        text-decoration: none;
+        border: 1px solid #e2e8f0;
+        border-radius: 999px;
+        padding: 6px 10px;
+        font-size: .85rem;
+        color: #334155;
+        background: #fff;
+    }
+
+    .socials a:hover {
+        border-color: #fdba74;
+        color: #9a3412;
+        background: #fff7ed;
+    }
+
+    .field-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .field {
+        margin-bottom: 10px;
+    }
+
+    .field label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 700;
+        color: #334155;
+        font-size: .9rem;
+    }
+
+    .form-control {
+        width: 100%;
+        border-radius: 12px;
+        border: 1px solid #cbd5e1;
+        padding: 10px 12px;
+        font-size: .95rem;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--accent-2);
+        box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.22);
+    }
+
+    .btn-send {
+        border: none;
+        border-radius: 999px;
+        padding: 11px 16px;
+        font-weight: 700;
+        color: #fff;
+        background: linear-gradient(90deg, var(--accent-2), var(--accent));
+        box-shadow: 0 10px 18px rgba(234, 88, 12, 0.28);
+    }
+
+    .btn-send:hover {
+        filter: brightness(.96);
+    }
+
+    .mini-map {
+        margin-top: 14px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid #e5e7eb;
+    }
+
+    .mini-map iframe {
+        width: 100%;
+        height: 220px;
+        border: 0;
+        display: block;
+    }
+
+    @@media (max-width: 980px) {
+        .contact-hero {
+            grid-template-columns: 1fr;
+        }
+
+        .hero-photo {
+            min-height: 220px;
+        }
+
+        .contact-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 560px) {
+        .hero-text {
+            padding: 20px;
+        }
+
+        .hero-text h1 {
+            font-size: 1.6rem;
+        }
+
+        .field-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>

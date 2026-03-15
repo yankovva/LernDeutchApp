@@ -37,6 +37,9 @@
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Course" asp-action="Index">Courses</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
+                    </li>
                     @if (User.Identity?.IsAuthenticated ?? false)
                     {
                         <li class="nav-item">
@@ -70,8 +73,8 @@
         <div class="footer-mid-brand">
             <div class="brand-circle">L</div>
             <div>
-                <div class="brand-name">LernEasy Deutsch</div>
-                <div class="brand-sub">Онлайн учене на немски</div>
+                <div class="brand-name">DeutschBuddy</div>
+                <div class="brand-sub">Learn easy german online </div>
             </div>
         </div>
 
@@ -84,15 +87,19 @@
             {
                 if (await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                 {
-                    <a asp-controller="Course" asp-action="Index">
-                        <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM6 7v10h12V7z"/></svg>
-                        Курсове
+                    <a asp-controller="Lesson" asp-action="Index">
+                        <svg viewBox="0 0 24 24"><path d="M4 4h16v4H4zM4 10h10v4H4zM4 16h16v4H4z"/></svg>
+                        Lessons
                     </a>
                 }
             }
-            <a asp-controller="Lesson" asp-action="Index">
-                <svg viewBox="0 0 24 24"><path d="M4 4h16v4H4zM4 10h10v4H4zM4 16h16v4H4z"/></svg>
-                Уроци
+            <a asp-controller="Course" asp-action="Index">
+                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM6 7v10h12V7z"/></svg>
+                Courses
+            </a>
+            <a asp-controller="Home" asp-action="Contact">
+                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM6 7v10h12V7z"/></svg>
+                Contact
             </a>
             <a asp-controller="Home" asp-action="Privacy">
                 <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V5l-8-3Z"/></svg>
