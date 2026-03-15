@@ -39,6 +39,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             {
                 Id = l.Id.ToString(),
                 Name = l.Name,
+                Publisher = l.PublisherId.ToString(),
                 CourseId = l.CourseId != null ? l.CourseId.ToString() : null,
                 CourseName = l.Course != null ? l.Course.Name : null,
                 LevelName = l.Course != null ? l.Course.Level.Name : null,
@@ -153,8 +154,8 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
     public async Task<ServiceResultT<AddLessonToCourseViewModel>> GetAddLessonToCourseByIdAsync(string id,string userId)
     {
-        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
-        if (!isTeacher)
+        var teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null)
         {
             return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
         }
@@ -170,6 +171,11 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         if (lesson == null) 
         {
             return ServiceResultT<AddLessonToCourseViewModel>.Fail(LessonNotFoundMessage);
+        }
+
+        if (lesson.PublisherId != teacherId)
+        {
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
         }
 
         AddLessonToCourseViewModel model = new AddLessonToCourseViewModel()

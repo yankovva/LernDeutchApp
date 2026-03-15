@@ -1,5 +1,11 @@
+@using LerningApp.Services.Data.Interfaces
 @using LerningApp.Web.ViewModels.Lesson
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model IEnumerable<LessonIndexViewModel>
+@using LerningApp.Web.Infrastructure.Extensions
+
+@inject ITeacherService teacherService
+
 
 @{
     ViewData["Title"] = "Lessons";
@@ -116,7 +122,7 @@ else
                                asp-route-id="@row.Id">
                                 Урок
                             </a>
-
+                            @if(Guid.Parse(row.Publisher) == await teacherService.GetTeacherIdAsync(User.GetUserId()!))
                             <a class="btn btn-sm btn-primary"
                                asp-action="AddToCourse"
                                asp-route-id="@row.Id">
