@@ -6,7 +6,7 @@ namespace LerningApp.Services.Data.Interfaces;
 public interface ILessonService
 { 
     Task<IEnumerable<LessonIndexViewModel>> IndexGetLessonsAsync();
-    Task<ServiceResultT<LessonContentViewModel>> GetLessonDetailsAsync(string id, string? userId);
+    Task<ServiceResultT<LessonContentViewModel>> GetLessonDetailsAsync(string id, string userId);
     Task<ServiceResultT<AddLessonToCourseViewModel>> GetAddLessonToCourseByIdAsync(string id,string userId);
     Task<ServiceResult> AddLessonToCourseAsync(AddLessonToCourseViewModel model,string userId);
     Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, string userId);

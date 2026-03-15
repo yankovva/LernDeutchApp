@@ -354,7 +354,7 @@
                 </a>
             }
 
-            @if (Model.CourseId != null)
+            @if (!string.IsNullOrWhiteSpace(Model.CourseId))
             {
                 <a asp-controller="Course" asp-action="Details" asp-route-id="@Model.CourseId"
                    class="btn btn-outline-primary">

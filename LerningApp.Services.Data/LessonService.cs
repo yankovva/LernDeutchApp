@@ -7,7 +7,7 @@ using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.ListeningExercise;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.TranslationExercise;
-
+using LerningApp.Web.ViewModels.UserLessonProgress;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.EntityErrorMessages.Common;
@@ -50,7 +50,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         return lessons;
     }
 
-    public async Task<ServiceResultT<LessonContentViewModel>> GetLessonDetailsAsync(string id, string? userId)
+    public async Task<ServiceResultT<LessonContentViewModel>> GetLessonDetailsAsync(string id, string userId)
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
@@ -121,26 +121,28 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         var userProgressResult = await userLessonProgressService
             .GetUserLessonProgress(lessonId, userId);
 
-        if (userProgressResult.Result == false)
+        bool isUserTeacher = await teacherService.IsUserTeacherAsync(userId);
+        
+        if (userProgressResult.Result == false && !isUserTeacher)
         {
             return ServiceResultT<LessonContentViewModel>.Fail(userProgressResult.Message ?? "Invalid operation.");
         }
         
-        if (userId != null && userProgressResult.Data != null && !userProgressResult.Data.IsUnlocked)
+        if (userProgressResult.Data != null && !userProgressResult.Data.IsUnlocked&& !isUserTeacher)
         {
             return ServiceResultT<LessonContentViewModel>.Fail("Lesson is locked.");
         }
-
+        
         
         LessonContentViewModel model = new LessonContentViewModel()
         {
             Id = lesson.Id.ToString(),
             Name = lesson.Name,
-            CourseId = lesson.CourseId.ToString(),
+            CourseId = lesson.CourseId?.ToString(),
             Content = lesson.Content,
             WordCount = lesson.VocabularyCards.Count(),
             PublisherId = lesson.PublisherId.ToString(),
-            UserLessonProgress = userProgressResult.Data,
+            UserLessonProgress = userProgressResult.Data ?? new IndexUserLessonProgressViewModel(),
             OrderIndex = lesson.OrderIndex,
             CourseName = lesson.Course != null ? lesson.Course.Name : "No course found.",
             Target = lesson.Target,
@@ -148,6 +150,14 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             TranslationExercises = translationExerciseViewModels,
             ListeningExercises = listeningExercises
         };
+        
+        if (isUserTeacher)
+        {
+            model.UserLessonProgress = new()
+            {
+                IsUnlocked = true,
+            };
+        }
         
         return ServiceResultT<LessonContentViewModel>.Success(model);
     }
