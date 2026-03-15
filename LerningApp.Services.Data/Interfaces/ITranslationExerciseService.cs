@@ -9,5 +9,5 @@ public interface ITranslationExerciseService
     Task<ServiceResultT<CreateTranslationExerciseViewModel>> GetAddTranslationExercisesAsync(string lessonId, string userId);
     Task<ServiceResult> AddTranslationExerciseAsync(CreateTranslationExerciseViewModel model, string userId);
 
-    Task<(bool isCorrect, string correctAnswer)?> CheckTranslationAsync(string exId, string userAnswer);
+    Task<(bool isCorrect, string correctAnswer)?> CheckTranslationAsync(string exId, string userAnswer, string lessonId, string userId);
 }

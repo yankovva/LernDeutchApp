@@ -537,8 +537,6 @@
 </div>
 
 <script>
-    import {Toast} from "../../wwwroot/lib/bootstrap/dist/js/bootstrap.esm";
-
     document.addEventListener('DOMContentLoaded', () => {
 
         // Multiple choice
@@ -553,11 +551,13 @@
                 if (!selected) return;
 
                 const exerciseId = box.querySelector('input[name="exerciseId"]').value;
+                const lessonId = box.querySelector('input[name="lessonId"]').value;
                 const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
 
                 const formData = new URLSearchParams();
                 formData.append("exerciseId", exerciseId);
                 formData.append("selectedAnswer", selected.value);
+                formData.append("lessonId", lessonId)
 
                 const res = await fetch('/MultipleChoiceExercise/CheckMultipleChoice', {
                     method: 'POST',
@@ -601,7 +601,7 @@
                 const selected = box.querySelector('input[type="radio"]:checked');
                 if (!selected) return;
 
-                const lessonId = box.querySelectorAll('input[name="lessonId"]').value;
+                const lessonId = box.querySelector('input[name="lessonId"]').value;
                 const questionId = box.querySelector('input[name="questionId"]').value;
                 const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
 
@@ -659,10 +659,12 @@
                 const exerciseId = box.querySelector('input[name="exerciseId"]').value;
                 const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
                 const userAnswer = box.querySelector('input[name="userAnswer"]').value;
+                const lessonId = box.querySelector('input[name="lessonId"]').value;
                     
                 const formData = new URLSearchParams();
                 formData.append("exerciseId", exerciseId);
                 formData.append("userAnswer", userAnswer);
+                formData.append("lessonId", lessonId)
 
                 const res = await fetch('/TranslationExercise/CheckTranslationExercise', {
                     method: 'POST',
@@ -673,6 +675,13 @@
                     body: formData
                 });
 
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    console.log(err.message || 'Invalid operation.');
+                    toastr.error(err.message || 'Invalid operation.');
+                    return;
+                }
+                
                 const data = await res.json();
                 const input = box.querySelector('input[name="userAnswer"]');
                 input.classList.remove('correct', 'wrong');

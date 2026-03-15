@@ -48,14 +48,16 @@ public class TranslationExerciseController(ITranslationExerciseService translati
    
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CheckTranslationExercise(string exerciseId, string userAnswer)
+    public async Task<IActionResult> CheckTranslationExercise(string exerciseId, string userAnswer, string lessonId)
     {
+        var userId = User.GetUserId();
+        
         var result = await translationExerciseService
-            .CheckTranslationAsync(exerciseId, userAnswer);
+            .CheckTranslationAsync(exerciseId, userAnswer,lessonId, userId!);
         
         if (result == null)
         {
-            return Json(new { isCorrect = false });
+            return BadRequest(new { message = "Invalid operation." });
         }
 
         return Json(new { result.Value.isCorrect, result.Value.correctAnswer });
