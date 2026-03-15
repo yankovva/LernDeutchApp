@@ -1,4 +1,3 @@
-@using System.Security.Claims
 @using LerningApp.Services.Data.Interfaces
 @using LerningApp.Web.ViewModels.Course
 @using LerningApp.Web.Infrastructure.Extensions
@@ -7,25 +6,40 @@
 
 @{
     ViewData["Title"] = "Course Details";
+    var isAuthenticated = User.Identity?.IsAuthenticated == true;
+    var isTeacher = isAuthenticated && await teacherService.IsUserTeacherAsync(User.GetUserId()!);
+    var progress = Math.Clamp(Model.ProgressPercentage, 0, 100);
 }
 
 <div class="row g-4">
     <div class="col-lg-8">
         <div class="course-page">
-            <div class="course-hero">
-                <div class="hero-left">
-                    <div class="eyebrow">Курс</div>
-                    <h2 class="title">@Model.Name</h2>
-                    <div class="meta-line">
-                        <span class="meta-label">Ниво</span>
-                        <span class="level-pill">@(Model.LevelName ?? "—")</span>
+
+            <section class="course-hero">
+                <div class="hero-main">
+                    <div class="hero-eyebrow">Курс</div>
+                    <h1 class="hero-title">@Model.Name</h1>
+
+                    <div class="hero-meta">
+                        <span class="meta-pill">
+                            <span class="meta-label">Ниво</span>
+                            <strong>@(Model.LevelName ?? "—")</strong>
+                        </span>
+                        <span class="meta-pill">
+                            <span class="meta-label">Уроци</span>
+                            <strong>@Model.CourseLessons.Count()</strong>
+                        </span>
+                        <span class="meta-pill">
+                            <span class="meta-label">Думи</span>
+                            <strong>@Model.TotalWordsInCourse</strong>
+                        </span>
                     </div>
                 </div>
 
-                <div class="hero-right">
+                <div class="hero-actions">
                     <a asp-action="Index" class="btn btn-outline-secondary">← Всички курсове</a>
 
-                    @if (User.Identity?.IsAuthenticated == true && await teacherService.IsUserTeacherAsync(User.GetUserId()!))
+                    @if (isTeacher)
                     {
                         if (Model.IsActive)
                         {
@@ -35,7 +49,7 @@
                                   onsubmit="return confirm('Сигурни ли сте, че искате да деактивирате този курс?');"
                                   class="d-inline">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-outline-danger">🗄️ Деактивирай</button>
+                                <button type="submit" class="btn btn-outline-danger">Деактивирай</button>
                             </form>
                         }
                         else
@@ -46,41 +60,51 @@
                                   onsubmit="return confirm('Сигурни ли сте, че искате да активирате този курс?');"
                                   class="d-inline">
                                 @Html.AntiForgeryToken()
-                                <button type="submit" class="btn btn-outline-success">♻️ Възстанови курса</button>
+                                <button type="submit" class="btn btn-outline-success">Възстанови</button>
                             </form>
                         }
                     }
                 </div>
-            </div>
+            </section>
 
-            <div class="course-stats">
-                <div class="stat-card">
-                    <div class="stat-label">Уроци</div>
-                    <div class="stat-value">@Model.CourseLessons.Count()</div>
+            <section class="progress-card">
+                <div class="progress-head">
+                    <div>
+                        <h5 class="progress-title">Прогрес в курса</h5>
+                        <p class="progress-subtitle">Завършени уроци спрямо всички уроци</p>
+                    </div>
+                    <div class="progress-value">@progress%</div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-label">Думи</div>
-                    <div class="stat-value">@Model.TotalWordsInCourse</div>
-                </div>
-            </div>
 
-            <div class="course-actions">
-                @if (User.Identity?.IsAuthenticated == true && await teacherService.IsUserTeacherAsync(User.GetUserId()!))
-                {
-                    <a asp-action="Edit" asp-controller="Course" asp-route-id="@Model.Id" class="btn btn-warning">Редактирай</a>
+                <div class="progress progress-custom"
+                     role="progressbar"
+                     aria-label="Course progress"
+                     aria-valuenow="@progress"
+                     aria-valuemin="0"
+                     aria-valuemax="100">
+                    <div class="progress-bar progress-bar-custom" style="width: @progress%;"></div>
+                </div>
+            </section>
+
+            @if (isTeacher)
+            {
+                <section class="actions-card">
+                    <a asp-action="Edit" asp-controller="Course" asp-route-id="@Model.Id" class="btn btn-warning">
+                        Редактирай
+                    </a>
 
                     <form asp-action="SoftDelete" method="post"
                           onsubmit="return confirm('Сигурни ли сте, че искате да изтриете този курс?');"
                           class="d-inline">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.Id" />
+                        <input type="hidden" name="id" value="@Model.Id"/>
                         <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
                     </form>
-                }
-            </div>
+                </section>
+            }
 
-            <div class="section-card">
-                <h5 class="section-title">Описание</h5>
+            <section class="section-card">
+                <h4 class="section-title">Описание</h4>
                 @if (string.IsNullOrWhiteSpace(Model.Description))
                 {
                     <p class="text-muted mb-0">Няма описание за този курс.</p>
@@ -89,9 +113,9 @@
                 {
                     <p class="mb-0">@Model.Description</p>
                 }
-            </div>
+            </section>
 
-            <div class="section-card">
+            <section class="section-card">
                 <div class="section-head">
                     <h4 class="section-title">Уроци в курса</h4>
                     <span class="lesson-count">@Model.CourseLessons.Count() урока</span>
@@ -99,7 +123,7 @@
 
                 @if (!Model.CourseLessons.Any())
                 {
-                    <div class="alert alert-info">Все още няма уроци в този курс.</div>
+                    <div class="alert alert-info mb-0">Все още няма уроци в този курс.</div>
                 }
                 else
                 {
@@ -109,136 +133,164 @@
                             var isUnlocked = lesson.UserLessonProgress?.IsUnlocked ?? false;
                             var isCompleted = lesson.UserLessonProgress?.IsCompleted ?? false;
 
-                            <div class="lesson-card @(isUnlocked ? "" : "lesson-card-locked")">
+                            <article class="lesson-card @(isUnlocked ? "" : "lesson-card-locked")">
                                 <div class="lesson-title">@lesson.LessonName</div>
                                 <div class="lesson-desc">@lesson.LessonTarget</div>
                                 <div class="lesson-meta">@lesson.WordsInLesson думи</div>
 
-                                @if (isCompleted)
-                                {
-                                    <span class="badge bg-success mb-2">Completed</span>
-                                }
+                                <div class="lesson-foot">
+                                    @if (isCompleted)
+                                    {
+                                        <span class="badge rounded-pill text-bg-success">Completed</span>
+                                    }
 
-                                @if (isUnlocked)
-                                {
-                                    <a asp-controller="Lesson"
-                                       asp-action="Details"
-                                       asp-route-id="@lesson.LessinId"
-                                       class="btn btn-outline-primary btn-sm">
-                                        Отвори урок →
-                                    </a>
-                                }
-                                else
-                                {
-                                    <button type="button"
-                                            class="btn btn-sm btn-locked"
-                                            disabled
-                                            title="Завърши предишния урок, за да отключиш този.">
-                                        Заключен урок
-                                    </button>
-                                }
-                            </div>
+                                    @if (isUnlocked)
+                                    {
+                                        <a asp-controller="Lesson"
+                                           asp-action="Details"
+                                           asp-route-id="@lesson.LessinId"
+                                           class="btn btn-outline-primary btn-sm">
+                                            Отвори урок →
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <button type="button"
+                                                class="btn btn-sm btn-locked"
+                                                disabled
+                                                title="Завърши предишния урок, за да отключиш този.">
+                                            Заключен урок
+                                        </button>
+                                    }
+                                </div>
+                            </article>
                         }
                     </div>
                 }
-            </div>
+            </section>
         </div>
     </div>
 
     <div class="col-lg-4">
-        <partial name="_CourseDetailsSidebarPartial" model="Model" />
+        <partial name="_CourseDetailsSidebarPartial" model="Model"/>
     </div>
 </div>
 
 <style>
     .course-page {
-        padding: 18px 0 30px 0;
+        padding: 18px 0 30px;
     }
 
     .course-hero {
         display: flex;
         justify-content: space-between;
-        align-items: center;
-        gap: 14px;
-        padding: 18px 20px;
-        background: linear-gradient(135deg, rgba(255, 245, 235, 1), rgba(255, 255, 255, 1));
+        align-items: flex-start;
+        gap: 16px;
+        padding: 20px;
         border-radius: 18px;
         border: 1px solid #f1e4d7;
+        background: linear-gradient(135deg, #fff7ed 0%, #ffffff 100%);
         box-shadow: 0 8px 18px rgba(15, 23, 42, 0.06);
         margin-bottom: 14px;
     }
 
-    .eyebrow {
+    .hero-eyebrow {
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: .12em;
         color: #8b93a6;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
     }
 
-    .title {
+    .hero-title {
+        margin: 0 0 10px;
         font-size: 2rem;
         font-weight: 800;
-        margin: 0 0 6px 0;
     }
 
-    .meta-line {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .meta-label {
-        color: #6b7280;
-        font-size: 0.9rem;
-    }
-
-    .level-pill {
-        background: rgba(255, 230, 210, 1);
-        color: #9a4a1a;
-        padding: 4px 10px;
-        border-radius: 999px;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .course-stats {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 12px;
-        margin: 10px 0 16px 0;
-    }
-
-    .stat-card {
-        background: #fff7ed;
-        border: 1px solid #fed7aa;
-        border-radius: 14px;
-        padding: 12px 14px;
-        box-shadow: 0 6px 14px rgba(255, 122, 48, 0.08);
-    }
-
-    .stat-label {
-        font-size: 0.75rem;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        color: #9a4a1a;
-    }
-
-    .stat-value {
-        font-size: 1.6rem;
-        font-weight: 800;
-        color: #7c2d12;
-    }
-
-    .course-actions {
+    .hero-meta {
         display: flex;
         flex-wrap: wrap;
         gap: 8px;
-        margin: 10px 0 18px 0;
+    }
+
+    .meta-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 12px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+    }
+
+    .meta-label {
+        font-size: .8rem;
+        color: #64748b;
+    }
+
+    .hero-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: flex-end;
+    }
+
+    .progress-card {
+        padding: 16px;
+        border-radius: 16px;
+        border: 1px solid #fed7aa;
+        background: linear-gradient(180deg, #fff 0%, #fff7ed 100%);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+        margin-bottom: 14px;
+    }
+
+    .progress-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+    }
+
+    .progress-title {
+        margin: 0;
+        font-weight: 700;
+    }
+
+    .progress-subtitle {
+        margin: 2px 0 0;
+        color: #64748b;
+        font-size: .9rem;
+    }
+
+    .progress-value {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #9a3412;
+    }
+
+    .progress-custom {
+        height: 12px;
+        border-radius: 999px;
+        background: #ffe7d2;
+    }
+
+    .progress-bar-custom {
+        border-radius: 999px;
+        background: linear-gradient(90deg, #fb923c 0%, #ea580c 100%);
+    }
+
+    .actions-card {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
     }
 
     .section-card {
-        background: #ffffff;
+        background: #fff;
         border: 1px solid #e5e7eb;
         border-radius: 16px;
         padding: 16px;
@@ -247,7 +299,7 @@
     }
 
     .section-title {
-        margin: 0 0 10px 0;
+        margin: 0;
         font-weight: 700;
     }
 
@@ -255,11 +307,11 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 8px;
+        margin-bottom: 10px;
     }
 
     .lesson-count {
-        font-size: 0.85rem;
+        font-size: .85rem;
         color: #6b7280;
     }
 
@@ -275,7 +327,7 @@
         border-radius: 14px;
         padding: 14px;
         box-shadow: 0 6px 16px rgba(15, 23, 42, 0.05);
-        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+        transition: transform .18s ease, box-shadow .18s ease;
     }
 
     .lesson-card:hover {
@@ -290,15 +342,22 @@
 
     .lesson-desc {
         color: #475569;
-        font-size: 0.95rem;
+        font-size: .95rem;
         min-height: 38px;
         margin-bottom: 8px;
     }
 
     .lesson-meta {
-        font-size: 0.85rem;
+        font-size: .85rem;
         color: #6b7280;
         margin-bottom: 10px;
+    }
+
+    .lesson-foot {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
     }
 
     .lesson-card-locked {
