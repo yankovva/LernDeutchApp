@@ -17,17 +17,19 @@
             <strong>@Model.TotalWordsInCourse</strong>
         </div>
 
-        @if (Model.IsEnrolled == false)
+        @if (!Model.IsEnrolled)
         {
             <form asp-action="Enroll" method="post" class="d-inline">
-                <input type="hidden" name="courseId" value="@Model.Id"/>
-                <button type="submit" class="btn btn-accent">Запиши се</button>
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="courseId" value="@Model.Id" />
+                <button type="submit" class="side-cta">Запиши се</button>
             </form>
         }
         else
         {
-            <span class="badge badge-success">Записан</span>
+            <span class="badge bg-success">Записан</span>
         }
+
     </div>
 
     <div class="side-price">
