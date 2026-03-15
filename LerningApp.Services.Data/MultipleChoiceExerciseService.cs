@@ -3,6 +3,7 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
+using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Common;
 
@@ -10,6 +11,7 @@ namespace LerningApp.Services.Data;
 
 public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepository,
     IRepository<MultipleChoiceExercise, Guid> exerciseRepository,
+    IRepository<UserLessonProgress, Guid> userLessonProgressRepository,
     ITeacherService teacherService) : IMultipleChoiceExerciseService
 {
     public async  Task<ServiceResultT<CreateMultipleChoiceExerciseViewModel>> GetCreateAsync(string lessonId, string userId)
@@ -79,17 +81,34 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         return ServiceResult.Success();
     }
 
-    public async Task<(bool isCorrect, string correctAnswer)?> CheckMultipleChoice(string exerciseId, string selectedAnswer)
+    public async Task<(bool isCorrect, string correctAnswer)?> CheckMultipleChoice(string exerciseId, string selectedAnswer,string lessonId,string userId)
     {
-        if (!Guid.TryParse(exerciseId, out var exId))
+        if (!Guid.TryParse(exerciseId, out var exerciseGuidId))
+        {
+            return null;
+        }
+        
+        if (!Guid.TryParse(lessonId, out var lessonGuidId))
         {
             return null;
         }
         
         var exercise = await exerciseRepository
-            .GetByIdAsync(exId);
+            .GetAllAttached()
+            .FirstOrDefaultAsync(x => x.Id == exerciseGuidId && x.LessonId == lessonGuidId);
 
         if (exercise == null)
+        {
+            return null;
+        }
+        
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        
+        var isUnlocked = await userLessonProgressRepository
+            .GetAllAttached()
+            .AnyAsync(up => up.LessonId == lessonGuidId && up.UserId == Guid.Parse(userId) && up.IsUnlocked == true);
+      
+        if (!isUnlocked && !isTeacher)
         {
             return null;
         }

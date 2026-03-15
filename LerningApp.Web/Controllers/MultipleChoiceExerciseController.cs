@@ -1,20 +1,25 @@
+using LerningApp.Data.Models;
+using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 
 namespace LerningApp.Controllers;
 
 [Authorize]
-public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exerciseService) : Controller
+public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exerciseService,
+    ITeacherService teacherService,
+    IRepository<UserLessonProgress, Guid> userLessonProgressRepository) : Controller
 {
     
     [HttpGet]
     public async Task<IActionResult> Create(string lessonId)
-    {
-        string userId = User.GetUserId()!;
+    { 
+       string userId = User.GetUserId()!;
         var result = await exerciseService.GetCreateAsync(lessonId, userId!);
         if (result.Result == false)
         {
@@ -50,13 +55,14 @@ public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exe
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CheckMultipleChoice(string exerciseId, string lessonId, string selectedAnswer)
     {
+        string userId = User.GetUserId()!;
+       
         var result = await exerciseService
-            .CheckMultipleChoice(exerciseId, selectedAnswer);
+            .CheckMultipleChoice(exerciseId, selectedAnswer,lessonId, userId);
 
         if (result == null)
         {
-            TempData["ErrorMessage"] = "Невалидно упражнение.";
-            return RedirectToAction("Details", "Lesson" ,new { id = lessonId });
+            return BadRequest(new { message = "Invalid operation." });
         }
         
         return Json(new
