@@ -10,6 +10,7 @@ public class CourseDetailsViewModel
     
     public string LevelName { get; set; } = null!;
     
+    public double ProgressPercentage { get; set; }
     public bool IsActive { get; set; }
     
     public decimal Price { get; set; }

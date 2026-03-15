@@ -135,14 +135,23 @@ public class CourseService(
                 .GetAllAttached()
                 .AnyAsync(uc => uc.UserId == userGuidId && uc.CourseId == courseId);
         }
-
+        
         if (model.IsEnrolled)
         {
+            var progressResult = await userLessonProgressService.GetCourseProgressPercent(courseId, userGuidId!);
+            if (progressResult.Result)
+            {
+                model.ProgressPercentage = progressResult.Data;
+            }
+            else
+            {
+                model.ProgressPercentage = 0;
+            }
+            
             foreach (var lesson in model.CourseLessons)
             {
                 var result = await userLessonProgressService
                     .GetUserLessonProgress(Guid.Parse(lesson.LessinId), userId);
-
                 
                 if (result.Result)
                 {
