@@ -157,7 +157,6 @@ public class ListeningExerciseService(
 
         if (questions.Count == 0)
         {
-            //ModelState.AddModelError(nameof(model.Questions), "Add at least one valid question.");
             return ServiceResult.Fail("Add at least one valid question.", nameof(model.Questions));
         }
 
@@ -168,33 +167,49 @@ public class ListeningExerciseService(
         return ServiceResult.Success();
     }
 
-    public async Task<(bool isCorrect, string correctAnswer)?> CheckListeningExerciseAnswer(string exerciseId, string selectedAnswer)
+    public async Task<(bool isCorrect, string correctAnswer)?> CheckListeningExerciseAnswer(string questionId, string selectedAnswer,string lessonId, string userId)
     {
-        if (!Guid.TryParse(exerciseId, out var queId))
+        if (!Guid.TryParse(questionId, out var queGuidId))
         {
             return null;
         }
         
-        var question = await listeningQuestionRepository
+        if (!Guid.TryParse(lessonId, out var lessonGuidId))
+        {
+            return null;
+        }
+        
+        var exercise = await listeningExerciseRepository
             .GetAllAttached()
-            .Include(q => q.Options)
-            .FirstOrDefaultAsync(q => q.Id == queId);
+            .Include(e => e.Questions)
+            .ThenInclude(q => q.Options)
+            .FirstOrDefaultAsync(e => e.LessonId == lessonGuidId &&
+                                      e.Questions.Any(q => q.Id == queGuidId));
 
+        if (exercise == null)
+        {
+            return null;
+        }
+        
+        var question = exercise
+            .Questions
+            .FirstOrDefault(q => q.Id == queGuidId);
+        
         if (question == null)
+        {
+            return null;
+        }
+        
+        var correctAnswer = question
+            .Options
+            .FirstOrDefault(op => op.isCorrect);
+
+        if (correctAnswer == null)
         {
            return null;
         }
         
         bool isCorrect;
-        var correctAnswer = question
-            .Options
-            .FirstOrDefault(op => op.isCorrect);
-        
-        if (correctAnswer == null)
-        {
-            return null;
-        }
-        
         if (correctAnswer.Answer == selectedAnswer)
         {
             isCorrect = true;

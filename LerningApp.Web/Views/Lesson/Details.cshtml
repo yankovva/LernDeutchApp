@@ -618,7 +618,13 @@
                     },
                     body: formData
                 });
-
+                
+                if (!res.ok) {
+                    const err = await res.json().catch(() => ({}));
+                    console.log(err.message || 'Invalid operation.');
+                    toastr.error(err.message || 'Invalid operation.');
+                    return;
+                }
                 const data = await res.json();
 
                 const selectedRow = selected.closest('.answer-row');

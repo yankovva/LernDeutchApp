@@ -53,13 +53,14 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CheckListeningExercise(string questionId, string lessonId, string selectedAnswer)
     {
+        string userId = User.GetUserId()!;
+        
         var result = await exerciseService
-            .CheckListeningExerciseAnswer(questionId, selectedAnswer);
+            .CheckListeningExerciseAnswer(questionId, selectedAnswer,lessonId, userId);
 
         if (result == null)
         {
-            TempData["ErrorMessage"] = ExerciseNotFoundMessage;
-            return RedirectToAction("Details", "Lesson" ,new { id = lessonId });
+            return BadRequest(new { message = "Invalid operation." });
         }
         
         return Json(new

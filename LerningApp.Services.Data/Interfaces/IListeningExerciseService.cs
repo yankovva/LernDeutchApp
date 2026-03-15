@@ -9,6 +9,6 @@ public interface IListeningExerciseService
      
      Task<ServiceResult> CreatePostListeningExercise(CreateListeningExerciseViewModel model, string userId);
      
-     public Task<(bool isCorrect, string correctAnswer)?> CheckListeningExerciseAnswer(string exerciseId, string selectedAnswer);
+     public Task<(bool isCorrect, string correctAnswer)?> CheckListeningExerciseAnswer(string exerciseId, string selectedAnswer,string lessonId, string userId);
      
 }
