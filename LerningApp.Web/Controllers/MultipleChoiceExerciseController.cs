@@ -15,7 +15,7 @@ public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exe
     ITeacherService teacherService,
     IRepository<UserLessonProgress, Guid> userLessonProgressRepository) : Controller
 {
-    
+    //Done
     [HttpGet]
     public async Task<IActionResult> Create(string lessonId)
     { 
@@ -29,7 +29,7 @@ public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exe
         
         return View(result.Data);
     }
-
+    //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateMultipleChoiceExerciseViewModel model)
@@ -50,7 +50,7 @@ public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exe
         TempData["SuccessMessage"] = "Успешно създадохте упражнението";
         return RedirectToAction(nameof(Create), new { lessonId = model.LessonId });
     }
-
+    //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CheckMultipleChoice(string exerciseId, string lessonId, string selectedAnswer)

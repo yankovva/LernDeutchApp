@@ -17,7 +17,7 @@ public class LessonController(ILessonService lessonService,
     public async Task<IActionResult> Index()
     { 
         string userId = User.GetUserId()!;
-        if (await teacherService.IsUserTeacherAsync(userId))
+        if (await teacherService.IsUserTeacherAsync(userId) == false)
         {
             TempData["ErrorMessage"] = AccessDeniedMessage;
             return RedirectToAction("Index", "Home");
@@ -29,7 +29,7 @@ public class LessonController(ILessonService lessonService,
     [HttpGet]
     public async Task<IActionResult> Details(string id)
     {
-        string? userId = User.GetUserId();
+        string? userId = User.GetUserId()!;
         var result = await  lessonService.GetLessonDetailsAsync(id, userId);
         if (result.Result == false )
         {
@@ -170,7 +170,7 @@ public class LessonController(ILessonService lessonService,
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return RedirectToAction("Details", new { id = id });
+            return RedirectToAction("Index", "Home");
         }
         
         TempData["SuccessMessage"] = $"Успешно изтрихте урока";

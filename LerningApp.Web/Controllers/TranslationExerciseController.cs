@@ -9,7 +9,7 @@ namespace LerningApp.Controllers;
 [Authorize]
 public class TranslationExerciseController(ITranslationExerciseService translationExerciseService) : Controller
 {
-    
+    //Done
     [HttpGet]
     public async Task<IActionResult> Create(string lessonId)
     {
@@ -23,7 +23,7 @@ public class TranslationExerciseController(ITranslationExerciseService translati
         
         return View(result.Data);
     }
-    
+    //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(CreateTranslationExerciseViewModel model)
@@ -46,6 +46,7 @@ public class TranslationExerciseController(ITranslationExerciseService translati
         return RedirectToAction(nameof(Create), new { lessonId = model.LessonId });
     }
    
+    //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CheckTranslationExercise(string exerciseId, string userAnswer, string lessonId)

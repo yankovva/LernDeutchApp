@@ -4,12 +4,14 @@ using LerningApp.Web.ViewModels.Course;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using static LerningApp.Common.EntityErrorMessages.Common;
 namespace LerningApp.Controllers;
 
 public class CourseController(ICourseService courseService,
     ILevelService levelService,
     ITeacherService teacherService) : BaseController
 {
+    //Done
     [HttpGet]
     public async Task<IActionResult> Index()
     {
@@ -21,6 +23,7 @@ public class CourseController(ICourseService courseService,
         return this.View(courses);
     }
 
+    //Done
     [HttpGet]
     public async Task<IActionResult> Details(string id)
     {
@@ -36,18 +39,17 @@ public class CourseController(ICourseService courseService,
 
         return View(result.Data);
     }
-
+    //Done
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> Create()
     {
         string userId = User.GetUserId()!;
-        
         bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
 
         if (!isTeacher)
         {
-            TempData["ErrorMessage"] = "Нямате права.";
+            TempData["ErrorMessage"] = AccessDeniedMessage ;
             return RedirectToAction(nameof(Index));
         }
        
@@ -59,6 +61,7 @@ public class CourseController(ICourseService courseService,
         return this.View(model);
     }
 
+    //Done
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -92,6 +95,7 @@ public class CourseController(ICourseService courseService,
         return RedirectToAction(nameof(Index));
     }
 
+    //Done
     [Authorize]
     [HttpGet]
     public async Task<IActionResult> Edit(string id)
@@ -109,7 +113,8 @@ public class CourseController(ICourseService courseService,
         result.Data!.Levels = await levelService.GetAllLevelOptionsAsync();
         return View(result.Data);
     }
-
+    
+    //Done
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -142,7 +147,8 @@ public class CourseController(ICourseService courseService,
         TempData["SuccessMessage"] = "Успешно редактирахте курса.";
         return RedirectToAction(nameof(Details), new { Id = id });
     }
-
+    
+    //Done
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -161,6 +167,7 @@ public class CourseController(ICourseService courseService,
         return RedirectToAction(nameof(Index));
     }
 
+    //Done
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -178,7 +185,8 @@ public class CourseController(ICourseService courseService,
         TempData["SuccessMessage"] = "Успешно активирахте курса.";
         return RedirectToAction(nameof(Index));
     }
-
+    
+    //Done
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -195,7 +203,8 @@ public class CourseController(ICourseService courseService,
         TempData["SuccessMessage"] = $"Успешно се запизахте за курса.";
         return RedirectToAction("Details", new { id = courseId });
     }
-
+    
+    //Done
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
