@@ -1,13 +1,37 @@
 using System.Reflection;
 using LerningApp.Data;
+using LerningApp.Data.Models;
 using LerningApp.Data.Repository;
 using LerningApp.Data.Repository.Interfaces;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace LerningApp.Web.Infrastructure.Extensions;
+namespace Microsoft.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtension
 {
+    public static IServiceCollection AddApplicationDbContext(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        string connectionString = configuration.GetConnectionString("DefaultConnection")!;
+        services
+            .AddDbContext<LerningAppContext>(options =>
+            {
+                options.UseSqlServer(connectionString);
+            });
+
+        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+            {
+                ConfigureIdentity(options, configuration);
+            })
+            .AddEntityFrameworkStores<LerningAppContext>()
+            .AddDefaultTokenProviders();
+        
+        return services;
+    }
     public static void RegisterRepositories(this IServiceCollection services)
     {
         using IServiceScope scope = services.BuildServiceProvider().CreateScope();
@@ -54,5 +78,21 @@ public static class ServiceCollectionExtension
             services.AddScoped(serviceInterfaceType, serviceType);
         }
     }
+    private static void ConfigureIdentity(IdentityOptions options, IConfiguration configuration)
+    {
+    
+        options.Password.RequiredLength = configuration.GetValue<int>("Identity:Password:RequiredLength");
+        options.Password.RequireNonAlphanumeric = configuration.GetValue<bool>("Identity:Password:RequireNonAlphanumeric");
+        options.Password.RequireDigit = configuration.GetValue<bool>("Identity:Password:RequireDigits");
+        options.Password.RequireLowercase = configuration.GetValue<bool>("Identity:Password:RequireLowercase");
+        options.Password.RequireUppercase = configuration.GetValue<bool>("Identity:Password:RequireUppercase");
+        options.Password.RequiredUniqueChars =configuration.GetValue<int>("Identity:Password:RequiredUniqueChars");
 
+        options.SignIn.RequireConfirmedEmail =configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedEmail");
+        options.SignIn.RequireConfirmedPhoneNumber = configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedPhoneNumber");
+        options.SignIn.RequireConfirmedAccount = configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedAccount");
+        
+        options.User.RequireUniqueEmail = configuration.GetValue<bool>("Identity:User:RequireUniqueEmail");
+
+    }
 }

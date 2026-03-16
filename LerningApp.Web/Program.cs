@@ -17,21 +17,8 @@ using LerningAppContext = LerningApp.Data.LerningAppContext;
 using NoOpEmailSender = LerningApp.Web.Infrastructure.NoOpEmailSender;
 
 var builder = WebApplication.CreateBuilder(args);
-string connectionString = builder.Configuration.GetConnectionString("DefaultConnection")!;
-// Add services to the container.
-builder.Services
-    .AddDbContext<LerningAppContext>(options =>
-        {
-            options.UseSqlServer(connectionString);
-        });
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
-    {
-        ConfigureIdentity(options, builder);
-    })
-    .AddEntityFrameworkStores<LerningAppContext>()
-    .AddDefaultTokenProviders();
-    
+builder.Services.AddApplicationDbContext(builder.Configuration);
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -75,8 +62,6 @@ app.UseStaticFiles(new StaticFileOptions
     ContentTypeProvider = provider
 });
 
-
-
 app.MapControllerRoute(
         name: "default",
         pattern: "{controller=Home}/{action=Index}/{id?}");
@@ -91,21 +76,3 @@ if (app.Environment.IsDevelopment())
 await app.ApplyMigrations();
 
 app.Run();
-
-static void ConfigureIdentity(IdentityOptions options, WebApplicationBuilder builder)
-{
-    
-    options.Password.RequiredLength = builder.Configuration.GetValue<int>("Identity:Password:RequiredLength");
-    options.Password.RequireNonAlphanumeric = builder.Configuration.GetValue<bool>("Identity:Password:RequireNonAlphanumeric");
-    options.Password.RequireDigit = builder.Configuration.GetValue<bool>("Identity:Password:RequireDigits");
-    options.Password.RequireLowercase = builder.Configuration.GetValue<bool>("Identity:Password:RequireLowercase");
-    options.Password.RequireUppercase = builder.Configuration.GetValue<bool>("Identity:Password:RequireUppercase");
-    options.Password.RequiredUniqueChars = builder.Configuration.GetValue<int>("Identity:Password:RequiredUniqueChars");
-
-    options.SignIn.RequireConfirmedEmail = builder.Configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedEmail");
-    options.SignIn.RequireConfirmedPhoneNumber = builder.Configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedPhoneNumber");
-    options.SignIn.RequireConfirmedAccount = builder.Configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedAccount");
-        
-    options.User.RequireUniqueEmail = builder.Configuration.GetValue<bool>("Identity:User:RequireUniqueEmail");
-
-}
