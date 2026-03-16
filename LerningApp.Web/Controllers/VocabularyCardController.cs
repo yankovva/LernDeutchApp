@@ -1,4 +1,5 @@
 using LerningApp.Services.Data.Interfaces;
+using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.VocabularyCard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,12 @@ namespace LerningApp.Controllers;
 public class VocabularyCardController(IVocabularyCardService vocabularyCardService,
     IPartOfSpeechService partOfSpeechService) :BaseController
 {
+    //DONE
     [HttpGet]
     public async Task<IActionResult> Index(string lessonId)
     {
-        var result = await vocabularyCardService.IndexGetAllCardsForALessonAsync(lessonId);
+        var userId = User.GetUserId()!;
+        var result = await vocabularyCardService.IndexGetAllCardsForALessonAsync(lessonId, userId);
 
         if (result.Result == false)
         {
@@ -22,11 +25,12 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         
         return View(result.Data);
     }
-
+    //DONE
     [HttpGet]
     public async Task<IActionResult> Details(string id)
     {
-        var result = await vocabularyCardService.GetDetailsForACardAsync(id);
+        var userId = User.GetUserId()!;
+        var result = await vocabularyCardService.GetDetailsForACardAsync(id, userId);
 
         if (result.Result == false)
         {
@@ -36,18 +40,21 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         
         return this.View(result.Data);
     }
-
+    //Done
     [HttpGet]
     public async Task<IActionResult> Create(string lessonId)
     {
-        var model = new VocabularyCardCreateInputModel()
+        var userId = User.GetUserId()!;
+        var result = await vocabularyCardService.GetCreateVocabularyCardAsync(lessonId, userId);
+        if (result.Result == false)
         {
-            LessonId = lessonId,
-            PartOfSpeechOptions = await partOfSpeechService.GetAllPartOfSpeechOptionsAsync()
-        };
-
-        return this.View(model);
+            TempData["ErrorMessage"] = result.Message;
+            return this.RedirectToAction("Index", "Lesson");
+        }
+        return this.View(result.Data);
     }
+    
+    //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(VocabularyCardCreateInputModel model)
@@ -57,8 +64,8 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
             model.PartOfSpeechOptions = await partOfSpeechService.GetAllPartOfSpeechOptionsAsync();
             return View(model);
         }
-       
-        var result = await vocabularyCardService.CreateVocabularyCardAsync(model);
+        var userId = User.GetUserId();
+        var result = await vocabularyCardService.CreateVocabularyCardAsync(model, userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
@@ -69,57 +76,62 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         TempData["SuccessMessage"] = "Успешно създадохте нова карта";
         return RedirectToAction(nameof(Index), new { lessonId = model.LessonId });
     }
+    //Done
     [HttpGet]
     public async Task<IActionResult> Edit(string id)
     {
-        var result = await vocabularyCardService.GetCardEditByIdAsync(id);
+        var userId = User.GetUserId();
+        var result = await vocabularyCardService.GetCardEditByIdAsync(id, userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return RedirectToAction(nameof(Index), new { lessonId = result.Data?.LessonId });
+            return this.RedirectToAction("Index", "Home");
         }
         result.Data!.PartOfSpeechOptions = await partOfSpeechService.GetAllPartOfSpeechOptionsAsync();
         
         return this.View(result.Data);
     }
-    
+    //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit(VocabularyCardEditInputModel model,string id)
     {
-        var result = await vocabularyCardService.PostCardEditByIdAsync(model,id);
+        var userId = User.GetUserId()!;
+        var result = await vocabularyCardService.PostCardEditByIdAsync(model,id, userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return RedirectToAction(nameof(Index), new { lessonId = model.LessonId });
+            return this.RedirectToAction("Index", "Home");
         }
-        
         return RedirectToAction(nameof(Index), new { lessonId = model.LessonId });
     }
-    
+    //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Delete(string id, string lessonId)
     {
-        var result = await vocabularyCardService.DeleteCardByIdAsync(id);
+        var userId = User.GetUserId();
+        var result = await vocabularyCardService.DeleteCardByIdAsync(id,userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return RedirectToAction("Details", new { id = id });
+            return this.RedirectToAction("Index", "Home");
         }
         TempData["SuccessMessage"] = "Успешно премахнахте картата.";
         return RedirectToAction(nameof(Index), new {lessonId });
     }
     
+    //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> SoftDelete(string id, string lessonId)
     {
-        var result = await vocabularyCardService.SoftDeleteCardAsync(id);
+        var userId = User.GetUserId()!;
+        var result = await vocabularyCardService.SoftDeleteCardAsync(id, userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return RedirectToAction("Details", new { id = id });
+            return this.RedirectToAction("Index", "Home");
         }
         
         TempData["SuccessMessage"] = $"Успешно изтрихте картата";

@@ -9,6 +9,7 @@ using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.File;
 using static LerningApp.Common.EntityErrorMessages.PartOfSpeech;
 using static LerningApp.Common.EntityErrorMessages.Card;
+using static LerningApp.Common.EntityErrorMessages.Common;
 
 
 using static LerningApp.Common.ApplicationConstants;
@@ -17,10 +18,20 @@ namespace LerningApp.Services.Data;
 public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCardRepository,
     IRepository<Lesson,Guid> lessonRepository,
     IRepository<PartOfSpeech, Guid> partOfSpeechrRepository,
-    IFileService fileService): IVocabularyCardService
+    ITeacherService teacherService,
+    IFileService fileService,
+    IUserLessonProgressService userLessonProgressService,
+    IPartOfSpeechService partOfSpeechService): IVocabularyCardService
 {
-    public async Task<ServiceResultT<VocabularyCardsIndexViewModel>> IndexGetAllCardsForALessonAsync(string lessonId)
+    public async Task<ServiceResultT<VocabularyCardsIndexViewModel>> IndexGetAllCardsForALessonAsync(string lessonId, string userId)
     {
+        var result = await userLessonProgressService
+            .IsLessonUnlockedForAUserAsync(lessonId, userId);
+        if (result.Data == false)
+        {
+            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(result.Message ?? "Invalid operation.");
+        }
+        
         if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuidId))
         {
             return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(InvalidLessonIdMessage);
@@ -59,7 +70,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         return ServiceResultT<VocabularyCardsIndexViewModel>.Success(model);
     }
 
-    public async Task<ServiceResultT<VocabularyCardDetailsViewModel>> GetDetailsForACardAsync(string id)
+    public async Task<ServiceResultT<VocabularyCardDetailsViewModel>> GetDetailsForACardAsync(string id, string userId)
     {
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid cardGuid))
         {
@@ -77,6 +88,13 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         if (card == null)
         {
             return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(CardNotFoundMessage);
+        }
+        
+        var result = await userLessonProgressService
+            .IsLessonUnlockedForAUserAsync(card.LessonId.ToString(), userId);
+        if (result.Data == false)
+        {
+            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(result.Message ?? "Invalid operation.");
         }
         
         var de = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "de");
@@ -107,8 +125,40 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         return ServiceResultT<VocabularyCardDetailsViewModel>.Success(model);
     }
 
-    public async Task<ServiceResult> CreateVocabularyCardAsync(VocabularyCardCreateInputModel model)
+    public async Task<ServiceResultT<VocabularyCardCreateInputModel>> GetCreateVocabularyCardAsync(string lessonId, string userId)
     {
+        if (await teacherService.IsUserTeacherAsync(userId) == false)
+        {
+            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(AccessDeniedMessage);
+        }
+
+        if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuid))
+        {
+            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(LessonNotFoundMessage);
+        }
+
+        Lesson? lesson = await lessonRepository.GetByIdAsync(lessonGuid);
+        if (lesson == null)
+        {
+            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(LessonNotFoundMessage);
+        }
+        
+        var model = new VocabularyCardCreateInputModel()
+        {
+            LessonId = lessonId,
+            PartOfSpeechOptions = await partOfSpeechService
+                .GetAllPartOfSpeechOptionsAsync()
+        };
+        return ServiceResultT<VocabularyCardCreateInputModel>.Success(model);
+    }
+
+    public async Task<ServiceResult> CreateVocabularyCardAsync(VocabularyCardCreateInputModel model, string userId)
+    {
+        if (await teacherService.IsUserTeacherAsync(userId) == false)
+        {
+            return ServiceResult.Fail(AccessDeniedMessage);
+        }
+        
         if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
          return ServiceResult.Fail(InvalidLessonIdMessage, string.Empty);
@@ -186,8 +236,13 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         return ServiceResult.Success();        
     }
 
-    public async Task<ServiceResultT<VocabularyCardEditInputModel>> GetCardEditByIdAsync(string id)
+    public async Task<ServiceResultT<VocabularyCardEditInputModel>> GetCardEditByIdAsync(string id, string userId)
     {
+        if (await teacherService.IsUserTeacherAsync(userId) == false)
+        {
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage);
+        }
+        
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
             return ServiceResultT<VocabularyCardEditInputModel>.Fail(InvalidCardIdMessage);
@@ -223,8 +278,13 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         return ServiceResultT<VocabularyCardEditInputModel>.Success(model);
     }
 
-    public async Task<ServiceResult> PostCardEditByIdAsync(VocabularyCardEditInputModel model, string id)
+    public async Task<ServiceResult> PostCardEditByIdAsync(VocabularyCardEditInputModel model, string id,string userId)
     {
+        if (await teacherService.IsUserTeacherAsync(userId) == false)
+        {
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage);
+        }
+        
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
             return ServiceResult.Fail(InvalidCardIdMessage);
@@ -293,8 +353,13 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> DeleteCardByIdAsync(string id)
+    public async Task<ServiceResult> DeleteCardByIdAsync(string id,string userId)
     {
+        if (await teacherService.IsUserTeacherAsync(userId) == false)
+        {
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage);
+        }
+        
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
             return ServiceResult.Fail(InvalidCardIdMessage);
@@ -316,8 +381,13 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
         
         return ServiceResult.Success();
     }
-    public async Task<ServiceResult> SoftDeleteCardAsync(string id)
+    public async Task<ServiceResult> SoftDeleteCardAsync(string id, string userId)
     {
+        if (await teacherService.IsUserTeacherAsync(userId) == false)
+        {
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage);
+        }
+        
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
             return ServiceResult.Fail(InvalidCardIdMessage);
