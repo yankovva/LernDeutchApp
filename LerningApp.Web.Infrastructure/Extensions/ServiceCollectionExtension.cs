@@ -16,13 +16,19 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddApplicationDbContext(this IServiceCollection services,
         IConfiguration configuration)
     {
-        string connectionString = configuration.GetConnectionString("DefaultConnection")!;
+        string connectionString = configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("DefaultConnection is missing.");
         services
             .AddDbContext<LerningAppContext>(options =>
             {
                 options.UseSqlServer(connectionString);
             });
+        
+        return services;
+    }
 
+    public static IServiceCollection AddApplicationIdentity(this IServiceCollection services,
+        IConfiguration configuration)
+    {
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
             {
                 ConfigureIdentity(options, configuration);
@@ -32,7 +38,7 @@ public static class ServiceCollectionExtension
         
         return services;
     }
-    public static void RegisterRepositories(this IServiceCollection services)
+    public static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
         using IServiceScope scope = services.BuildServiceProvider().CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<LerningAppContext>();
@@ -52,8 +58,9 @@ public static class ServiceCollectionExtension
 
             services.AddScoped(repoInterface, repoImpl);
         }
+        return services;
     }
-    public static void RegisterUserDefinedServices(this IServiceCollection services, Assembly serviceAssembly)
+    public static IServiceCollection RegisterUserDefinedServices(this IServiceCollection services, Assembly serviceAssembly)
     {
         var serviceInterfaceTypes = serviceAssembly
             .GetTypes()
@@ -77,10 +84,10 @@ public static class ServiceCollectionExtension
 
             services.AddScoped(serviceInterfaceType, serviceType);
         }
+        return services;
     }
     private static void ConfigureIdentity(IdentityOptions options, IConfiguration configuration)
     {
-    
         options.Password.RequiredLength = configuration.GetValue<int>("Identity:Password:RequiredLength");
         options.Password.RequireNonAlphanumeric = configuration.GetValue<bool>("Identity:Password:RequireNonAlphanumeric");
         options.Password.RequireDigit = configuration.GetValue<bool>("Identity:Password:RequireDigits");
@@ -93,6 +100,5 @@ public static class ServiceCollectionExtension
         options.SignIn.RequireConfirmedAccount = configuration.GetValue<bool>("Identity:SignIn:RequireConfirmedAccount");
         
         options.User.RequireUniqueEmail = configuration.GetValue<bool>("Identity:User:RequireUniqueEmail");
-
     }
 }
