@@ -358,14 +358,10 @@
             {
                 <a asp-controller="Course" asp-action="Details" asp-route-id="@Model.CourseId"
                    class="btn btn-outline-primary">
-                    Виж курс
+                    ← Назад
                 </a>
             }
-
-            <a asp-action="Index" class="btn btn-outline-secondary">
-                ← Назад
-            </a>
-
+            
             <a asp-controller="VocabularyCard" asp-action="Index" asp-route-lessonId="@Model.Id"
                class="btn btn-outline-primary">
                 Flashcards

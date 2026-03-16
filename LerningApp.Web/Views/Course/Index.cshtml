@@ -1,4 +1,7 @@
+@using LerningApp.Services.Data.Interfaces
+@using LerningApp.Web.Infrastructure.Extensions
 @using LerningApp.Web.ViewModels.Course
+@inject ITeacherService teacherService
 @model IEnumerable<CourseIndexViewModel>
 
 @{
@@ -16,11 +19,14 @@
             </p>
             <div class="hero-actions">
                 <a href="#course-grid" class="btn btn-accent btn-pill">Разгледай курсовете</a>
-                @if (User.Identity?.IsAuthenticated == true)
+                @if (User.Identity?.IsAuthenticated == true )
                 {
-                    <a asp-action="Create" class="btn btn-outline btn-pill">
-                        + Нов курс
-                    </a>
+                    if (await teacherService.IsUserTeacherAsync(User.GetUserId()!))
+                    {
+                        <a asp-action="Create" class="btn btn-outline btn-pill">
+                            + Нов курс
+                        </a>
+                    }
                 }
             </div>
         </div>

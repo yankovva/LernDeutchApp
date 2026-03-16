@@ -1,4 +1,7 @@
+@using LerningApp.Services.Data.Interfaces
+@using LerningApp.Web.Infrastructure.Extensions
 @using LerningApp.Web.ViewModels.VocabularyCard
+@inject ITeacherService teacherService
 @model VocabularyCardsIndexViewModel
 
 <style>
@@ -155,12 +158,16 @@
 </style>
 
 <h2 class="mb-3">Думи за урок: @Model.LessonName</h2>
-<a asp-action="Create"
-   asp-controller="VocabularyCard"
-   asp-route-lessonId="@Model.LessonId"
-   class="btn btn-add-card">
-    <span class="plus">+</span> Добави карта
-</a>
+@if (User.Identity?.IsAuthenticated == true &&
+     await teacherService.IsUserTeacherAsync(User.GetUserId()!))
+{
+    <a asp-action="Create"
+       asp-controller="VocabularyCard"
+       asp-route-lessonId="@Model.LessonId"
+       class="btn btn-add-card">
+        <span class="plus">+</span> Добави карта
+    </a>
+}
 
 <div class="flashcard-grid">
     @foreach (var c in Model.Cards)
