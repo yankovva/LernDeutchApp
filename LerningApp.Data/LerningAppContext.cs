@@ -35,7 +35,8 @@ public class LerningAppContext : IdentityDbContext<ApplicationUser, IdentityRole
     public virtual DbSet<ListeningQuestion> ListeningQuestions { get; set; } = null!;
     
     public virtual DbSet<UserLessonProgress> UsersLessonsProgresses { get; set; } = null!;
-
+    
+    public virtual DbSet<UserExerciseProgress> UsersExercisesProgresses { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

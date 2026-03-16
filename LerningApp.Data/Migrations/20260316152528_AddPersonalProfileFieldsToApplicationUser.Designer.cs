@@ -4,6 +4,7 @@ using LerningApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LerningApp.Data.Migrations
 {
     [DbContext(typeof(LerningAppContext))]
-    partial class LerningAppContextModelSnapshot : ModelSnapshot
+    [Migration("20260316152528_AddPersonalProfileFieldsToApplicationUser")]
+    partial class AddPersonalProfileFieldsToApplicationUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -516,40 +519,6 @@ namespace LerningApp.Data.Migrations
                     b.ToTable("UsersCourses");
                 });
 
-            modelBuilder.Entity("LerningApp.Data.Models.UserExerciseProgress", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("ExerciseId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("ExerciseType")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("LessonId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LessonId");
-
-                    b.HasIndex("UserId", "ExerciseId", "ExerciseType")
-                        .IsUnique();
-
-                    b.ToTable("UsersExercisesProgresses");
-                });
-
             modelBuilder.Entity("LerningApp.Data.Models.UserLessonProgress", b =>
                 {
                     b.Property<Guid>("Id")
@@ -948,25 +917,6 @@ namespace LerningApp.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("LerningApp.Data.Models.UserExerciseProgress", b =>
-                {
-                    b.HasOne("LerningApp.Data.Models.Lesson", "Lesson")
-                        .WithMany("UserExerciseProgresses")
-                        .HasForeignKey("LessonId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LerningApp.Data.Models.ApplicationUser", "User")
-                        .WithMany("UserExerciseProgresses")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Lesson");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("LerningApp.Data.Models.UserLessonProgress", b =>
                 {
                     b.HasOne("LerningApp.Data.Models.Lesson", "Lesson")
@@ -1073,8 +1023,6 @@ namespace LerningApp.Data.Migrations
 
                     b.Navigation("UserCourses");
 
-                    b.Navigation("UserExerciseProgresses");
-
                     b.Navigation("UserLessonsProgresses");
                 });
 
@@ -1092,8 +1040,6 @@ namespace LerningApp.Data.Migrations
                     b.Navigation("MultipleChoiceExercises");
 
                     b.Navigation("TranslationExercises");
-
-                    b.Navigation("UserExerciseProgresses");
 
                     b.Navigation("UsersLessonProgresses");
 

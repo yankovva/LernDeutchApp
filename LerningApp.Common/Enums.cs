@@ -7,4 +7,11 @@ public class Enums
         Bg = 1,
         En = 2
     }
+
+    public enum ExerciseType
+    {
+        MultipleChoiceExercise = 1,
+        TranslationExercise = 2,
+        ListeningExercise = 3
+    }
 }

@@ -24,7 +24,6 @@ public class ApplicationUser : IdentityUser<Guid>
 
     public TranslationLanguage NativeLanguage { get; set; } = TranslationLanguage.Bg;
     public virtual ICollection<UserCourse> UserCourses { get; set; } = new HashSet<UserCourse>();
-    
     public virtual ICollection<UserLessonProgress> UserLessonsProgresses { get; set; } = new HashSet<UserLessonProgress>();
-
+    public virtual ICollection<UserExerciseProgress> UserExerciseProgresses { get; set; } = new HashSet<UserExerciseProgress>();
 }
