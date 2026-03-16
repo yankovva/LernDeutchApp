@@ -17,15 +17,9 @@ using LerningAppContext = LerningApp.Data.LerningAppContext;
 using NoOpEmailSender = LerningApp.Web.Infrastructure.NoOpEmailSender;
 
 var builder = WebApplication.CreateBuilder(args);
-
+//Add services to the container
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddApplicationIdentity(builder.Configuration);
-
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = "/Identity/Account/Login";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-});
 
 builder.Services.AddControllersWithViews();
 

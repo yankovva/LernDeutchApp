@@ -4,6 +4,7 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository;
 using LerningApp.Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -35,6 +36,24 @@ public static class ServiceCollectionExtension
             })
             .AddEntityFrameworkStores<LerningAppContext>()
             .AddDefaultTokenProviders();
+        
+        services.ConfigureApplicationCookie(options =>
+        {
+            options.LoginPath = "/Identity/Account/Login";
+            options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+            options.LogoutPath = "/Identity/Account/Logout";
+            options.ExpireTimeSpan = TimeSpan.FromHours(12);
+            options.SlidingExpiration = true;
+            options.Cookie.HttpOnly = true;
+            options.Cookie.Name = "DeutchBuddy.Auth";
+            options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            options.Cookie.SameSite = SameSiteMode.Lax;
+        });
+        
+        services.Configure<SecurityStampValidatorOptions>(options =>
+        {
+            options.ValidationInterval = TimeSpan.FromHours(1);
+        });
         
         return services;
     }
