@@ -12,7 +12,7 @@ namespace LerningApp.Services.Data;
 
 public class UserLessonProgressService(IRepository<Lesson,Guid> lessonRepository,
     IRepository<UserLessonProgress, Guid> userProgressRepository,
-    IRepository<UserCourse, object> userCourseRepository) : IUserLessonProgressService
+    ITeacherService teacherService) : IUserLessonProgressService
 {
     public async Task<ServiceResultT<IndexUserLessonProgressViewModel>> GetUserLessonProgress(Guid lessonId, string? userId)
     {
@@ -79,5 +79,32 @@ public class UserLessonProgressService(IRepository<Lesson,Guid> lessonRepository
         var percentInt = (int)Math.Round((completedLessons / (double)totalLessons) * 100);
         
         return ServiceResultT<int>.Success(percentInt);
+    }
+
+    public async Task<ServiceResultT<bool>> IsLessonUnlockedForAUserAsync (string lessonId ,string userId)
+    {
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
+        if (isTeacher)
+        {
+            return ServiceResultT<bool>.Success(true);
+        }
+        
+        Guid? userGuid = Guid.TryParse(userId, out Guid parsedUserId) ? parsedUserId : null;
+        if (userGuid == null)
+        {
+            return ServiceResultT<bool>.Fail("Invalid operation.");
+        }
+        
+        Guid? lessonGuid = Guid.TryParse(lessonId, out Guid parsedLessonId) ? parsedLessonId : null;
+        if (lessonGuid == null)
+        {
+            return ServiceResultT<bool>.Fail("Invalid operation.");
+        }
+        
+        bool hasProgress = await userProgressRepository
+            .GetAllAttached()
+            .AnyAsync(x => x.LessonId == lessonGuid && x.UserId == userGuid && x.IsUnlocked);
+        
+        return ServiceResultT<bool>.Success(hasProgress);
     }
 }
