@@ -13,26 +13,11 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
             .HasKey(x => x.Id);
         
         builder
-            .Property(x => x.FirstName)
-            .IsRequired()
-            .HasMaxLength(FirstNameMaxLength);
-        
-        builder
-            .Property(x => x.LastName)
-            .IsRequired()
-            .HasMaxLength(LastNameMaxLength);
-        
-        builder
-            .Property(x => x.ProfileImage)
-            .HasMaxLength(ProfileImageMaxLength);
-        
-        builder
             .Property(x => x.Biography)
             .HasMaxLength(BiographyMaxLength);
         
         builder
             .Property(x => x.Qualification)
-            .IsRequired()
             .HasMaxLength(QualificationMaxLength);
         
         builder

@@ -43,8 +43,6 @@ public class DbSeeder
         var teacher = new Teacher
         {
             Id = Guid.Parse("662d6cc2-90ea-4e1b-bf31-2f43088233e4"),
-            FirstName = "Teacher",
-            LastName = "Teacher",
             Biography =
                 "I'm a teacher! The Best ever! You can learn a lot from me and be the best student ever to exist! Join my Courses now!",
             Qualification = "I have studied something with computers!",

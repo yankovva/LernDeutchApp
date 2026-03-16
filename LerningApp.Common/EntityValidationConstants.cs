@@ -2,6 +2,18 @@ namespace LerningApp.Common;
 
 public static class EntityValidationConstants
 {
+    public static class User
+    {
+        public const int FirstNameMinLength = 2;
+        public const int FirstNameMaxLength = 100;
+        
+        public const int LastNameMinLength = 2;
+        public const int LastNameMaxLength = 100;
+        
+        public const int ProfileImageMinLength = 150;
+        public const int ProfileImageMaxLength = 350;
+    }
+
     public static class Lesson
     {
         public const int NameMinLength = 5;

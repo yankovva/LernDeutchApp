@@ -11,6 +11,15 @@ public class ApplicationUser : IdentityUser<Guid>
         this.Id = Guid.NewGuid();
     }
 
+    [PersonalData]
+    public string? FirstName { get; set; }
+    
+    [PersonalData]
+    public string? LastName { get; set; }
+    
+    [PersonalData]
+    public string? ProfileImage { get; set; }
+
     public Teacher? Teacher { get; set; }
 
     public TranslationLanguage NativeLanguage { get; set; } = TranslationLanguage.Bg;
