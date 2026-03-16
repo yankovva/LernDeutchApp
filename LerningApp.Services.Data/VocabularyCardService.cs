@@ -27,7 +27,8 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
     {
         var result = await userLessonProgressService
             .IsLessonUnlockedForAUserAsync(lessonId, userId);
-        if (result.Data == false)
+     
+        if (!result.Result || !result.Data)
         {
             return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(result.Message ?? "Invalid operation.");
         }
@@ -106,7 +107,7 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             Id = card.Id.ToString(),
             LessonId = card.LessonId.ToString(),
             LessonName = card.Lesson?.Name ?? "Урок",
-            ImageUrl = card.ImagePath!,
+            ImageUrl = card.ImagePath,
             GermanWord = de!.Word ,
             BulgarianTranslation = bg?.Word ?? "no word",
             EnglishTranslation = en?.Word ?? "no word",
@@ -355,14 +356,17 @@ public class VocabularyCardService(IRepository<VocabularyCard,Guid> vocabularyCa
             string uniqueFileName = $"{Guid.NewGuid()}{extension}";
             string imagePath = await fileService.UploadFileAsync(model.Image, DefaultCardDirectoryPath, uniqueFileName);
            
-            if (card.ImagePath != null)
-            {
-                fileService.DeleteFile(card.ImagePath);
-            }
+            string? oldImagePath = card.ImagePath;
 
             card.ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath;
-        }
 
+            await vocabularyCardRepository.SaveChangesAsync();
+
+            if (!string.IsNullOrWhiteSpace(oldImagePath))
+            {
+                fileService.DeleteFile(oldImagePath);
+            }
+        }
         card.PartOfSpeechId = partOfSpeechId;
         
         var de = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "de");
