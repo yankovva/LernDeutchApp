@@ -12,6 +12,7 @@ namespace LerningApp.Services.Data;
 
 public class UserLessonProgressService(IRepository<Lesson,Guid> lessonRepository,
     IRepository<UserLessonProgress, Guid> userProgressRepository,
+    IRepository<UserExerciseProgress, Guid> userExerciseProgressRepository,
     ITeacherService teacherService) : IUserLessonProgressService
 {
     public async Task<ServiceResultT<IndexUserLessonProgressViewModel>> GetUserLessonProgress(Guid lessonId, string? userId)
@@ -106,5 +107,88 @@ public class UserLessonProgressService(IRepository<Lesson,Guid> lessonRepository
             .AnyAsync(x => x.LessonId == lessonGuid && x.UserId == userGuid && x.IsUnlocked);
         
         return ServiceResultT<bool>.Success(hasProgress);
+    }
+
+    public async Task<bool> TryCompleteLessonProgressAsync(Guid lessonId, Guid userId)
+    {
+        var userProgress = await userProgressRepository
+            .GetAllAttached()
+            .FirstOrDefaultAsync(x => x.LessonId == lessonId && x.UserId == userId);
+
+        if (userProgress == null)
+        {
+            return false;
+        }
+
+        var hasAny = await userExerciseProgressRepository
+            .GetAllAttached()
+            .AnyAsync(u => u.UserId == userId && u.LessonId == lessonId);
+
+        if (!hasAny)
+        {
+            return false;
+        }
+
+        var hasNotCompleted = await userExerciseProgressRepository
+            .GetAllAttached()
+            .Where(u => u.UserId == userId && u.LessonId == lessonId)
+            .AnyAsync(up => up.IsCompleted == false);
+        
+        if (hasNotCompleted)
+        {
+            return false;
+        }
+        userProgress.IsCompleted = true;
+        userProgress.CompletedAt = DateTime.UtcNow;
+        await userProgressRepository.SaveChangesAsync();
+        
+        await UnlockNextLessonAsync(lessonId, userId);
+
+        return true;
+    }
+
+    public async Task<bool> UnlockNextLessonAsync(Guid lessonId, Guid userId)
+    {
+        var currentLesson = await lessonRepository
+            .GetAllAttached()
+            .Where(l => l.Id == lessonId)
+            .Select(l => new { l.Id, l.CourseId, l.OrderIndex })
+            .FirstOrDefaultAsync();
+
+        if (currentLesson == null || currentLesson.CourseId == null)
+        {
+            return false;
+        }
+
+        var nextLesson = await lessonRepository
+            .GetAllAttached()
+            .Where(l => l.CourseId == currentLesson.CourseId && l.OrderIndex > currentLesson.OrderIndex)
+            .OrderBy(l => l.OrderIndex)
+            .Select(l => new { l.Id })
+            .FirstOrDefaultAsync();
+       
+        if (nextLesson == null)
+        {
+            return false; 
+        }
+
+        var nextProgress = await userProgressRepository
+            .GetAllAttached()
+            .FirstOrDefaultAsync(x => x.LessonId == nextLesson.Id && x.UserId == userId);
+
+        if (nextProgress == null)
+        {
+            return false;
+        }
+
+        if (nextProgress.IsUnlocked)
+        {
+            return true;
+        }
+
+        nextProgress.IsUnlocked = true;
+        await userProgressRepository.SaveChangesAsync();
+        
+        return true;
     }
 }

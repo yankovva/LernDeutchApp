@@ -3,6 +3,7 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Lesson;
+using LerningApp.Web.ViewModels.UserLessonProgress;
 using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.Enums;
@@ -10,12 +11,14 @@ using static LerningApp.Common.Enums;
 namespace LerningApp.Services.Data;
 
 public class UserExerciseProgressService(IRepository<UserExerciseProgress, Guid> userExerciseProgressRepository,
-    ITeacherService teacherService) : IUserExerciseProgressService
+    ITeacherService teacherService,
+    IUserLessonProgressService userLessonProgressService) : IUserExerciseProgressService
 {
     public async Task<ServiceResult> CompleteExerciseAsync(Guid userId, Guid exerciseId)
     {
         var userProgress = await userExerciseProgressRepository
             .GetAllAttached()
+            .Include(x => x.Lesson)
             .FirstOrDefaultAsync(u => u.ExerciseId == exerciseId && u.UserId == userId);
        
         if (userProgress == null)
@@ -30,7 +33,8 @@ public class UserExerciseProgressService(IRepository<UserExerciseProgress, Guid>
         userProgress.IsCompleted = true;
        
         await userExerciseProgressRepository.SaveChangesAsync();
-        return ServiceResult.Success();
+        await userLessonProgressService.TryCompleteLessonProgressAsync(userProgress.LessonId, userId);
+         return ServiceResult.Success();
     }
     public async  Task<ServiceResultT<bool>> HasUserProgresAsync(string userId, string exerciseId)
     {
