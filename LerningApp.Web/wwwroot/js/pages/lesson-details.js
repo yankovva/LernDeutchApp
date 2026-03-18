@@ -1,0 +1,180 @@
+document.addEventListener('DOMContentLoaded', () => {
+
+    // Multiple choice
+    document.querySelectorAll('.exercise-box').forEach(box => {
+        const checkBtn = box.querySelector('.check-btn');
+        if (!checkBtn) return;
+
+        checkBtn.addEventListener('click', async () => {
+            box.querySelectorAll('.answer-row').forEach(r => r.classList.remove('correct', 'wrong'));
+
+            const selected = box.querySelector('input[type="radio"]:checked');
+            if (!selected) return;
+
+            const exerciseId = box.querySelector('input[name="exerciseId"]').value;
+            const lessonId = box.querySelector('input[name="lessonId"]').value;
+            const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            const formData = new URLSearchParams();
+            formData.append("exerciseId", exerciseId);
+            formData.append("selectedAnswer", selected.value);
+            formData.append("lessonId", lessonId)
+
+            const res = await fetch('/MultipleChoiceExercise/CheckMultipleChoice', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token
+                },
+                body: formData
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                console.log(err.message || 'Invalid operation.');
+                toastr.error(err.message || 'Invalid operation.');
+                return;
+            }
+            const data = await res.json();
+
+            const selectedRow = selected.closest('.answer-row');
+            if (data.isCorrect) {
+                selectedRow.classList.add('correct');
+            } else {
+                selectedRow.classList.add('wrong');
+                box.querySelectorAll('input[type="radio"]').forEach(r => {
+                    if (r.value === data.correctAnswer) {
+                        r.closest('.answer-row').classList.add('correct');
+                    }
+                });
+            }
+        });
+    });
+
+    // Listening choice
+    document.querySelectorAll('.exercise-box').forEach(box => {
+        const checkBtn = box.querySelector('.check-listening-btn');
+        if (!checkBtn) return;
+
+        checkBtn.addEventListener('click', async () => {
+            const exerciseWrap = checkBtn.closest('.listening-exercise-box');
+            if (!exerciseWrap) return;
+            
+            exerciseWrap.querySelectorAll('.answer-row').forEach(r => {
+                r.classList.remove('correct', 'wrong');
+            });
+            
+            const lessonId = box.querySelector('input[name="lessonId"]').value;
+            const exerciseId = box.querySelector('input[name="exerciseId"]').value;
+            const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            const answers = [];
+            exerciseWrap.querySelectorAll('.listening-question').forEach(q => {
+                const questionId = q.querySelector('input[name="questionId"]').value;
+                const selected = q.querySelector('input[type="radio"]:checked');
+                if (selected) {
+                    answers.push({ questionId, selectedAnswer: selected.value });
+                }
+            });
+
+            const res = await fetch('/ListeningExercise/CheckListeningExercise', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                body: JSON.stringify({ exerciseId, lessonId, answers })
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                console.log(err.message || 'Invalid operation.');
+                toastr.error(err.message || 'Invalid operation.');
+                return;
+            }
+
+            const data = await res.json();
+
+            exerciseWrap.querySelectorAll('.listening-question').forEach(q => {
+                const questionId = q.querySelector('input[name="questionId"]').value;
+                const selected = q.querySelector('input[type="radio"]:checked');
+                if (!selected) return;
+
+                const row = selected.closest('.answer-row');
+                row.classList.remove('correct', 'wrong');
+
+                const resultItem = data.results?.find(x =>
+                    x.questionId?.toLowerCase() === questionId.toLowerCase()
+                );
+
+                if (resultItem?.isCorrect === true) {
+                    row.classList.add('correct');
+                } else {
+                    row.classList.add('wrong');
+                }
+            });
+
+        });
+    });
+
+
+    // Translation:BG/EN
+    document.querySelectorAll('.exercise-box').forEach(box => {
+        const question = box.querySelector('.question');
+        const radios = box.querySelectorAll('input[name="selectedLanguage"]');
+        if (!question || radios.length === 0) return;
+
+        radios.forEach(r => {
+            r.addEventListener('change', () => {
+                question.textContent = r.value === 'Bg'
+                    ? question.dataset.bg
+                    : question.dataset.en;
+            });
+        });
+    });
+
+    // Translation: проверка
+    document.querySelectorAll('.exercise-box').forEach(box => {
+        const btn = box.querySelector('.check-translation-btn');
+        if (!btn) return;
+
+        btn.addEventListener('click', async () => {
+            const exerciseId = box.querySelector('input[name="exerciseId"]').value;
+            const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
+            const userAnswer = box.querySelector('input[name="userAnswer"]').value;
+            const lessonId = box.querySelector('input[name="lessonId"]').value;
+
+            const formData = new URLSearchParams();
+            formData.append("exerciseId", exerciseId);
+            formData.append("userAnswer", userAnswer);
+            formData.append("lessonId", lessonId)
+
+            const res = await fetch('/TranslationExercise/CheckTranslationExercise', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token
+                },
+                body: formData
+            });
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                console.log(err.message || 'Invalid operation.');
+                toastr.error(err.message || 'Invalid operation.');
+                return;
+            }
+
+            const data = await res.json();
+            const input = box.querySelector('input[name="userAnswer"]');
+            input.classList.remove('correct', 'wrong');
+
+            if (data.isCorrect) {
+                input.classList.add('correct');
+            } else {
+                input.classList.add('wrong');
+            }
+
+        });
+    });
+});
