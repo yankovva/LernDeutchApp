@@ -4,6 +4,7 @@ using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.ListeningExercise;
 using LerningApp.Web.ViewModels.ListeningExercise.DTOs;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
@@ -169,18 +170,17 @@ public class ListeningExerciseService(
         return ServiceResult.Success();
     }
 
-    public async Task<(List<ListeningQuestionCheckResultDTO> Results, bool IsCompleted)> CheckListeningExerciseAnswer(CheckListeningExerciseInputModel model, string userId)
+    public async Task<ServiceResultT<List<ListeningQuestionCheckResultDTO>>> CheckListeningExerciseAnswer(CheckListeningExerciseInputModel model, string userId)
     {
         List<ListeningQuestionCheckResultDTO> results = new();
         if (!Guid.TryParse(userId, out var userGuidId))
         {
-            return (results, false);
+            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
         }
         
         if (!Guid.TryParse(model.LessonId, out var lessonGuidId))
         {
-            return (results, false);
-
+            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
         }
         
         var isTeacher = await teacherService.IsUserTeacherAsync(userId.ToString());
@@ -190,13 +190,13 @@ public class ListeningExerciseService(
 
         if (!isUnlocked)
         {
-            return (results, false);
+            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
 
         }
         
         if (!Guid.TryParse(model.ExerciseId, out var exerciseGuidId))
         {
-            return (results, false);
+            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
         }
         
         var exercise = await listeningExerciseRepository
@@ -207,7 +207,7 @@ public class ListeningExerciseService(
 
         if (exercise == null)
         {
-            return (results, false);
+            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
         }
         
         var answerMap = model
@@ -222,7 +222,7 @@ public class ListeningExerciseService(
                 .FirstOrDefault(o => o.isCorrect);
             if (correctOption == null)
             {
-                return (null, false);
+                return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
             }
 
             string correctAnswer = correctOption.Answer;
@@ -246,9 +246,13 @@ public class ListeningExerciseService(
 
         if (isCompleted)
         {
-            await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exerciseGuidId);
+            var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
+            if (result.Result == false)
+            {
+                return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
+            }
         }
         
-        return (results, isCompleted);
+        return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Success(results);
     }
 }

@@ -10,6 +10,6 @@ public interface IListeningExerciseService
      
      Task<ServiceResult> CreatePostListeningExercise(CreateListeningExerciseViewModel model, string userId);
 
-     Task<(List<ListeningQuestionCheckResultDTO> Results, bool IsCompleted)> CheckListeningExerciseAnswer(
+     Task<ServiceResultT<List<ListeningQuestionCheckResultDTO>>> CheckListeningExerciseAnswer(
           CheckListeningExerciseInputModel model, string userId);
 }
