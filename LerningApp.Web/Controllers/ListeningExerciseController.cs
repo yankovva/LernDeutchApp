@@ -58,7 +58,7 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
         var result = await exerciseService
             .CheckListeningExerciseAnswer(answers, userId);
 
-        if (result.Results == null)
+        if (result.Result == false)
         {
             return BadRequest(new { message = "Invalid operation." });
         }
@@ -66,8 +66,7 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
         
         return Json(new
         {
-            results = result.Results,
-            isCompleted = result.IsCompleted
+            results = result.Data,
         });
         
     }
