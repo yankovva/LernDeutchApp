@@ -8,9 +8,12 @@ using LerningApp.Web.ViewModels.ListeningExercise;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.TranslationExercise;
 using LerningApp.Web.ViewModels.UserLessonProgress;
+
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.EntityErrorMessages.Common;
+
+using static LerningApp.Common.Enums;
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -26,7 +29,8 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
     IRepository<UserLessonProgress, Guid> lessonProgressRepository,
     IRepository<UserCourse, object> userCourseRepository,
     ITeacherService teacherService,
-    IUserLessonProgressService userLessonProgressService) : ILessonService
+    IUserLessonProgressService userLessonProgressService,
+    IUserExerciseProgressService userExerciseProgressService) : ILessonService
 {
     public async Task<IEnumerable<LessonIndexViewModel>> IndexGetLessonsAsync()
     {
@@ -69,7 +73,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             return ServiceResultT<LessonContentViewModel>.Fail(LessonNotFoundMessage);
         }
 
-        List<IndexListeningExerciseViewModel> listeningExercises = await listeningExerciseRepository
+        List<IndexListeningExerciseViewModel> listeningExercisesViewModels = await listeningExerciseRepository
             .GetAllAttached()
             .AsNoTracking()
             .Where(ex => ex.LessonId == lessonId)
@@ -116,23 +120,29 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                 GermanSentence = ex.GermanSentence,
                 EnglishSentence = ex.EnglishSentence,
                 BulgarianSentence = ex.BulgarianSentence,
-            }).ToListAsync();
+            })
+            .ToListAsync();
         
         var userProgressResult = await userLessonProgressService
             .GetUserLessonProgress(lessonId, userId);
-
-        bool isUserTeacher = await teacherService.IsUserTeacherAsync(userId);
+ 
+        bool isUserTeacher = await teacherService
+            .IsUserTeacherAsync(userId);
         
         if (userProgressResult.Result == false && !isUserTeacher)
         {
             return ServiceResultT<LessonContentViewModel>.Fail(userProgressResult.Message ?? "Invalid operation.");
         }
         
-        if (userProgressResult.Data != null && !userProgressResult.Data.IsUnlocked&& !isUserTeacher)
+        if (userProgressResult.Data != null && !userProgressResult.Data.IsUnlocked && !isUserTeacher)
         {
             return ServiceResultT<LessonContentViewModel>.Fail("Lesson is locked.");
         }
         
+        await userExerciseProgressService.CreateUserExerciseProgress(listeningExercisesViewModels, x => x.Id, userId, lessonId, ExerciseType.ListeningExercise);
+        await userExerciseProgressService.CreateUserExerciseProgress(multipleChoiceExerciseViewModels, x => x.Id, userId, lessonId, ExerciseType.MultipleChoiceExercise);
+        await userExerciseProgressService.CreateUserExerciseProgress(translationExerciseViewModels, x => x.Id, userId, lessonId, ExerciseType.TranslationExercise);
+       
         
         LessonContentViewModel model = new LessonContentViewModel()
         {
@@ -148,7 +158,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             Target = lesson.Target,
             MultipleChoiceExercises = multipleChoiceExerciseViewModels,
             TranslationExercises = translationExerciseViewModels,
-            ListeningExercises = listeningExercises
+            ListeningExercises = listeningExercisesViewModels
         };
         
         if (isUserTeacher)
@@ -427,5 +437,4 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         await lessonRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
-    
 }
