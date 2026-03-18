@@ -52,22 +52,22 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
     //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CheckListeningExercise(string questionId, string lessonId, string selectedAnswer)
+    public async Task<IActionResult> CheckListeningExercise([FromBody]CheckListeningExerciseInputModel answers)
     {
         string userId = User.GetUserId()!;
-        
         var result = await exerciseService
-            .CheckListeningExerciseAnswer(questionId, selectedAnswer,lessonId, userId);
+            .CheckListeningExerciseAnswer(answers, userId);
 
-        if (result == null)
+        if (result.Results == null)
         {
             return BadRequest(new { message = "Invalid operation." });
         }
+
         
         return Json(new
         {
-            result.Value.isCorrect,
-            result.Value.correctAnswer,
+            results = result.Results,
+            isCompleted = result.IsCompleted
         });
         
     }
