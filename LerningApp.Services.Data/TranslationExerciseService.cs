@@ -13,7 +13,8 @@ public class TranslationExerciseService(
     IRepository<TranslationExercise, Guid> exerciseRepository,
     IRepository<Lesson, Guid> lessonRepository,
     IRepository<UserLessonProgress, Guid> userLessonProgressRepository,
-    ITeacherService teacherService) : ITranslationExerciseService
+    ITeacherService teacherService,
+    IUserExerciseProgressService userExerciseProgressService) : ITranslationExerciseService
 {
     public async Task<ServiceResultT<CreateTranslationExerciseViewModel>> GetAddTranslationExercisesAsync(string lessonId, string userId)
     {
@@ -109,8 +110,21 @@ public class TranslationExerciseService(
             return null;
         }
         
+        if (!Guid.TryParse(userId, out Guid userGuidId))
+        {
+            return null;
+        }
+        
         bool isCorrect = string.Equals(userAnswer?.Trim(), exercise.GermanSentence.Trim(),
             StringComparison.OrdinalIgnoreCase);
+        if (isCorrect)
+        {
+            var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
+            if (result.Result == false)
+            {
+                return null;
+            }
+        }
 
         return (isCorrect, exercise.GermanSentence);
     }
