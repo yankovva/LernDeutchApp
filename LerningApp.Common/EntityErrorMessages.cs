@@ -5,6 +5,8 @@ public static class EntityErrorMessages
    public static class Common
    {
       public const string AccessDeniedMessage = "You do not have permission to perform this action.";
+      public const string InvalidOperationMessage = "Invalid operation. Please try again.";
+
    }
    public static class File
    {
