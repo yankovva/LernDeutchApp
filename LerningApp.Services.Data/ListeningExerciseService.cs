@@ -3,6 +3,7 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.ListeningExercise;
+using LerningApp.Web.ViewModels.ListeningExercise.DTOs;
 using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
@@ -13,7 +14,8 @@ namespace LerningApp.Services.Data;
 public class ListeningExerciseService(
     IRepository<Lesson, Guid> lessonRepository,
     IRepository<ListeningExercise, Guid> listeningExerciseRepository,
-    IRepository<ListeningQuestion, Guid> listeningQuestionRepository,
+    IRepository<UserLessonProgress, Guid> userLessonProgressRepository,
+    IUserExerciseProgressService userExerciseProgressService,
     ITeacherService teacherService,
     IFileService fileService) : IListeningExerciseService
 {
@@ -167,55 +169,86 @@ public class ListeningExerciseService(
         return ServiceResult.Success();
     }
 
-    public async Task<(bool isCorrect, string correctAnswer)?> CheckListeningExerciseAnswer(string questionId, string selectedAnswer,string lessonId, string userId)
+    public async Task<(List<ListeningQuestionCheckResultDTO> Results, bool IsCompleted)> CheckListeningExerciseAnswer(CheckListeningExerciseInputModel model, string userId)
     {
-        if (!Guid.TryParse(questionId, out var queGuidId))
+        List<ListeningQuestionCheckResultDTO> results = new();
+        if (!Guid.TryParse(userId, out var userGuidId))
         {
-            return null;
+            return (results, false);
         }
         
-        if (!Guid.TryParse(lessonId, out var lessonGuidId))
+        if (!Guid.TryParse(model.LessonId, out var lessonGuidId))
         {
-            return null;
+            return (results, false);
+
+        }
+        
+        var isTeacher = await teacherService.IsUserTeacherAsync(userId.ToString());
+        var isUnlocked = isTeacher || await userLessonProgressRepository
+            .GetAllAttached()
+            .AnyAsync(x => x.UserId == userGuidId && x.LessonId == lessonGuidId && x.IsUnlocked);
+
+        if (!isUnlocked)
+        {
+            return (results, false);
+
+        }
+        
+        if (!Guid.TryParse(model.ExerciseId, out var exerciseGuidId))
+        {
+            return (results, false);
         }
         
         var exercise = await listeningExerciseRepository
             .GetAllAttached()
             .Include(e => e.Questions)
             .ThenInclude(q => q.Options)
-            .FirstOrDefaultAsync(e => e.LessonId == lessonGuidId &&
-                                      e.Questions.Any(q => q.Id == queGuidId));
+            .FirstOrDefaultAsync(e => e.Id == exerciseGuidId && e.LessonId == lessonGuidId);
 
         if (exercise == null)
         {
-            return null;
+            return (results, false);
         }
         
-        var question = exercise
-            .Questions
-            .FirstOrDefault(q => q.Id == queGuidId);
+        var answerMap = model
+            .Answers
+            .ToDictionary(a => a.QuestionId, a => a.SelectedAnswer);
         
-        if (question == null)
+        var correct = 0;
+        
+        foreach (var q in exercise.Questions)
         {
-            return null;
-        }
-        
-        var correctAnswer = question
-            .Options
-            .FirstOrDefault(op => op.isCorrect);
+            var correctOption = q.Options
+                .FirstOrDefault(o => o.isCorrect);
+            if (correctOption == null)
+            {
+                return (null, false);
+            }
 
-        if (correctAnswer == null)
-        {
-           return null;
+            string correctAnswer = correctOption.Answer;
+            bool isCorrect = answerMap.TryGetValue(q.Id, out var selected) &&
+                            selected == correctAnswer;
+
+            if (isCorrect)
+            {
+                correct++;
+            }
+            
+            results.Add(new ListeningQuestionCheckResultDTO()
+            {
+                IsCorrect = isCorrect,
+                QuestionId = q.Id.ToString()
+            });
         }
         
-        bool isCorrect;
-        if (correctAnswer.Answer == selectedAnswer)
+        var total = exercise.Questions.Count;
+        var isCompleted = total > 0 && correct == total;
+
+        if (isCompleted)
         {
-            isCorrect = true;
-        } else
-            isCorrect = false;
+            await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exerciseGuidId);
+        }
         
-        return (isCorrect, correctAnswer.Answer);
+        return (results, isCompleted);
     }
 }
