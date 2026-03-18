@@ -106,6 +106,11 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         }
         bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
         
+        if (!Guid.TryParse(userId, out Guid userGuidId))
+        {
+            return null;
+        }
+        
         var isUnlocked = await userLessonProgressRepository
             .GetAllAttached()
             .AnyAsync(up => up.LessonId == lessonGuidId && up.UserId == Guid.Parse(userId) && up.IsUnlocked == true);
@@ -114,15 +119,9 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         {
             return null;
         }
-
-        if (!Guid.TryParse(userId, out Guid userGuidId))
-        {
-            return null;
-        }
         
         bool isCorrect;
-        
-        if (exercise.CorrectAnswer == selectedAnswer)
+        if (exercise.CorrectAnswer == selectedAnswer && !isTeacher)
         {
             var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
             if (result.Result == false)

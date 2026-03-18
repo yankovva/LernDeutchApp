@@ -244,7 +244,7 @@ public class ListeningExerciseService(
         var total = exercise.Questions.Count;
         var isCompleted = total > 0 && correct == total;
 
-        if (isCompleted)
+        if (isCompleted && !isTeacher)
         {
             var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
             if (result.Result == false)

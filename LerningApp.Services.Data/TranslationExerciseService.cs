@@ -100,24 +100,23 @@ public class TranslationExerciseService(
         }
         
         bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
-        
-        var isUnlocked = await userLessonProgressRepository
-            .GetAllAttached()
-            .AnyAsync(up => up.LessonId == lessonGuidId && up.UserId == Guid.Parse(userId) && up.IsUnlocked == true);
-      
-        if (!isUnlocked && !isTeacher)
-        {
-            return null;
-        }
-        
         if (!Guid.TryParse(userId, out Guid userGuidId))
         {
             return null;
         }
         
+        var isUnlocked = await userLessonProgressRepository
+            .GetAllAttached()
+            .AnyAsync(up => up.LessonId == lessonGuidId && up.UserId == Guid.Parse(userId) && up.IsUnlocked == true);
+
+        if (!isUnlocked && !isTeacher)
+        {
+            return null;
+        }
+
         bool isCorrect = string.Equals(userAnswer?.Trim(), exercise.GermanSentence.Trim(),
             StringComparison.OrdinalIgnoreCase);
-        if (isCorrect)
+        if (isCorrect && !isTeacher)
         {
             var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
             if (result.Result == false)

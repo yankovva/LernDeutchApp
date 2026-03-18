@@ -61,31 +61,57 @@ public class UserExerciseProgressService(IRepository<UserExerciseProgress, Guid>
 
     public async Task<bool> CreateUserExerciseProgress<T>(IEnumerable<T> exercises,  Func<T, string> exerciseIdSelector, string userId, Guid lessonId, ExerciseType exerciseType)
     {
-        List<UserExerciseProgress> exerciseProgresses = new ();
-        foreach (var ex in exercises)
+        if (!Guid.TryParse(userId, out var userGuid))
         {
-            var idStr = exerciseIdSelector(ex);
-            if (!Guid.TryParse(idStr, out var exerciseGuid))
-                continue;
-            
-            var hasProgress = await HasUserProgresAsync(userId, idStr);
-            if (!hasProgress.Result)
+            return false;
+        }
+        
+        var allExerciseIds = new List<Guid>();
+        foreach (var exercise in exercises)
+        {
+            var idString = exerciseIdSelector(exercise);
+            if (Guid.TryParse(idString, out var exerciseId))
             {
-                return false;
+                allExerciseIds.Add(exerciseId);
             }
-            if (!hasProgress.Data)
+        }
+
+        if (allExerciseIds.Count == 0)
+        {
+            return true;
+        }
+
+        var existingProgressExerciseIds = await userExerciseProgressRepository
+            .GetAllAttached()
+            .Where(p =>
+                p.UserId == userGuid &&
+                p.LessonId == lessonId &&
+                p.ExerciseType == exerciseType &&
+                allExerciseIds.Contains(p.ExerciseId))
+            .Select(p => p.ExerciseId)
+            .ToHashSetAsync();
+        
+        var progressesToCreate = new List<UserExerciseProgress>();
+        foreach (var exerciseId in allExerciseIds)
+        {
+            if (!existingProgressExerciseIds.Contains(exerciseId))
             {
-                exerciseProgresses.Add(new UserExerciseProgress
+                progressesToCreate.Add(new UserExerciseProgress
                 {
+                    UserId = userGuid,
                     LessonId = lessonId,
-                    UserId = Guid.Parse(userId),
-                    ExerciseId = Guid.Parse(idStr),
+                    ExerciseId = exerciseId,
                     ExerciseType = exerciseType
                 });
             }
         }
-        userExerciseProgressRepository.AddRange(exerciseProgresses);
-        await userExerciseProgressRepository.SaveChangesAsync();
+
+        if (progressesToCreate.Count > 0)
+        {
+            userExerciseProgressRepository.AddRange(progressesToCreate);
+            await userExerciseProgressRepository.SaveChangesAsync();
+        }
+
         return true;
     }
 }
