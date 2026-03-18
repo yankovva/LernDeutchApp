@@ -4,15 +4,18 @@ using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using Microsoft.EntityFrameworkCore;
+
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Common;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data;
 
 public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepository,
     IRepository<MultipleChoiceExercise, Guid> exerciseRepository,
     IRepository<UserLessonProgress, Guid> userLessonProgressRepository,
-    ITeacherService teacherService) : IMultipleChoiceExerciseService
+    ITeacherService teacherService,
+    IUserExerciseProgressService userExerciseProgressService) : IMultipleChoiceExerciseService
 {
     public async  Task<ServiceResultT<CreateMultipleChoiceExerciseViewModel>> GetCreateAsync(string lessonId, string userId)
     {
@@ -101,7 +104,6 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         {
             return null;
         }
-        
         bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
         
         var isUnlocked = await userLessonProgressRepository
@@ -112,10 +114,22 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         {
             return null;
         }
+
+        if (!Guid.TryParse(userId, out Guid userGuidId))
+        {
+            return null;
+        }
         
         bool isCorrect;
+        
         if (exercise.CorrectAnswer == selectedAnswer)
         {
+            var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
+            if (result.Result == false)
+            {
+                return null;
+            }
+            
             isCorrect = true;
         } else
             isCorrect = false;
