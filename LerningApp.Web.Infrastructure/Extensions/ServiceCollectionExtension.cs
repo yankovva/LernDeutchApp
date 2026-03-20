@@ -4,6 +4,7 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository;
 using LerningApp.Data.Repository.Interfaces;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,10 @@ public static class ServiceCollectionExtension
             .AddEntityFrameworkStores<LerningAppContext>()
             .AddDefaultTokenProviders();
         
+        services.AddDataProtection()
+            .PersistKeysToFileSystem(new DirectoryInfo("/Users/magdalenaqnkova/RiderProjects/LerningApp/.keys"))
+            .SetApplicationName("LerningApp.SharedAuth");
+        
         services.ConfigureApplicationCookie(options =>
         {
             options.LoginPath = "/Identity/Account/Login";
@@ -46,6 +51,7 @@ public static class ServiceCollectionExtension
             options.SlidingExpiration = true;
             options.Cookie.HttpOnly = true;
             options.Cookie.Name = "DeutchBuddy.Auth";
+            options.Cookie.Path = "/";
             options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             options.Cookie.SameSite = SameSiteMode.Lax;
         });
