@@ -63,7 +63,12 @@
                        class="form-control"
                        placeholder="Търси курс по име..." />
             </div>
-
+            <div class="mb-3">
+                <label asp-for="OrderIndex" class="form-label">Ред на урока в курса</label>
+                    <select asp-for="OrderIndex" class="form-select" id="order-index">
+                    </select>
+                    <span asp-validation-for="OrderIndex" class="text-danger"></span>
+            </div>
 
             <div class="course-list" id="courseList">
                 @for (int i = 0; i < Model.Courses.Count; i++)
@@ -100,17 +105,43 @@
 </div>
 
 <script>
-    (function () {
-        const search = document.getElementById('courseSearch');
-        const list = document.getElementById('courseList');
-        const rows = Array.from(list.querySelectorAll('[data-name]'));
+    document.addEventListener('DOMContentLoaded', () => {
+        const courseRadios = document.querySelectorAll('input[name="SelectedCourseId"]');
+        const orderSelect = document.getElementById('order-index');
 
-        search.addEventListener('input', () => {
-            const term = (search.value || '').toLowerCase();
-            rows.forEach(r => {
-                const name = r.getAttribute('data-name');
-                r.style.display = name.includes(term) ? '' : 'none';
+        if (!courseRadios.length || !orderSelect) return;
+
+        async function loadIndexes(courseId) {
+            orderSelect.innerHTML = '';
+            if (!courseId) return;
+
+            const res = await fetch(`/api/lessons/available-indexes?courseId=${encodeURIComponent(courseId)}`);
+            if (!res.ok) {
+                console.log('Failed to load indexes');
+                return;
+            }
+
+            const indexes = await res.json();
+            indexes.forEach(i => {
+                const opt = document.createElement('option');
+                opt.value = i;
+                opt.textContent = i;
+                orderSelect.appendChild(opt);
+            });
+        }
+
+        courseRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.checked) {
+                    loadIndexes(radio.value);
+                }
             });
         });
-    })();
+
+        const selected = document.querySelector('input[name="SelectedCourseId"]:checked');
+        if (selected) {
+            loadIndexes(selected.value);
+        }
+    });
 </script>
+
