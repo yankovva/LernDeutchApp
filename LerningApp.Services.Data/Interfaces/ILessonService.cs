@@ -13,4 +13,5 @@ public interface ILessonService
     Task<ServiceResultT<LessonEditInputModel>> GetLessonEditInputModelAsync(string id, string userId);
     Task<ServiceResult> PostLessonEditInputModelAsync(LessonEditInputModel model, string id, string userId);
     Task<ServiceResult> SoftDeleteLessonAsync(string id,string userId);
+    Task<List<int>> GetAvailableOrderIndexes(string courseId);
 }

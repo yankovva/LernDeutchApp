@@ -38,7 +38,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             .GetAllAttached()
             .AsNoTracking()
             .Include(l => l.Course)
-            .OrderBy(l => l.Name)
+            .OrderBy(l => l.OrderIndex)
             .Select(l => new LessonIndexViewModel
             {
                 Id = l.Id.ToString(),
@@ -205,7 +205,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                     CourseId = c.Id.ToString().ToLower(),
                     CourseName = c.Name,
                 })
-                .ToListAsync()
+                .ToListAsync(),
         };
         return ServiceResultT<AddLessonToCourseViewModel>.Success(model);
     }
@@ -320,7 +320,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             CourseId = courseId == Guid.Empty ? null : courseId,
             CreatedAt = DateTime.UtcNow,
             PublisherId = teacherId.Value,
-            OrderIndex = model.OrderIndex,
             Target = model.Target,
         };
         
@@ -436,5 +435,45 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         lesson.IsDeleted = true;
         await lessonRepository.SaveChangesAsync();
         return ServiceResult.Success();
+    }
+
+    public async Task<List<int>> GetAvailableOrderIndexes(string courseId)
+    {
+        if (string.IsNullOrEmpty(courseId) || !Guid.TryParse(courseId, out Guid courseGuidId))
+        {
+            return null;
+        }
+
+        Course? course = await courseRepository
+            .GetAllAttached()
+            .Include(l => l.LessonsForCourse)
+            .FirstOrDefaultAsync(c => c.Id == courseGuidId);    
+        
+        if (course == null)
+        {
+            return null;
+        }
+
+        var usedIndexes = await lessonRepository
+            .GetAllAttached()
+            .Where(l => l.CourseId == courseGuidId)
+            .Select(l => l.OrderIndex)
+            .ToListAsync();
+
+        if (usedIndexes.Count == 0)
+        {
+            return new List<int> { 1 };
+        }
+
+        int biggestIndex = usedIndexes.Max();
+        List<int> availableIndexes = new List<int>();
+
+        for (int i = 1; i <= biggestIndex + 1 ; i++)
+        {
+            if (!usedIndexes.Contains(i))
+                availableIndexes.Add(i);
+        }
+
+        return availableIndexes;
     }
 }
