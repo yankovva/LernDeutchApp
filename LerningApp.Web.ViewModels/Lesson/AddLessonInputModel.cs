@@ -20,9 +20,6 @@ public class AddLessonInputModel
     [MaxLength(TargetMaxLength)]
     public string Target { get; set; } = null!;
 
-    [Range(OrderIndexMin, OrderIndexMax)]
-    public int OrderIndex { get; set; }
-
     // optional
     public string? CourseId { get; set; }
 

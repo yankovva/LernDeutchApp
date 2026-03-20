@@ -44,14 +44,6 @@
                         <div class="hint mt-1">Можеш да оставиш урока без курс и да го добавиш по-късно.</div>
                         <span asp-validation-for="CourseId" class="text-danger"></span>
                     </div>
-
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label asp-for="OrderIndex" class="form-label">Order index</label>
-                            <input asp-for="OrderIndex" class="form-control" type="number" min="1" />
-                            <span asp-validation-for="OrderIndex" class="text-danger"></span>
-                        </div>
-                    </div>
                     <div class="mb-3">
                         <label asp-for="Target" class="form-label">Цел на урока</label>
                         <textarea asp-for="Target" class="form-control" rows="1"
