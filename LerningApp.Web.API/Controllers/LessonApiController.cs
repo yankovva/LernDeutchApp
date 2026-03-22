@@ -12,6 +12,11 @@ public class LessonApiController(ILessonService lessonService,
     ITeacherService teacherService) : ControllerBase
 {
     [HttpGet("available-indexes")]
+    [ProducesResponseType(typeof(List<int>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+
     public async Task<ActionResult<List<int>>> GetAvailableLessonIndexes([FromQuery]string courseId)
     {
         var userId = User.GetUserId()!;
@@ -29,16 +34,5 @@ public class LessonApiController(ILessonService lessonService,
         }
 
         return Ok(indexes);
-    }
-    
-    [AllowAnonymous]
-    [HttpGet("whoami")]
-    public IActionResult WhoAmI()
-    {
-        return Ok(new
-        {
-            isAuth = User.Identity?.IsAuthenticated,
-            name = User.Identity?.Name
-        });
     }
 }

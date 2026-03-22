@@ -115,7 +115,9 @@
             orderSelect.innerHTML = '';
             if (!courseId) return;
 
-            const res = await fetch(`/api/lessons/available-indexes?courseId=${encodeURIComponent(courseId)}`);
+            const res = await fetch(`https://localhost:7092/api/lessons/available-indexes?courseId=${encodeURIComponent(courseId)}`, {
+                credentials: 'include'
+            });
             if (!res.ok) {
                 console.log('Failed to load indexes');
                 return;
