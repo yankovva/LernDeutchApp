@@ -35,7 +35,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-
 builder.Services.ConfigureApplicationCookie(options =>
 {
         options.LoginPath = "/Identity/Account/Login";

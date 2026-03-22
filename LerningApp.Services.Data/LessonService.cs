@@ -366,7 +366,6 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
 
     public async Task<ServiceResult> PostLessonEditInputModelAsync(LessonEditInputModel model, string id, string userId)
     {
-        
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid lessonId))
         {
             return ServiceResult.Fail(InvalidLessonIdMessage);
@@ -387,8 +386,10 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             if (!Guid.TryParse(model.CourseId, out var parsedCourseId))
                 return ServiceResult.Fail(InvalidCourseIdMessage);
 
-            var courseExists = await courseRepository.GetByIdAsync(parsedCourseId);
-            if (courseExists == null)
+            var course = await courseRepository.GetAllAttached()
+                .FirstOrDefaultAsync(c => c.Id == parsedCourseId);
+               
+            if (course == null)
                 return ServiceResult.Fail(CourseNotFoundMessage);
 
             courseId = parsedCourseId;
@@ -399,10 +400,9 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
         {
             return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
         }
-        
+
         lessonToChange.Name = model.Name;
         lessonToChange.Content = model.Content;
-        lessonToChange.OrderIndex = model.OrderIndex;
         lessonToChange.CourseId = courseId;
         lessonToChange.Target = model.Target;
        

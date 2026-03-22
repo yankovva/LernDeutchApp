@@ -6,5 +6,5 @@ public class IndexListeningExerciseViewModel
     
     public string AudioPath { get; set; } = null!;
     
-    public List<IndexListeningQestionViewModel> Qestions { get; set; } = new ()!;
+    public List<IndexListeningQestionViewModel> Qestions { get; set; } = new ();
 }
