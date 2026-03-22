@@ -84,7 +84,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         return ServiceResult.Success();
     }
 
-    public async Task<(bool isCorrect, string correctAnswer)?> CheckMultipleChoice(string exerciseId, string selectedAnswer,string lessonId,string userId)
+    public async Task<(bool isCorrect, string correctAnswer)?> CheckMultipleChoice(string exerciseId, string selectedAnswer,string lessonId, string userId)
     {
         if (!Guid.TryParse(exerciseId, out var exerciseGuidId))
         {

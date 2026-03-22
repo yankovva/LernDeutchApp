@@ -16,17 +16,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
 
             const formData = new URLSearchParams();
-            formData.append("exerciseId", exerciseId);
-            formData.append("selectedAnswer", selected.value);
-            formData.append("lessonId", lessonId)
-
-            const res = await fetch('/MultipleChoiceExercise/CheckMultipleChoice', {
+            const payload = {
+                exerciseId: exerciseId,
+                selectedAnswer: selected.value,
+                lessonId: lessonId
+            };
+            
+            const res = await fetch('https://localhost:7092/api/multiple-choice-exercise/check-answer',{
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                     'RequestVerificationToken': token
                 },
-                body: formData
+                credentials: 'include',
+                body: JSON.stringify(payload)
             });
 
             if (!res.ok) {
