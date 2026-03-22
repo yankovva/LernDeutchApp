@@ -33,19 +33,14 @@
                     </div>
 
                     <div class="row g-3">
-                        <div class="col-md-4">
-                            <label asp-for="OrderIndex" class="form-label">Order index</label>
-                            <input asp-for="OrderIndex" class="form-control" type="number" min="1" />
-                            <span asp-validation-for="OrderIndex" class="text-danger"></span>
-                        </div>
 
                         <div class="col-md-8">
                             <label asp-for="CourseId" class="form-label">Курс (по избор)</label>
-                            <select asp-for="CourseId" class="form-select">
+                            <select asp-for="CourseId" id="course-select" class="form-select">
                                 <option value="">— Без курс —</option>
                                 @foreach (var c in Model.Courses)
                                 {
-                                    <option value="@c.Id">@c.Name</option>
+                                    <option class="selected-course" value="@c.Id">@c.Name</option>
                                 }
                             </select>
                             <span asp-validation-for="CourseId" class="text-danger"></span>
