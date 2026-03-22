@@ -45,22 +45,4 @@ public class TranslationExerciseController(ITranslationExerciseService translati
         TempData["SuccessMessage"] = "Успешно създадохте упражнението";
         return RedirectToAction(nameof(Create), new { lessonId = model.LessonId });
     }
-   
-    //Done
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CheckTranslationExercise(string exerciseId, string userAnswer, string lessonId)
-    {
-        var userId = User.GetUserId();
-        
-        var result = await translationExerciseService
-            .CheckTranslationAsync(exerciseId, userAnswer,lessonId, userId!);
-        
-        if (result == null)
-        {
-            return BadRequest(new { message = "Invalid operation." });
-        }
-
-        return Json(new { result.Value.isCorrect, result.Value.correctAnswer });
-    }
 }

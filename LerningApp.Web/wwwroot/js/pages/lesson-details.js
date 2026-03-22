@@ -147,18 +147,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const userAnswer = box.querySelector('input[name="userAnswer"]').value;
             const lessonId = box.querySelector('input[name="lessonId"]').value;
 
-            const formData = new URLSearchParams();
-            formData.append("exerciseId", exerciseId);
-            formData.append("userAnswer", userAnswer);
-            formData.append("lessonId", lessonId)
+            const payload = {
+                exerciseId: exerciseId,
+                userTranslation: userAnswer,
+                lessonId: lessonId
+            };
 
-            const res = await fetch('/TranslationExercise/CheckTranslationExercise', {
+            const res = await fetch('https://localhost:7092/api/translation-exercise/check-answer',{
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Type': 'application/json',
                     'RequestVerificationToken': token
                 },
-                body: formData
+                credentials: 'include',
+                body: JSON.stringify(payload)
             });
 
             if (!res.ok) {
@@ -169,6 +171,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await res.json();
+            
             const input = box.querySelector('input[name="userAnswer"]');
             input.classList.remove('correct', 'wrong');
 
