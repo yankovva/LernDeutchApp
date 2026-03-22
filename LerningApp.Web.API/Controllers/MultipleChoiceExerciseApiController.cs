@@ -9,17 +9,17 @@ namespace LerningApp.Web.API.Controllers;
 [Authorize]
 [Route("api/multiple-choice-exercise")]
 [ApiController]
-public class MultipleChoiceExerciseApiController(IMultipleChoiceExerciseService exerciseService,
-    ITeacherService teacherService) : ControllerBase
+public class MultipleChoiceExerciseApiController(IMultipleChoiceExerciseService exerciseService) : ControllerBase
 {
     [HttpPost("check-answer")]
     [ProducesResponseType(typeof(CheckCorrectAnswerDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<ActionResult<CheckCorrectAnswerDto>> CheckMultipleChoiceExercise([FromBody]CheckCorrectInputDto checkInputDto)
+    public async Task<IActionResult> CheckMultipleChoiceExercise([FromBody]CheckCorrectInputDto checkInputDto)
     {
         var userId = User.GetUserId()!;
+        
         var serviceResult = await exerciseService
             .CheckMultipleChoice(checkInputDto.ExerciseId, checkInputDto.SelectedAnswer,checkInputDto.LessonId, userId);
 

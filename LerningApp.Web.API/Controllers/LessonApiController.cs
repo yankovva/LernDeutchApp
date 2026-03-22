@@ -16,8 +16,7 @@ public class LessonApiController(ILessonService lessonService,
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-
-    public async Task<ActionResult<List<int>>> GetAvailableLessonIndexes([FromQuery]string courseId)
+    public async Task<IActionResult> GetAvailableLessonIndexes([FromQuery]string courseId)
     {
         var userId = User.GetUserId()!;
         var isTeacher = await teacherService.IsUserTeacherAsync(userId);
