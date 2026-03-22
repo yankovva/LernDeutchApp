@@ -49,25 +49,4 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
         }
         return RedirectToAction("Details", "Lesson", new { id = model.LessonId });
     }
-    //Done
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CheckListeningExercise([FromBody]CheckListeningExerciseInputModel answers)
-    {
-        string userId = User.GetUserId()!;
-        var result = await exerciseService
-            .CheckListeningExerciseAnswer(answers, userId);
-
-        if (result.Result == false)
-        {
-            return BadRequest(new { message = "Invalid operation." });
-        }
-
-        
-        return Json(new
-        {
-            results = result.Data,
-        });
-        
-    }
 }

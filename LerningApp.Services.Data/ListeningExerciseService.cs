@@ -1,10 +1,9 @@
 using LerningApp.Common;
+using LerningApp.Contracts.ListeningExerciseDtos;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.ListeningExercise;
-using LerningApp.Web.ViewModels.ListeningExercise.DTOs;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
@@ -170,17 +169,17 @@ public class ListeningExerciseService(
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResultT<List<ListeningQuestionCheckResultDTO>>> CheckListeningExerciseAnswer(CheckListeningExerciseInputModel model, string userId)
+    public async Task<ServiceResultT<List<ListeningQuestionCheckResultDto>>> CheckListeningExerciseAnswer(CheckListeningExerciseInputDto dto, string userId)
     {
-        List<ListeningQuestionCheckResultDTO> results = new();
+        List<ListeningQuestionCheckResultDto> results = new();
         if (!Guid.TryParse(userId, out var userGuidId))
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
         }
         
-        if (!Guid.TryParse(model.LessonId, out var lessonGuidId))
+        if (!Guid.TryParse(dto.LessonId, out var lessonGuidId))
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
         }
         
         var isTeacher = await teacherService.IsUserTeacherAsync(userId.ToString());
@@ -190,13 +189,13 @@ public class ListeningExerciseService(
 
         if (!isUnlocked)
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
 
         }
         
-        if (!Guid.TryParse(model.ExerciseId, out var exerciseGuidId))
+        if (!Guid.TryParse(dto.ExerciseId, out var exerciseGuidId))
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
         }
         
         var exercise = await listeningExerciseRepository
@@ -207,10 +206,10 @@ public class ListeningExerciseService(
 
         if (exercise == null)
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
         }
         
-        var answerMap = model
+        var answerMap = dto
             .Answers
             .ToDictionary(a => a.QuestionId, a => a.SelectedAnswer);
         
@@ -222,7 +221,7 @@ public class ListeningExerciseService(
                 .FirstOrDefault(o => o.isCorrect);
             if (correctOption == null)
             {
-                return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
+                return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
             }
 
             string correctAnswer = correctOption.Answer;
@@ -234,7 +233,7 @@ public class ListeningExerciseService(
                 correct++;
             }
             
-            results.Add(new ListeningQuestionCheckResultDTO()
+            results.Add(new ListeningQuestionCheckResultDto()
             {
                 IsCorrect = isCorrect,
                 QuestionId = q.Id.ToString()
@@ -249,10 +248,10 @@ public class ListeningExerciseService(
             var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
             if (result.Result == false)
             {
-                return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Fail(LessonNotFoundMessage);
+                return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
             }
         }
         
-        return ServiceResultT<List<ListeningQuestionCheckResultDTO>>.Success(results);
+        return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Success(results);
     }
 }

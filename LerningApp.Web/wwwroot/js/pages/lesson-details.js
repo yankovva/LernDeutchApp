@@ -79,14 +79,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     answers.push({ questionId, selectedAnswer: selected.value });
                 }
             });
+            
+            const playload = {
+                exerciseId: exerciseId,
+                lessonId: lessonId,
+                answers: answers
+            }
 
-            const res = await fetch('/ListeningExercise/CheckListeningExercise', {
+            const res = await fetch('https://localhost:7092/api/listening-exercise/check-answer', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'RequestVerificationToken': token
                 },
-                body: JSON.stringify({ exerciseId, lessonId, answers })
+                credentials: 'include',
+                body: JSON.stringify(playload)
             });
 
             if (!res.ok) {
@@ -106,7 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = selected.closest('.answer-row');
                 row.classList.remove('correct', 'wrong');
 
-                const resultItem = data.results?.find(x =>
+                const resultItem = data.find(x =>
                     x.questionId?.toLowerCase() === questionId.toLowerCase()
                 );
 

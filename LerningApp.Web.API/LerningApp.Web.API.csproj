@@ -17,6 +17,7 @@
       <ProjectReference Include="..\LerningApp.Services.Data\LerningApp.Services.Data.csproj" />
       <ProjectReference Include="..\LerningApp.Web.Infrastructure\LerningApp.Web.Infrastructure.csproj" />
       <ProjectReference Include="..\LerningApp.Web.ViewModels\LerningApp.Web.ViewModels.csproj" />
+      <ProjectReference Include="..\LerningApp.Web\LerningApp.Web.csproj" />
     </ItemGroup>
 
 </Project>
