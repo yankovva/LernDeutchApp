@@ -50,25 +50,4 @@ public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exe
         TempData["SuccessMessage"] = "Успешно създадохте упражнението";
         return RedirectToAction(nameof(Create), new { lessonId = model.LessonId });
     }
-    //Done
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> CheckMultipleChoice(string exerciseId, string lessonId, string selectedAnswer)
-    {
-        string userId = User.GetUserId()!;
-       
-        var result = await exerciseService
-            .CheckMultipleChoice(exerciseId, selectedAnswer,lessonId, userId);
-
-        if (result == null)
-        {
-            return BadRequest(new { message = "Invalid operation." });
-        }
-        
-        return Json(new
-        {
-            result.Value.isCorrect,
-            result.Value.correctAnswer,
-        });
-    }
 }
