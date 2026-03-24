@@ -10,33 +10,10 @@ public class MultipleChoiceExerciseConfiguration : IEntityTypeConfiguration<Mult
     {
         builder
             .HasKey(x => x.Id);
-        
-        builder
-            .Property(x => x.Question)
-            .IsRequired()
-            .HasMaxLength(QuestionMaxLength);
-        
-        builder
-            .Property(x => x.CorrectAnswer)
-            .IsRequired()
-            .HasMaxLength(AnswerMaxLength);
-        
-        builder
-            .Property(x => x.FirstWrongAnswer)
-            .IsRequired()
-            .HasMaxLength(AnswerMaxLength);
 
         builder
             .Property(x => x.DifficultyLevel)
             .IsRequired();
-        
-        builder.
-            Property(x => x.SecondWrongAnswer)
-            .HasMaxLength(AnswerMaxLength);
-        
-        builder
-            .Property(x => x.ThirdWrongAnswer)
-            .HasMaxLength(AnswerMaxLength);
         
         builder
             .HasQueryFilter(x => x.IsDeleted == false);

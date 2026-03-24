@@ -102,12 +102,9 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
             .OrderBy(ex => ex.DifficultyLevel)
             .Select(ex => new IndexMultipleChoiceExerciseViewModel()
             {
-                Question = ex.Question,
+              
                 Id = ex.Id.ToString(),
-                CorrectAnswer = ex.CorrectAnswer,
-                FirstWrongAnswer = ex.FirstWrongAnswer,
-                SecondWrongAnswer = ex.SecondWrongAnswer,
-                ThirdWrongAnswer = ex.ThirdWrongAnswer,
+               
             }).ToListAsync();
 
         List<IndexTranslationExerciseViewModel> translationExerciseViewModels = await translationExersiceRepository

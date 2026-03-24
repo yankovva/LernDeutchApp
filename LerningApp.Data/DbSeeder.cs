@@ -110,32 +110,6 @@ public class DbSeeder
             PublisherId = teacher.Id
         };
         
-        var mc1 = new MultipleChoiceExercise
-        {
-            Id = Guid.NewGuid(),
-            Lesson = lesson1,
-            Question = "Was bedeutet „Haus“?",
-            CorrectAnswer = "къща",
-            FirstWrongAnswer = "врата",
-            SecondWrongAnswer = "куче",
-            ThirdWrongAnswer = "прозорец",
-            DifficultyLevel = 1,
-            PublisherId = teacher.Id
-        };
-
-        var mc2 = new MultipleChoiceExercise
-        {
-            Id = Guid.NewGuid(),
-            Lesson = lesson1,
-            Question = "Was bedeutet „Hund“?",
-            CorrectAnswer = "куче",
-            FirstWrongAnswer = "дом",
-            SecondWrongAnswer = "врата",
-            ThirdWrongAnswer = "прозорец",
-            DifficultyLevel = 1,
-            PublisherId = teacher.Id
-        };
-
         var noun = new PartOfSpeech
         {
             Id = Guid.NewGuid(),
@@ -255,7 +229,6 @@ public class DbSeeder
         await db.VocabularyCards.AddRangeAsync(item1, item2, item3);
         await db.Teachers.AddAsync(teacher);
         await db.TranslationExercises.AddRangeAsync(tEx1, tEx2);
-        await db.MultipleChoiceExercises.AddRangeAsync(mc1, mc2);
 
         await db.SaveChangesAsync();
     }

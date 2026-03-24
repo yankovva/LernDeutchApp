@@ -69,11 +69,6 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         MultipleChoiceExercise exercise = new MultipleChoiceExercise()
         {
             LessonId = lessonId,
-            Question = model.Question,
-            CorrectAnswer = model.CorrectAnswer,
-            SecondWrongAnswer = model.SecondWrongAnswer ?? null,
-            FirstWrongAnswer = model.FirstWrongAnswer,
-            ThirdWrongAnswer = model.ThirdWrongAnswer ?? null,
             DifficultyLevel = model.DifficultyLevel,
             PublisherId = teacherId.Value,
         };
@@ -121,7 +116,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         }
         
         bool isCorrect;
-        if (exercise.CorrectAnswer == selectedAnswer && !isTeacher)
+       /* if (exercise.CorrectAnswer == selectedAnswer && !isTeacher)
         {
             var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
             if (result.Result == false)
@@ -132,7 +127,8 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
             isCorrect = true;
         } else
             isCorrect = false;
-        
-        return (isCorrect, exercise.CorrectAnswer);
+             return (isCorrect, exercise.CorrectAnswer);
+        */
+         return (false, "test");
     }
 }
