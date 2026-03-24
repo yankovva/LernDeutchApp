@@ -37,6 +37,17 @@ public static class ServiceCollectionExtension
             })
             .AddEntityFrameworkStores<LerningAppContext>()
             .AddDefaultTokenProviders();
+
+        services.AddAuthentication()
+            .AddFacebook(options =>
+            {
+                options.AppId = configuration["Authentication:Facebook:AppId"]
+                                                ?? throw new InvalidOperationException("Facebook AppId is missing.");
+
+                options.AppSecret = configuration["Authentication:Facebook:AppSecret"]
+                                    ?? throw new InvalidOperationException("Facebook AppSecret is missing.");
+            });
+
         
         services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo("/Users/magdalenaqnkova/RiderProjects/LerningApp/.keys"))
