@@ -501,7 +501,7 @@
             {
             
                 <form asp-action="CheckTranslationExercise" method="post"
-                      asp-controller="TranslationExercise" data-correct="@ex.GermanSentence" class="exercise-box">
+                      asp-controller="TranslationExerciseApi" data-correct="@ex.GermanSentence" class="exercise-box">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="exerciseId" value="@ex.Id" />
                     <input type="hidden" name="lessonId" value="@Model.Id" />

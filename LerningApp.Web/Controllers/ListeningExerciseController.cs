@@ -17,7 +17,7 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
     public async Task<IActionResult> Create(string lessonId)
     {
         string userId = User.GetUserId()!;
-        var result = await exerciseService.CreateGetListeningExercise(userId, lessonId);
+        var result = await exerciseService.CreateGetListeningExercise(lessonId, userId);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
