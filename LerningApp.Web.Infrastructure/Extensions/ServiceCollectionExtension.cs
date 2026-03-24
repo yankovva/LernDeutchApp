@@ -31,7 +31,7 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddApplicationIdentity(this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+        services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {
                 ConfigureIdentity(options, configuration);
             })

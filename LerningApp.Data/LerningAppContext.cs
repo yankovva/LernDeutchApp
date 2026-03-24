@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Data;
 
-public class LerningAppContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
+public class LerningAppContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
 {
     public LerningAppContext(DbContextOptions<LerningAppContext> options)
         : base(options)
