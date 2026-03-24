@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace LerningApp.Data.Configurations;
 
-public class ListeningExerciseOptionConfiguration : IEntityTypeConfiguration<ListeningExerciseOption>
+public class MultipleChoiceOptionConfiguration : IEntityTypeConfiguration<MultipleChoiceExerciseOption>
 {
-    public void Configure(EntityTypeBuilder<ListeningExerciseOption> builder)
+    public void Configure(EntityTypeBuilder<MultipleChoiceExerciseOption> builder)
     {
         builder.HasKey(x => x.Id);
 
@@ -24,16 +24,16 @@ public class ListeningExerciseOptionConfiguration : IEntityTypeConfiguration<Lis
             .IsRequired();
 
         builder
-            .HasOne(x => x.ListeningQuestion)
+            .HasOne(x => x.MultipleChoiceQuestion)
             .WithMany(x => x.Options)
-            .HasForeignKey(x => x.ListeningQuestionId)
+            .HasForeignKey(x => x.MultipleChoiceQuestionId)
             .OnDelete(DeleteBehavior.Cascade);
-        
 
         builder
-            .HasQueryFilter(o => !o.ListeningQuestion.IsDeleted);
+            .HasQueryFilter(o => !o.MultipleChoiceQuestion.IsDeleted);
 
-        builder.HasIndex(x => x.ListeningQuestionId);
-        builder.HasIndex(x => new { x.ListeningQuestionId, x.OrderIndex }).IsUnique();
+        builder.HasIndex(x => x.MultipleChoiceQuestionId);
+        builder.HasIndex(x => new { x.MultipleChoiceQuestionId, x.OrderIndex }).IsUnique();
+
     }
 }

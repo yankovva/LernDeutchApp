@@ -36,4 +36,7 @@ public class MultipleChoiceExercise
    
     [Comment("ApplicationUser Reference")]
     public Teacher Publisher { get; set; } = null!;
+    
+    public ICollection<MultipleChoiceQuestion> Questions { get; set; } 
+        = new HashSet<MultipleChoiceQuestion>();
 }

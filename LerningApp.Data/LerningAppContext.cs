@@ -25,6 +25,10 @@ public class LerningAppContext : IdentityDbContext<ApplicationUser, ApplicationR
     
     public virtual DbSet<UserCourse> UsersCourses { get; set; } = null!;
     public virtual DbSet<MultipleChoiceExercise> MultipleChoiceExercises { get; set; } = null!;
+    
+    public virtual DbSet<MultipleChoiceExerciseOption> MultipleChoiceExerciseOptions { get; set; } = null!;
+    
+    public virtual DbSet<MultipleChoiceQuestion> MultipleChoiceQuestions { get; set; } = null!;
     public virtual DbSet<TranslationExercise> TranslationExercises { get; set; } = null!;
     public virtual DbSet<Teacher> Teachers { get; set; } = null!;
     

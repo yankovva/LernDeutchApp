@@ -91,7 +91,7 @@ public class LessonService(IRepository<Lesson, Guid> lessonRepository,
                             .Select(op => new IndexListeningOptionsViewModel()
                             {
                                 AnswerText = op.Answer,
-                                IsCorrect = op.isCorrect
+                                IsCorrect = op.IsCorrect
                             }).ToList()
                     }).ToList()
             }).ToListAsync();

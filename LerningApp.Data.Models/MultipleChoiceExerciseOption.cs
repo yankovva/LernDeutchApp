@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Data.Models;
 
-public class ListeningExerciseOption
+public class MultipleChoiceExerciseOption
 {
     public Guid  Id { get; set; } = Guid.NewGuid();
     
@@ -15,9 +15,9 @@ public class ListeningExerciseOption
     [Comment("Order index of the answer")]
     public int OrderIndex { get; set; }
     
-    [Comment("Foreign key to the Listening Question")]
-    public Guid ListeningQuestionId { get; set; }
+    [Comment("Foreign key to the MultipleChoise Question")]
+    public Guid MultipleChoiceQuestionId { get; set; }
     
     [Comment("ListeningQuestion Reference")]
-    public ListeningQuestion ListeningQuestion { get; set; } = null!;
+    public MultipleChoiceQuestion MultipleChoiceQuestion { get; set; } = null!;
 }

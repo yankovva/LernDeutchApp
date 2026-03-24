@@ -144,7 +144,7 @@ public class ListeningExerciseService(
                         ListeningExerciseOption newOption = new ListeningExerciseOption()
                         {
                             Answer = option.AnswerText,
-                            isCorrect = option.IsCorrect,
+                            IsCorrect = option.IsCorrect,
                             OrderIndex = option.OrderIndex,
                             ListeningQuestionId = newQuestion.Id,
                         };
@@ -218,7 +218,7 @@ public class ListeningExerciseService(
         foreach (var q in exercise.Questions)
         {
             var correctOption = q.Options
-                .FirstOrDefault(o => o.isCorrect);
+                .FirstOrDefault(o => o.IsCorrect);
             if (correctOption == null)
             {
                 return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
