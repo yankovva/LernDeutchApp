@@ -413,18 +413,11 @@
 
             @foreach (var ex in Model.MultipleChoiceExercises)
             {
-                var answers = new List<string>
-                    {
-                        ex.CorrectAnswer,
-                        ex.FirstWrongAnswer,
-                        ex.SecondWrongAnswer ?? "",
-                        ex.ThirdWrongAnswer ?? ""
-                    }.Where(a => !string.IsNullOrWhiteSpace(a))
-                    .OrderBy(_ => Guid.NewGuid())
-                    .ToList();
+                var answers = ex.Options;
 
                 <form asp-action="CheckMultipleChoice" method="post"
-                      asp-controller="MultipleChoiceExercise" data-correct="@ex.CorrectAnswer" class="exercise-box">
+                      asp-controller="MultipleChoiceExercise" data-correct="@ex.Options
+                        .Where(o =>o.IsCorrect)" class="exercise-box">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="exerciseId" value="@ex.Id" />
                     <input type="hidden" name="lessonId" value="@Model.Id" />
@@ -437,8 +430,8 @@
                             <input class="form-check-input"
                                    type="radio"
                                    name="selectedAnswer"
-                                   value="@answers[i]" />
-                            <label class="form-check-label">@answers[i]</label>
+                                   value="@answers[i].Answer" />
+                            <label class="form-check-label">@answers[i].Answer</label>
                         </div>
                     }
                     <button type="button" class="btn btn-sm btn-primary mt-2 check-btn">Провери</button>
