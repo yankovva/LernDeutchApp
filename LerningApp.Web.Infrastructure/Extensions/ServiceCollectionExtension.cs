@@ -38,17 +38,6 @@ public static class ServiceCollectionExtension
             .AddEntityFrameworkStores<LerningAppContext>()
             .AddDefaultTokenProviders();
 
-        services.AddAuthentication()
-            .AddFacebook(options =>
-            {
-                options.AppId = configuration["Authentication:Facebook:AppId"]
-                                                ?? throw new InvalidOperationException("Facebook AppId is missing.");
-
-                options.AppSecret = configuration["Authentication:Facebook:AppSecret"]
-                                    ?? throw new InvalidOperationException("Facebook AppSecret is missing.");
-            });
-
-        
         services.AddDataProtection()
             .PersistKeysToFileSystem(new DirectoryInfo("/Users/magdalenaqnkova/RiderProjects/LerningApp/.keys"))
             .SetApplicationName("LerningApp.SharedAuth");
@@ -72,6 +61,24 @@ public static class ServiceCollectionExtension
             options.ValidationInterval = TimeSpan.FromHours(1);
         });
         
+        return services;
+    }
+    
+    public static IServiceCollection AddFacebookAuth(this IServiceCollection services, IConfiguration configuration)
+    {
+        var appId = configuration["Authentication:Facebook:AppId"];
+        var appSecret = configuration["Authentication:Facebook:AppSecret"];
+
+        if (!string.IsNullOrWhiteSpace(appId) && !string.IsNullOrWhiteSpace(appSecret))
+        {
+            services.AddAuthentication()
+                .AddFacebook(options =>
+                {
+                    options.AppId = appId;
+                    options.AppSecret = appSecret;
+                });
+        }
+
         return services;
     }
     public static IServiceCollection RegisterRepositories(this IServiceCollection services)

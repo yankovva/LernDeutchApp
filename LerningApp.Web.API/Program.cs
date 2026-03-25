@@ -12,6 +12,7 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddApplicationIdentity(builder.Configuration);
+builder.Services.AddFacebookAuth(builder.Configuration);
 
 builder.Services.RegisterRepositories();
 builder.Services.RegisterUserDefinedServices(typeof(CourseService).Assembly);
