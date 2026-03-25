@@ -24,16 +24,16 @@ public class MultipleChoiceOptionConfiguration : IEntityTypeConfiguration<Multip
             .IsRequired();
 
         builder
-            .HasOne(x => x.MultipleChoiceQuestion)
+            .HasOne(x => x.MultipleChoiceExercise)
             .WithMany(x => x.Options)
-            .HasForeignKey(x => x.MultipleChoiceQuestionId)
+            .HasForeignKey(x => x.MultipleChoiceExerciseId)
             .OnDelete(DeleteBehavior.Cascade);
 
         builder
-            .HasQueryFilter(o => !o.MultipleChoiceQuestion.IsDeleted);
+            .HasQueryFilter(o => !o.MultipleChoiceExercise.IsDeleted);
 
-        builder.HasIndex(x => x.MultipleChoiceQuestionId);
-        builder.HasIndex(x => new { x.MultipleChoiceQuestionId, x.OrderIndex }).IsUnique();
+        builder.HasIndex(x => x.MultipleChoiceExerciseId);
+        builder.HasIndex(x => new { x.MultipleChoiceExerciseId, x.OrderIndex }).IsUnique();
 
     }
 }

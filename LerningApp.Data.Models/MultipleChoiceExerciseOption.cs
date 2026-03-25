@@ -15,9 +15,9 @@ public class MultipleChoiceExerciseOption
     [Comment("Order index of the answer")]
     public int OrderIndex { get; set; }
     
-    [Comment("Foreign key to the MultipleChoise Question")]
-    public Guid MultipleChoiceQuestionId { get; set; }
+    [Comment("Foreign key to the MultipleChoiceExercise")]
+    public Guid MultipleChoiceExerciseId { get; set; }
     
-    [Comment("ListeningQuestion Reference")]
-    public MultipleChoiceQuestion MultipleChoiceQuestion { get; set; } = null!;
+    [Comment("MultipleChoiceExercise Reference")]
+    public MultipleChoiceExercise MultipleChoiceExercise { get; set; } = null!;
 }
