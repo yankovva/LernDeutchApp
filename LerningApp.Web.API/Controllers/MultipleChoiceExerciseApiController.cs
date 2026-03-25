@@ -1,3 +1,4 @@
+using LerningApp.Contracts.MultipleChoiceExerciseDtos;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.API.DTO.MultipleChoiceExerciseDtos;
 using LerningApp.Web.Infrastructure.Extensions;
@@ -16,23 +17,19 @@ public class MultipleChoiceExerciseApiController(IMultipleChoiceExerciseService 
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> CheckMultipleChoiceExercise([FromBody]CheckCorrectInputDto checkInputDto)
+    public async Task<IActionResult> CheckMultipleChoiceExercise([FromBody]CheckMultipleChoiceExerciseInputDto checkInputDto)
     {
         var userId = User.GetUserId()!;
         
         var serviceResult = await exerciseService
-            .CheckMultipleChoice(checkInputDto.ExerciseId, checkInputDto.SelectedAnswer,checkInputDto.LessonId, userId);
+            .CheckMultipleChoice(checkInputDto, userId);
 
-        if (serviceResult == null)
+        if (serviceResult.Result == false)
         {
            return BadRequest("Invalid operation.");
         }
 
-        var result = new CheckCorrectAnswerDto()
-        {
-            IsCorrect = serviceResult.Value.isCorrect,
-            CorrectAnswer = serviceResult.Value.correctAnswer,
-        };
+        var result = serviceResult.Data;
        
         return Ok(result);
     }

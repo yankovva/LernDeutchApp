@@ -1,4 +1,5 @@
 using LerningApp.Common;
+using LerningApp.Contracts.MultipleChoiceExerciseDtos;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
@@ -7,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Common;
-using static LerningApp.Common.Enums;
+using static LerningApp.Common.EntityErrorMessages.Exercise;
 
 namespace LerningApp.Services.Data;
 
@@ -95,16 +96,16 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         return ServiceResult.Success();
     }
 
-    public async Task<(bool isCorrect, string correctAnswer)?> CheckMultipleChoice(string exerciseId, string selectedAnswer,string lessonId, string userId)
+    public async Task<ServiceResultT<MultipleChoiceCheckResultDto>> CheckMultipleChoice(CheckMultipleChoiceExerciseInputDto dto, string userId)
     {
-        if (!Guid.TryParse(exerciseId, out var exerciseGuidId))
+        if (!Guid.TryParse(dto.ExerciseId, out var exerciseGuidId))
         {
-            return null;
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(ExerciseNotFoundMessage);
         }
         
-        if (!Guid.TryParse(lessonId, out var lessonGuidId))
+        if (!Guid.TryParse(dto.LessonId, out var lessonGuidId))
         {
-            return null;
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(LessonNotFoundMessage);
         }
         
         var exercise = await exerciseRepository
@@ -114,14 +115,15 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
 
         if (exercise == null)
         {
-            return null;
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(ExerciseNotFoundMessage);
         }
-        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
         
         if (!Guid.TryParse(userId, out Guid userGuidId))
         {
-            return null;
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(AccessDeniedMessage);
         }
+        
+        bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
         
         var isUnlocked = await userLessonProgressRepository
             .GetAllAttached()
@@ -129,31 +131,32 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
       
         if (!isUnlocked && !isTeacher)
         {
-            return null;
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(AccessDeniedMessage);
         }
         
         var correctOption = exercise.Options
             .FirstOrDefault(x => x.IsCorrect)!;
         bool isCorrect;
+
+        var resultDto = new MultipleChoiceCheckResultDto()
+        {
+            CorrectAnswer = correctOption.Answer,
+        };
         
-       if (correctOption.Answer == selectedAnswer)
+       if (correctOption.Answer == dto.SelectedAnswer)
         {
             if (!isTeacher)
             {
                 var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
                 if (result.Result == false)
                 {
-                    return null;
+                    return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(InvalidOperationMessage);
                 }
             }
             
-            isCorrect = true;
-        }
-        else
-        {
-            isCorrect = false;
+            resultDto.IsCorrect = true;
         }
        
-        return (isCorrect, correctOption.Answer);
+        return ServiceResultT<MultipleChoiceCheckResultDto>.Success(resultDto);
     }
 }
