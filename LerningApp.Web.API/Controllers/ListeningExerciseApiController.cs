@@ -16,8 +16,7 @@ public class ListeningExerciseApiController(IListeningExerciseService listeningE
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> CheckListeningExercise(
-        CheckListeningExerciseInputDto dto)
+    public async Task<IActionResult> CheckListeningExercise(CheckListeningExerciseInputDto dto)
     {
         var userId = User.GetUserId()!;
 

@@ -102,16 +102,17 @@ public class ListeningExerciseService(
 
         List<ListeningQuestion> questions = new List<ListeningQuestion>();
 
-        if (model.Questions.Count == 0)
+        var filledQuestions = model.Questions
+            .Where(q => !string.IsNullOrWhiteSpace(q.QuestionText))
+            .ToList();
+
+        if (!filledQuestions.Any())
         {
             return ServiceResult.Fail("Add at least one question for the exercise.", nameof(model.Questions));
         }
 
-        foreach (var question in model.Questions)
+        foreach (var question in filledQuestions)
         {
-            if (!string.IsNullOrWhiteSpace(question.QuestionText))
-            {
-
                 ListeningQuestion newQuestion = new ListeningQuestion()
                 {
                     Question = question.QuestionText,
@@ -137,7 +138,7 @@ public class ListeningExerciseService(
                 }
 
                 List<ListeningExerciseOption> options = new List<ListeningExerciseOption>();
-                foreach (var option in question.Options)
+                foreach (var option in filledOptions)
                 {
                     if (!string.IsNullOrWhiteSpace(option.AnswerText))
                     {
@@ -154,7 +155,7 @@ public class ListeningExerciseService(
 
                 newQuestion.Options = options;
                 questions.Add(newQuestion);
-            }
+            
         }
 
         if (questions.Count == 0)

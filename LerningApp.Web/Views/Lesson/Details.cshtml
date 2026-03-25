@@ -416,8 +416,7 @@
                 var answers = ex.Options;
 
                 <form asp-action="CheckMultipleChoice" method="post"
-                      asp-controller="MultipleChoiceExercise" data-correct="@ex.Options
-                        .Where(o =>o.IsCorrect)" class="exercise-box">
+                      asp-controller="MultipleChoiceExercise">
                     @Html.AntiForgeryToken()
                     <input type="hidden" name="exerciseId" value="@ex.Id" />
                     <input type="hidden" name="lessonId" value="@Model.Id" />

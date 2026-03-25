@@ -66,6 +66,19 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
+        var filledOptions = model.Options
+            .Where(o => !string.IsNullOrWhiteSpace(o.AnswerText))
+            .ToList();
+        
+        if (filledOptions.Count <= 1)
+        {
+            return ServiceResult.Fail("Add at least 2 options");
+        }
+
+        if (filledOptions.Count(o => o.IsCorrect) != 1)
+        {
+            return ServiceResult.Fail("Add 1 correct option");
+        }
         
         var options = new List<MultipleChoiceExerciseOption>();
         foreach (var option in model.Options)
