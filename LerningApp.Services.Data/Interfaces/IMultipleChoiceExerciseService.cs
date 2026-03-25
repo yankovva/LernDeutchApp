@@ -7,7 +7,8 @@ namespace LerningApp.Services.Data.Interfaces;
 
 public interface IMultipleChoiceExerciseService
 {
-    public Task<ServiceResultT<CreateMultipleChoiceExerciseViewModel>> GetCreateAsync(string lessonId, string userId);
-    public Task<ServiceResult> CreateAsync(CreateMultipleChoiceExerciseViewModel model, string userId);
-    public Task<ServiceResultT<MultipleChoiceCheckResultDto>> CheckMultipleChoice(CheckMultipleChoiceExerciseInputDto dto, string userId);
+     Task<ServiceResultT<CreateMultipleChoiceExerciseViewModel>> GetCreateAsync(string lessonId, string userId);
+     Task<ServiceResult> CreateAsync(CreateMultipleChoiceExerciseViewModel model, string userId);
+     Task<ServiceResultT<MultipleChoiceCheckResultDto>> CheckMultipleChoice(CheckMultipleChoiceExerciseInputDto dto, string userId);
+     Task<ServiceResult> SoftDeleteExerciseAsync(string id, string userId);
 }

@@ -1,8 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // Multiple choice
-    document.querySelectorAll('.exercise-box').forEach(box => {
+    document.querySelectorAll('.exercise-box-multiple-choice').forEach(box => {
         const checkBtn = box.querySelector('.check-btn');
+        const deleteBtn = box.querySelector('.delete-btn');
         if (!checkBtn) return;
 
         checkBtn.addEventListener('click', async () => {
@@ -53,9 +54,52 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+    
+    document.querySelectorAll('.multiple-exercise-admin').forEach(adm => {
+        const delBtn = adm.querySelector('.btn-sm');
+        if (!delBtn) return;
+        
+        delBtn.addEventListener('click', async() => {
+            const token = adm.querySelector('input[name="__RequestVerificationToken"]').value;
+            const exerciseId = adm.querySelector('input[name="id"]').value;
+
+            const payload = {
+                exerciseId: exerciseId
+            };
+
+            if (!confirm('Сигурни ли сте, че искате да изтриете това упражнение?')) {
+                return;
+            }
+
+            const res = await fetch('https://localhost:7092/api/multiple-choice-exercise/soft-delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                credentials: 'include',
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                console.log(text);
+                toastr.error(text || 'Invalid operation.');
+                return;
+            }
+            
+            const text = await res.text();
+            toastr.success(text);
+            
+            adm.closest('.exercise-shell')?.remove();
+        })
+        
+        
+    });
+   
 
     // Listening choice
-    document.querySelectorAll('.exercise-box').forEach(box => {
+    document.querySelectorAll('.exercise-box-listening').forEach(box => {
         const checkBtn = box.querySelector('.check-listening-btn');
         if (!checkBtn) return;
 
@@ -129,7 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // Translation:BG/EN
-    document.querySelectorAll('.exercise-box').forEach(box => {
+    document.querySelectorAll('.exercise-box-translation').forEach(box => {
         const question = box.querySelector('.question');
         const radios = box.querySelectorAll('input[name="selectedLanguage"]');
         if (!question || radios.length === 0) return;
@@ -144,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Translation: проверка
-    document.querySelectorAll('.exercise-box').forEach(box => {
+    document.querySelectorAll('.exercise-box-translation').forEach(box => {
         const btn = box.querySelector('.check-translation-btn');
         if (!btn) return;
 

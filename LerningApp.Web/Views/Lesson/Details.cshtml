@@ -40,6 +40,17 @@
         border-radius: 24px;
         padding: 24px;
         box-shadow: var(--shadow);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .lesson-wrap::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 140px;
+        background: linear-gradient(135deg, rgba(255, 237, 213, 0.7), rgba(255, 255, 255, 0));
+        pointer-events: none;
     }
 
     .lesson-title {
@@ -60,7 +71,7 @@
         border: 1px solid var(--line);
         border-radius: 999px;
         padding: 6px 12px;
-        background: #fff;
+        background: rgba(255, 255, 255, 0.92);
         font-size: 0.9rem;
         color: var(--muted);
         box-shadow: var(--shadow-soft);
@@ -98,6 +109,16 @@
 
     .btn-outline-secondary {
         border-color: #cbd5f5;
+    }
+
+    .lesson-toolbar {
+        position: relative;
+        z-index: 1;
+        padding: 18px;
+        margin: -6px -6px 18px -6px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, rgba(255, 247, 237, 0.95), rgba(255, 255, 255, 0.88));
+        border: 1px solid rgba(251, 191, 36, 0.18);
     }
 
     .lesson-section {
@@ -169,12 +190,19 @@
     }
 
     .exercise-box {
-        background: #fff;
-        border: 1px solid var(--line);
+        background: linear-gradient(180deg, #ffffff 0%, #fffaf5 100%);
+        border: 1px solid #f1dfcf;
         border-radius: var(--radius-lg);
         padding: 16px;
         margin-top: 12px;
         box-shadow: var(--shadow-soft);
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .exercise-box:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.08);
+        border-color: #fdba74;
     }
 
     .exercise-box .question {
@@ -182,6 +210,7 @@
         font-size: 1.05rem;
         margin-bottom: 10px;
         color: var(--ink);
+        line-height: 1.45;
     }
 
     .exercise-box .form-check {
@@ -195,6 +224,11 @@
         background: var(--sand);
         border-color: #fed7aa;
         transform: translateY(-1px);
+    }
+
+    .answer-row {
+        margin-bottom: 8px;
+        background: rgba(255, 255, 255, 0.7);
     }
 
     .exercise-box .form-check-input:checked + .form-check-label {
@@ -234,6 +268,11 @@
 
     .exercises-section {
         margin-top: 28px;
+        padding: 18px;
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 247, 237, 0.62));
+        border: 1px solid rgba(226, 232, 240, 0.9);
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
     }
 
     .exercise-section-title {
@@ -282,6 +321,33 @@
         max-width: 560px;
     }
 
+    .exercise-shell {
+        margin-top: 14px;
+    }
+
+    .exercise-admin {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 8px;
+    }
+
+    .listening-exercise-box {
+        margin-top: 14px;
+        padding: 14px;
+        border-radius: 20px;
+        border: 1px solid #f1dfcf;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 250, 245, 0.96));
+        box-shadow: var(--shadow-soft);
+    }
+
+    .listening-question {
+        margin-top: 12px;
+        padding: 12px;
+        border-radius: 14px;
+        border: 1px solid #efe2d3;
+        background: rgba(255, 255, 255, 0.85);
+    }
+
     .lesson-progress-badge {
         display: inline-flex;
         align-items: center;
@@ -310,7 +376,7 @@
 </style>
 
 <div class="lesson-wrap">
-    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+    <div class="lesson-toolbar d-flex justify-content-between align-items-start gap-3 mb-3">
         <div>
             <h1 class="lesson-title mb-2">@Model.Name</h1>
 
@@ -413,28 +479,45 @@
 
             @foreach (var ex in Model.MultipleChoiceExercises)
             {
-                var answers = ex.Options;
-
-                <form asp-action="CheckMultipleChoice" method="post"
-                      asp-controller="MultipleChoiceExercise">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="exerciseId" value="@ex.Id" />
-                    <input type="hidden" name="lessonId" value="@Model.Id" />
-
-                    <div class="question">@ex.Question</div>
-
-                    @for (int i = 0; i < answers.Count; i++)
+                <div class="exercise-shell">
+                    @if (User.Identity?.IsAuthenticated == true &&
+                         await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                     {
-                        <div class="form-check answer-row">
-                            <input class="form-check-input"
-                                   type="radio"
-                                   name="selectedAnswer"
-                                   value="@answers[i].Answer" />
-                            <label class="form-check-label">@answers[i].Answer</label>
+                        <div class="multiple-exercise-admin">
+                            <form asp-action="SoftDelete" asp-controller="MultipleChoiceExerciseApi" method="post"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@ex.Id"/>
+                                <input type="hidden" name="lessonId" value="@Model.Id"/>
+                                <button type="button" class="btn btn-danger btn-sm">Изтрий</button>
+                            </form>
                         </div>
                     }
-                    <button type="button" class="btn btn-sm btn-primary mt-2 check-btn">Провери</button>
-                </form>
+                    @{
+                        var answers = ex.Options;
+                    }
+
+                    <form asp-action="CheckMultipleChoice" method="post"
+                          asp-controller="MultipleChoiceExercise" class="exercise-box exercise-box-multiple-choice">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="exerciseId" value="@ex.Id" />
+                        <input type="hidden" name="lessonId" value="@Model.Id" />
+
+                        <div class="question">@ex.Question</div>
+
+                        @for (int i = 0; i < answers.Count; i++)
+                        {
+                            <div class="form-check answer-row">
+                                <input class="form-check-input"
+                                       type="radio"
+                                       name="selectedAnswer"
+                                       value="@answers[i].Answer" />
+                                <label class="form-check-label">@answers[i].Answer</label>
+                            </div>
+                        }
+                        <button type="button" class="btn btn-sm btn-primary mt-2 check-btn">Провери</button>
+                    </form>
+                </div>
             }
         </section>
     }
@@ -472,7 +555,7 @@
                         </div>
                     }
                     <form asp-action="CheckListeningExercise" method="post"
-                          asp-controller="ListeningExercise"  class="exercise-box">
+                          asp-controller="ListeningExercise"  class="exercise-box exercise-box-listening">">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="exerciseId" value="@ex.Id" />
                         <input type="hidden" name="lessonId" value="@Model.Id" />
@@ -491,38 +574,39 @@
 
             @foreach (var ex in Model.TranslationExercises)
             {
-            
-                <form asp-action="CheckTranslationExercise" method="post"
-                      asp-controller="TranslationExerciseApi" data-correct="@ex.GermanSentence" class="exercise-box">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="exerciseId" value="@ex.Id" />
-                    <input type="hidden" name="lessonId" value="@Model.Id" />
+                <div class="exercise-shell">
+                    <form asp-action="CheckTranslationExercise" method="post"
+                          asp-controller="TranslationExerciseApi" data-correct="@ex.GermanSentence" class="exercise-box exercise-box-translation">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="exerciseId" value="@ex.Id" />
+                        <input type="hidden" name="lessonId" value="@Model.Id" />
 
-                    <div class="mb-2">
-                        <label class="me-3">
-                            <input type="radio" name="selectedLanguage" value="Bg" checked />
-                            Български
-                        </label>
-                        <label>
-                            <input type="radio" name="selectedLanguage" value="En" />
-                            English
-                        </label>
-                    </div>
+                        <div class="mb-2">
+                            <label class="me-3">
+                                <input type="radio" name="selectedLanguage" value="Bg" checked />
+                                Български
+                            </label>
+                            <label>
+                                <input type="radio" name="selectedLanguage" value="En" />
+                                English
+                            </label>
+                        </div>
 
-                    <div class="question"
-                         data-bg="@ex.BulgarianSentence"
-                         data-en="@ex.EnglishSentence">
-                        @ex.BulgarianSentence
-                    </div>
+                        <div class="question"
+                             data-bg="@ex.BulgarianSentence"
+                             data-en="@ex.EnglishSentence">
+                            @ex.BulgarianSentence
+                        </div>
 
-                    <input type="text"
-                           name="userAnswer"
-                           class="form-control mt-2"
-                           placeholder="Напишете превода на немски" />
+                        <input type="text"
+                               name="userAnswer"
+                               class="form-control mt-2"
+                               placeholder="Напишете превода на немски" />
 
 
-                    <button type="button" class="btn btn-sm btn-primary mt-2 check-translation-btn">Провери</button>
-                </form>
+                        <button type="button" class="btn btn-sm btn-primary mt-2 check-translation-btn">Провери</button>
+                    </form>
+                </div>
             }
         </section>
     }

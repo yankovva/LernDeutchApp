@@ -172,4 +172,33 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
        
         return ServiceResultT<MultipleChoiceCheckResultDto>.Success(resultDto);
     }
+
+    public async Task<ServiceResult> SoftDeleteExerciseAsync(string id, string userId)
+    {
+        if (!Guid.TryParse(id, out var exerciseGuidId))
+        {
+            return ServiceResult.Fail(InvalidExerciseIdMessage);
+        }
+
+        var exercise = await exerciseRepository
+            .GetAllAttached()
+            .Include(c => c.Options)
+            .FirstOrDefaultAsync(c => c.Id == exerciseGuidId);
+
+        if (exercise == null)
+        {
+            return ServiceResult.Fail(InvalidExerciseIdMessage);
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || exercise.PublisherId != teacherId)
+        {
+            return ServiceResult.Fail(AccessDeniedMessage);
+        }
+        
+        exercise.IsDeleted = true;
+
+        await exerciseRepository.SaveChangesAsync();
+        return ServiceResult.Success();
+    }
 }

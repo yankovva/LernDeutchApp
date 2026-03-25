@@ -17,7 +17,7 @@ public class MultipleChoiceExerciseOption
     
     [Comment("Foreign key to the MultipleChoiceExercise")]
     public Guid MultipleChoiceExerciseId { get; set; }
-    
+
     [Comment("MultipleChoiceExercise Reference")]
     public MultipleChoiceExercise MultipleChoiceExercise { get; set; } = null!;
 }

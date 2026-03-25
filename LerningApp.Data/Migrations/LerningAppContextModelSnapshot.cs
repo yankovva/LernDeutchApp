@@ -181,7 +181,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.Lesson", b =>
@@ -235,7 +235,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("Lessons");
+                    b.ToTable("Lessons", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.Level", b =>
@@ -259,7 +259,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Levels");
+                    b.ToTable("Levels", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.ListeningExercise", b =>
@@ -296,7 +296,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("ListeningExercises");
+                    b.ToTable("ListeningExercises", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.ListeningExerciseOption", b =>
@@ -330,7 +330,7 @@ namespace LerningApp.Data.Migrations
                     b.HasIndex("ListeningQuestionId", "OrderIndex")
                         .IsUnique();
 
-                    b.ToTable("ListeningExerciseOptions");
+                    b.ToTable("ListeningExerciseOptions", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.ListeningQuestion", b =>
@@ -359,7 +359,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("ListeningQuestions");
+                    b.ToTable("ListeningQuestions", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.MultipleChoiceExercise", b =>
@@ -394,7 +394,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("MultipleChoiceExercises");
+                    b.ToTable("MultipleChoiceExercises", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.MultipleChoiceExerciseOption", b =>
@@ -428,7 +428,7 @@ namespace LerningApp.Data.Migrations
                     b.HasIndex("MultipleChoiceExerciseId", "OrderIndex")
                         .IsUnique();
 
-                    b.ToTable("MultipleChoiceExerciseOptions");
+                    b.ToTable("MultipleChoiceExerciseOptions", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.PartOfSpeech", b =>
@@ -446,7 +446,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PartsOfSpeech");
+                    b.ToTable("PartsOfSpeech", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.Teacher", b =>
@@ -474,7 +474,7 @@ namespace LerningApp.Data.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Teachers");
+                    b.ToTable("Teachers", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.TranslationExercise", b =>
@@ -523,7 +523,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("PublisherId");
 
-                    b.ToTable("TranslationExercises");
+                    b.ToTable("TranslationExercises", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.UserCourse", b =>
@@ -552,7 +552,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("UsersCourses");
+                    b.ToTable("UsersCourses", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.UserExerciseProgress", b =>
@@ -586,7 +586,7 @@ namespace LerningApp.Data.Migrations
                     b.HasIndex("UserId", "ExerciseId", "ExerciseType")
                         .IsUnique();
 
-                    b.ToTable("UsersExercisesProgresses");
+                    b.ToTable("UsersExercisesProgresses", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.UserLessonProgress", b =>
@@ -617,7 +617,7 @@ namespace LerningApp.Data.Migrations
                     b.HasIndex("UserId", "LessonId")
                         .IsUnique();
 
-                    b.ToTable("UsersLessonsProgresses");
+                    b.ToTable("UsersLessonsProgresses", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.VocabularyCard", b =>
@@ -650,7 +650,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("PartOfSpeechId");
 
-                    b.ToTable("VocabularyCards");
+                    b.ToTable("VocabularyCards", (string)null);
                 });
 
             modelBuilder.Entity("LerningApp.Data.Models.VocabularyTerm", b =>
@@ -699,7 +699,7 @@ namespace LerningApp.Data.Migrations
 
                     b.HasIndex("VocabularyCardId", "Side");
 
-                    b.ToTable("VocabularyTerms");
+                    b.ToTable("VocabularyTerms", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
