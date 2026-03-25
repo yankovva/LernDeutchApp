@@ -383,6 +383,11 @@ namespace LerningApp.Data.Migrations
                         .HasColumnType("uniqueidentifier")
                         .HasComment("Foreign key to ApplicationUser");
 
+                    b.Property<string>("Question")
+                        .IsRequired()
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LessonId");

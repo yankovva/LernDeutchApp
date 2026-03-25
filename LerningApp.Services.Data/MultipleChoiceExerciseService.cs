@@ -66,10 +66,26 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
             return ServiceResult.Fail(AccessDeniedMessage);
         }
         
+        var options = new List<MultipleChoiceExerciseOption>();
+        foreach (var option in model.Options)
+        {
+            if (!string.IsNullOrWhiteSpace(option.AnswerText))
+            {
+                options.Add( new MultipleChoiceExerciseOption()
+                {
+                    Answer = option.AnswerText,
+                    IsCorrect = option.IsCorrect,
+                    OrderIndex = option.OrderIndex,
+                });
+            }
+        }
+        
         MultipleChoiceExercise exercise = new MultipleChoiceExercise()
         {
             LessonId = lessonId,
             DifficultyLevel = model.DifficultyLevel,
+            Options = options,
+            Question = model.Question,
             PublisherId = teacherId.Value,
         };
         
@@ -93,6 +109,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         
         var exercise = await exerciseRepository
             .GetAllAttached()
+            .Include(x => x.Options)
             .FirstOrDefaultAsync(x => x.Id == exerciseGuidId && x.LessonId == lessonGuidId);
 
         if (exercise == null)
@@ -115,20 +132,28 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
             return null;
         }
         
+        var correctOption = exercise.Options
+            .FirstOrDefault(x => x.IsCorrect)!;
         bool isCorrect;
-       /* if (exercise.CorrectAnswer == selectedAnswer && !isTeacher)
+        
+       if (correctOption.Answer == selectedAnswer)
         {
-            var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
-            if (result.Result == false)
+            if (!isTeacher)
             {
-                return null;
+                var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
+                if (result.Result == false)
+                {
+                    return null;
+                }
             }
             
             isCorrect = true;
-        } else
+        }
+        else
+        {
             isCorrect = false;
-             return (isCorrect, exercise.CorrectAnswer);
-        */
-         return (false, "test");
+        }
+       
+        return (isCorrect, correctOption.Answer);
     }
 }

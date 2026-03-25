@@ -29,43 +29,36 @@
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="CorrectAnswer" class="form-label">Правилен отговор</label>
-                        <input asp-for="CorrectAnswer" class="form-control" placeholder="Пример: Къща" />
-                        <span asp-validation-for="CorrectAnswer" class="text-danger"></span>
+                        <label asp-for="DifficultyLevel" class="form-label">Трудност</label>
+                        <select asp-for="DifficultyLevel" class="form-select">
+                            <option value="1">Very Easy</option>
+                            <option value="2">Easy</option>
+                            <option value="3">Medium</option>
+                            <option value="4">Hard</option>
+                            <option value="5">Very Hard</option>
+                        </select>
+                        <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
                     </div>
 
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label asp-for="FirstWrongAnswer" class="form-label">Грешен отговор 1</label>
-                            <input asp-for="FirstWrongAnswer" class="form-control" placeholder="Пример: Куче" />
-                            <span asp-validation-for="FirstWrongAnswer" class="text-danger"></span>
+                    @for (var j = 0; j < 4; j++)
+                    {
+                        <div class="row mb-2 align-items-center">
+                            <div class="col-md-8">
+                                <input name="Options[@j].AnswerText" class="form-control" placeholder="Option @(j + 1)" />
+                                <input type="hidden" name="Options[@j].OrderIndex" value="@(j + 1)" />
+                                <input type="hidden"
+                                       name="Options[@j].IsCorrect"
+                                       value="false"
+                                       class="is-correct-q-" />
+                            </div>
+                            <div class="col-md-4">
+                                <input type="radio"
+                                       name="correct"
+                                       onchange="setCorrect(@j)" />
+                                <label>Correct</label>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <label asp-for="SecondWrongAnswer" class="form-label">Грешен отговор 2 (по желание)</label>
-                            <input asp-for="SecondWrongAnswer" class="form-control" placeholder="Пример: Врата" />
-                            <span asp-validation-for="SecondWrongAnswer" class="text-danger"></span>
-                        </div>
-                    </div>
-
-                    <div class="row g-3 mt-1">
-                        <div class="col-md-6">
-                            <label asp-for="ThirdWrongAnswer" class="form-label">Грешен отговор 3 (по желание)</label>
-                            <input asp-for="ThirdWrongAnswer" class="form-control" placeholder="Пример: Прозорец" />
-                            <span asp-validation-for="ThirdWrongAnswer" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="DifficultyLevel" class="form-label">Трудност</label>
-                            <select asp-for="DifficultyLevel" class="form-select">
-                                <option value="1">Very Easy</option>
-                                <option value="2">Easy</option>
-                                <option value="3">Medium</option>
-                                <option value="4">Hard</option>
-                                <option value="5">Very Hard</option>
-                            </select>
-                            <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
-                        </div>
-                        
-                    </div>
+                    }
 
                     <div class="d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary">💾 Създай</button>
@@ -82,4 +75,15 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        function setCorrect(optionIndex) {
+            const allHidden = document.querySelectorAll('.is-correct-q-');
+            allHidden.forEach(x => x.value = 'false');
+
+            const target = document.querySelector(
+                `input[name="Options[${optionIndex}].IsCorrect"]`
+            );
+            if (target) target.value = 'true';
+        }
+    </script>
 }

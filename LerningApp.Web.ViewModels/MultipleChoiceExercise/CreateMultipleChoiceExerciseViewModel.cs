@@ -13,25 +13,8 @@ public class CreateMultipleChoiceExerciseViewModel
     [MaxLength(QuestionMaxLength)]
     [MinLength(QuestionMinLength)]
     public string Question { get; set; } = null!;
-    
-    [Required]
-    [MaxLength(AnswerMaxLength)]
-    [MinLength(AnswerMinLength)]
-    public string CorrectAnswer { get; set; } = null!;
-    
-    [Required]
-    [MaxLength(AnswerMaxLength)]
-    [MinLength(AnswerMinLength)]
-    public string FirstWrongAnswer { get; set; } = null!;
-    
-    [MaxLength(AnswerMaxLength)]
-    [MinLength(AnswerMinLength)]
-    public string? SecondWrongAnswer { get; set; }
-    
-    [MaxLength(AnswerMaxLength)]
-    [MinLength(AnswerMinLength)]
-    public string? ThirdWrongAnswer { get; set; }
-    public int OrderIndex { get; set; }
+   
+    public IList<MultipleChoiceOptionsAddViewModel> Options { get; set; } = new List<MultipleChoiceOptionsAddViewModel>();
     
     [Range(1,5)]
     public int DifficultyLevel { get; set; }
