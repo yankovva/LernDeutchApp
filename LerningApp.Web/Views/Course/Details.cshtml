@@ -1,3 +1,4 @@
+@using LerningApp.Common
 @using LerningApp.Services.Data.Interfaces
 @using LerningApp.Web.ViewModels.Course
 @using LerningApp.Web.Infrastructure.Extensions
@@ -147,7 +148,7 @@
                                         <span class="badge rounded-pill text-bg-success">Completed</span>
                                     }
 
-                                    @if (isUnlocked)
+                                    @if (isUnlocked || isTeacher)
                                     {
                                         <a asp-controller="Lesson"
                                            asp-action="Details"
