@@ -1,9 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
+    initMultipleChoiceCheck();
+    initMultipleChoiceDelete();
+    initListeningCheck();
+    initTranslationLanguageToggle();
+    initTranslationCheck();
+});
 
-    // Multiple choice
+function initMultipleChoiceCheck() {
     document.querySelectorAll('.exercise-box-multiple-choice').forEach(box => {
         const checkBtn = box.querySelector('.check-btn');
-        const deleteBtn = box.querySelector('.delete-btn');
         if (!checkBtn) return;
 
         checkBtn.addEventListener('click', async () => {
@@ -16,14 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const lessonId = box.querySelector('input[name="lessonId"]').value;
             const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
 
-            const formData = new URLSearchParams();
             const payload = {
                 exerciseId: exerciseId,
                 selectedAnswer: selected.value,
                 lessonId: lessonId
             };
-            
-            const res = await fetch('https://localhost:7092/api/multiple-choice-exercise/check-answer',{
+
+            const res = await fetch('https://localhost:7092/api/multiple-choice-exercise/check-answer', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -39,9 +43,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 toastr.error(err.message || 'Invalid operation.');
                 return;
             }
-            const data = await res.json();
 
+            const data = await res.json();
             const selectedRow = selected.closest('.answer-row');
+
             if (data.isCorrect) {
                 selectedRow.classList.add('correct');
             } else {
@@ -54,12 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
-    
+}
+
+function initMultipleChoiceDelete() {
     document.querySelectorAll('.multiple-exercise-admin').forEach(adm => {
         const delBtn = adm.querySelector('.btn-sm');
         if (!delBtn) return;
-        
-        delBtn.addEventListener('click', async() => {
+
+        delBtn.addEventListener('click', async () => {
             const token = adm.querySelector('input[name="__RequestVerificationToken"]').value;
             const exerciseId = adm.querySelector('input[name="id"]').value;
 
@@ -87,18 +94,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 toastr.error(text || 'Invalid operation.');
                 return;
             }
-            
+
             const text = await res.text();
             toastr.success(text);
-            
             adm.closest('.exercise-shell')?.remove();
-        })
-        
-        
+        });
     });
-   
+}
 
-    // Listening choice
+function initListeningCheck() {
     document.querySelectorAll('.exercise-box-listening').forEach(box => {
         const checkBtn = box.querySelector('.check-listening-btn');
         if (!checkBtn) return;
@@ -106,11 +110,11 @@ document.addEventListener('DOMContentLoaded', () => {
         checkBtn.addEventListener('click', async () => {
             const exerciseWrap = checkBtn.closest('.listening-exercise-box');
             if (!exerciseWrap) return;
-            
+
             exerciseWrap.querySelectorAll('.answer-row').forEach(r => {
                 r.classList.remove('correct', 'wrong');
             });
-            
+
             const lessonId = box.querySelector('input[name="lessonId"]').value;
             const exerciseId = box.querySelector('input[name="exerciseId"]').value;
             const token = box.querySelector('input[name="__RequestVerificationToken"]').value;
@@ -123,12 +127,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     answers.push({ questionId, selectedAnswer: selected.value });
                 }
             });
-            
-            const playload = {
+
+            const payload = {
                 exerciseId: exerciseId,
                 lessonId: lessonId,
                 answers: answers
-            }
+            };
 
             const res = await fetch('https://localhost:7092/api/listening-exercise/check-answer', {
                 method: 'POST',
@@ -137,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     'RequestVerificationToken': token
                 },
                 credentials: 'include',
-                body: JSON.stringify(playload)
+                body: JSON.stringify(payload)
             });
 
             if (!res.ok) {
@@ -167,12 +171,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.classList.add('wrong');
                 }
             });
-
         });
     });
+}
 
-
-    // Translation:BG/EN
+function initTranslationLanguageToggle() {
     document.querySelectorAll('.exercise-box-translation').forEach(box => {
         const question = box.querySelector('.question');
         const radios = box.querySelectorAll('input[name="selectedLanguage"]');
@@ -186,8 +189,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
     });
+}
 
-    // Translation: проверка
+function initTranslationCheck() {
     document.querySelectorAll('.exercise-box-translation').forEach(box => {
         const btn = box.querySelector('.check-translation-btn');
         if (!btn) return;
@@ -204,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 lessonId: lessonId
             };
 
-            const res = await fetch('https://localhost:7092/api/translation-exercise/check-answer',{
+            const res = await fetch('https://localhost:7092/api/translation-exercise/check-answer', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -222,7 +226,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await res.json();
-            
             const input = box.querySelector('input[name="userAnswer"]');
             input.classList.remove('correct', 'wrong');
 
@@ -231,7 +234,6 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 input.classList.add('wrong');
             }
-
         });
     });
-});
+}
