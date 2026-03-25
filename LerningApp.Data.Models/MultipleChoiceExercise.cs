@@ -16,6 +16,8 @@ public class MultipleChoiceExercise
     [Comment("Lesson Reference")]
     public Lesson Lesson { get; set; } = null!;
     
+    public string Question { get; set; } = null!;
+    
     [Comment("Foreign key to ApplicationUser")]
     public Guid PublisherId { get; set; }
    

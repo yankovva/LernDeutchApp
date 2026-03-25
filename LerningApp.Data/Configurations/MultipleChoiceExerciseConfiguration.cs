@@ -15,6 +15,10 @@ public class MultipleChoiceExerciseConfiguration : IEntityTypeConfiguration<Mult
             .Property(x => x.DifficultyLevel)
             .IsRequired();
         
+        builder.Property(x => x.Question)
+            .IsRequired()
+            .HasMaxLength(300);
+        
         builder
             .HasQueryFilter(x => x.IsDeleted == false);
         
