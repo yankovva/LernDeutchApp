@@ -39,4 +39,9 @@
       <Folder Include="wwwroot\images\VocabularyCardsImages\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Content Remove="wwwroot\audios\ListeningExerciseAudios\9a584e6a-b5d0-4130-86b1-b6cf718f6ef7.mp3" />
+      <Content Remove="wwwroot\audios\ListeningExerciseAudios\623c65ee-29fe-4e1e-a211-bb76fd69b24d.mp3" />
+    </ItemGroup>
+
 </Project>

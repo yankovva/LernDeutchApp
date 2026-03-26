@@ -574,6 +574,19 @@
 
             @foreach (var ex in Model.TranslationExercises)
             {
+                @if (User.Identity?.IsAuthenticated == true &&
+                     await teacherService.IsUserTeacherAsync(User.GetUserId()!))
+                {
+                    <div class="translation-exercise-admin">
+                        <form asp-action="SoftDelete" asp-controller="MultipleChoiceExerciseApi" method="post"
+                              class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@ex.Id"/>
+                            <input type="hidden" name="lessonId" value="@Model.Id"/>
+                            <button type="button" class="btn btn-danger btn-sm">Изтрий</button>
+                        </form>
+                    </div>
+                }
                 <div class="exercise-shell">
                     <form asp-action="CheckTranslationExercise" method="post"
                           asp-controller="TranslationExerciseApi" data-correct="@ex.GermanSentence" class="exercise-box exercise-box-translation">

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initListeningCheck();
     initTranslationLanguageToggle();
     initTranslationCheck();
+    initTranslationDelete();
 });
 
 function initMultipleChoiceCheck() {
@@ -190,7 +191,46 @@ function initTranslationLanguageToggle() {
         });
     });
 }
+function initTranslationDelete() {
+    document.querySelectorAll('.translation-exercise-admin').forEach(adm => {
+        const delBtn = adm.querySelector('.btn-sm');
+        if (!delBtn) return;
 
+        delBtn.addEventListener('click', async () => {
+            const token = adm.querySelector('input[name="__RequestVerificationToken"]').value;
+            const exerciseId = adm.querySelector('input[name="id"]').value;
+
+            const payload = {
+                exerciseId: exerciseId
+            };
+
+            if (!confirm('Сигурни ли сте, че искате да изтриете това упражнение?')) {
+                return;
+            }
+
+            const res = await fetch('https://localhost:7092/api/translation-exercise/soft-delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': token
+                },
+                credentials: 'include',
+                body: JSON.stringify(payload)
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                console.log(text);
+                toastr.error(text || 'Invalid operation.');
+                return;
+            }
+
+            const text = await res.text();
+            toastr.success(text);
+            adm.closest('.exercise-shell')?.remove();
+        });
+    });
+}
 function initTranslationCheck() {
     document.querySelectorAll('.exercise-box-translation').forEach(box => {
         const btn = box.querySelector('.check-translation-btn');
