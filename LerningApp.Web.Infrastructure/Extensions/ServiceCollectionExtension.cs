@@ -83,24 +83,7 @@ public static class ServiceCollectionExtension
     }
     public static IServiceCollection RegisterRepositories(this IServiceCollection services)
     {
-        using IServiceScope scope = services.BuildServiceProvider().CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<LerningAppContext>();
-
-        var entityTypes = dbContext.Model
-            .GetEntityTypes()
-            .Select(e => e.ClrType)
-            .Where(t => !t.IsAbstract);
-
-        foreach (var type in entityTypes)
-        {
-            var idProp = type.GetProperty("Id");
-            var idType = idProp?.PropertyType ?? typeof(object);
-
-            var repoInterface = typeof(IRepository<,>).MakeGenericType(type, idType);
-            var repoImpl = typeof(Repository<,>).MakeGenericType(type, idType);
-
-            services.AddScoped(repoInterface, repoImpl);
-        }
+        services.AddScoped(typeof(IRepository<,>), typeof(Repository<,>));
         return services;
     }
     public static IServiceCollection RegisterUserDefinedServices(this IServiceCollection services, Assembly serviceAssembly)
