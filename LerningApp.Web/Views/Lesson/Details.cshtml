@@ -529,40 +529,56 @@
        
             @foreach (var ex in Model.ListeningExercises)
             {
-                <div class="listening-exercise-box">
-                    <div class="audio-frame">
-                        <audio controls preload="metadata">
-                            <source src="@Url.Content(ex.AudioPath)" type="audio/mpeg" />
-                        </audio>
-                    </div>
-            
-                    @foreach (var question in ex.Qestions)
+                <div class="exercise-shell">
+                    @if (User.Identity?.IsAuthenticated == true &&
+                         await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                     {
-                        <div class="listening-question">
-                            <input type="hidden" name="questionId" value="@question.Id" />
-                            <div class="question">@question.Question</div>
-
-                            @for (int i = 0; i < question.Options.Count; i++)
-                            {
-                                <div class="form-check answer-row">
-                                    <input class="form-check-input"
-                                           type="radio"
-                                           name="selectedAnswer_@question.Id"
-                                           value="@question.Options[i].AnswerText" />
-                                    <label class="form-check-label">@question.Options[i].AnswerText</label>
-                                </div>
-                            }
+                        <div class="listening-exercise-admin">
+                            <form asp-action="SoftDelete" asp-controller="MultipleChoiceExerciseApi" method="post"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@ex.Id"/>
+                                <input type="hidden" name="lessonId" value="@Model.Id"/>
+                                <button type="button" class="btn btn-danger btn-sm">Изтрий</button>
+                            </form>
                         </div>
                     }
-                    <form asp-action="CheckListeningExercise" method="post"
-                          asp-controller="ListeningExercise"  class="exercise-box exercise-box-listening">">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="exerciseId" value="@ex.Id" />
-                        <input type="hidden" name="lessonId" value="@Model.Id" />
                 
-                        <button type="button" class="btn btn-sm btn-primary mt-2 check-listening-btn">Провери</button>
-                    </form>
-                </div>
+                    <div class="listening-exercise-box">
+                        <div class="audio-frame">
+                            <audio controls preload="metadata">
+                                <source src="@Url.Content(ex.AudioPath)" type="audio/mpeg" />
+                            </audio>
+                        </div>
+            
+                        @foreach (var question in ex.Qestions)
+                        {
+                            <div class="listening-question">
+                                <input type="hidden" name="questionId" value="@question.Id" />
+                                <div class="question">@question.Question</div>
+
+                                @for (int i = 0; i < question.Options.Count; i++)
+                                {
+                                    <div class="form-check answer-row">
+                                        <input class="form-check-input"
+                                               type="radio"
+                                               name="selectedAnswer_@question.Id"
+                                               value="@question.Options[i].AnswerText" />
+                                        <label class="form-check-label">@question.Options[i].AnswerText</label>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        <form asp-action="CheckListeningExercise" method="post"
+                              asp-controller="ListeningExercise"  class="exercise-box exercise-box-listening">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="exerciseId" value="@ex.Id" />
+                            <input type="hidden" name="lessonId" value="@Model.Id" />
+                
+                            <button type="button" class="btn btn-sm btn-primary mt-2 check-listening-btn">Провери</button>
+                        </form>
+                    </div>
+                    </div>
             }
         </section>
     }
@@ -574,6 +590,7 @@
 
             @foreach (var ex in Model.TranslationExercises)
             {
+                <div class="exercise-shell">
                 @if (User.Identity?.IsAuthenticated == true &&
                      await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                 {
@@ -587,7 +604,7 @@
                         </form>
                     </div>
                 }
-                <div class="exercise-shell">
+               
                     <form asp-action="CheckTranslationExercise" method="post"
                           asp-controller="TranslationExerciseApi" data-correct="@ex.GermanSentence" class="exercise-box exercise-box-translation">
                         @Html.AntiForgeryToken()

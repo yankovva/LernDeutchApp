@@ -4,10 +4,13 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.ListeningExercise;
+
 using Microsoft.EntityFrameworkCore;
+
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.ApplicationConstants;
+using static LerningApp.Common.EntityErrorMessages.Exercise;
 
 namespace LerningApp.Services.Data;
 
@@ -254,5 +257,33 @@ public class ListeningExerciseService(
         }
         
         return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Success(results);
+    }
+
+    public async Task<ServiceResult> SoftDeleteExerciseAsync(string exerciseId, string userId)
+    {
+        if (!Guid.TryParse(exerciseId, out var exerciseGuidId))
+        {
+            return ServiceResult.Fail(InvalidExerciseIdMessage);
+        }
+
+        var exercise = await listeningExerciseRepository
+            .GetAllAttached()
+            .FirstOrDefaultAsync(c => c.Id == exerciseGuidId);
+
+        if (exercise == null)
+        {
+            return ServiceResult.Fail(InvalidExerciseIdMessage);
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        if (teacherId == null || exercise.PublisherId != teacherId)
+        {
+            return ServiceResult.Fail(AccessDeniedMessage);
+        }
+        
+        exercise.IsDeleted = true;
+
+        await listeningExerciseRepository.SaveChangesAsync();
+        return ServiceResult.Success();
     }
 }

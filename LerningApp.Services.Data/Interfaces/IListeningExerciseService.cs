@@ -10,6 +10,6 @@ public interface IListeningExerciseService
      
      Task<ServiceResult> CreatePostListeningExercise(CreateListeningExerciseViewModel model, string userId);
 
-     Task<ServiceResultT<List<ListeningQuestionCheckResultDto>>> CheckListeningExerciseAnswer(
-         CheckListeningExerciseInputDto dto, string userId);
+     Task<ServiceResultT<List<ListeningQuestionCheckResultDto>>> CheckListeningExerciseAnswer(CheckListeningExerciseInputDto dto, string userId);
+     Task<ServiceResult> SoftDeleteExerciseAsync(string exerciseId, string userId);
 }

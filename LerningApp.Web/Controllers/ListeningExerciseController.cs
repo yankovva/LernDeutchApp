@@ -41,10 +41,7 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
         
         if (result.Result == false)
         {
-            if (result.Field != null)
-                ModelState.AddModelError(string.Empty, result.Message);
-            else
-                TempData["ErrorMessage"] = result.Message;
+            TempData["ErrorMessage"] = result.Message;
             return  RedirectToAction("Index", "Home");
         }
         return RedirectToAction("Details", "Lesson", new { id = model.LessonId });
