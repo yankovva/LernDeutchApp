@@ -1,5 +1,6 @@
 using LerningApp.Contracts.MultipleChoiceExerciseDtos;
 using LerningApp.Services.Data.Interfaces;
+using LerningApp.Web.API.DTO.Common;
 using LerningApp.Web.API.DTO.MultipleChoiceExerciseDtos;
 using LerningApp.Web.Infrastructure.Extensions;
 using Microsoft.AspNetCore.Authorization;
