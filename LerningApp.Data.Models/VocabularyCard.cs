@@ -4,6 +4,7 @@ namespace LerningApp.Data.Models;
 
 public class VocabularyCard
 {
+    //TODO Add Publisher
     [Comment("PK Unique Identifier")]
     public Guid Id { get; set; }= Guid.NewGuid();
     
