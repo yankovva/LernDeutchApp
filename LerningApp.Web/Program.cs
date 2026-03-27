@@ -20,6 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 //Add services to the container
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddApplicationIdentity(builder.Configuration);
+builder.Services.AddFacebookAuth(builder.Configuration);
 
 builder.Services.AddControllersWithViews();
 

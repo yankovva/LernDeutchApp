@@ -12,18 +12,12 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddApplicationDbContext(builder.Configuration);
 builder.Services.AddApplicationIdentity(builder.Configuration);
-builder.Services.AddFacebookAuth(builder.Configuration);
 
 builder.Services.RegisterRepositories();
 builder.Services.RegisterUserDefinedServices(typeof(CourseService).Assembly);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
-
-builder.Services.AddDataProtection()
-        .PersistKeysToFileSystem(new DirectoryInfo("/Users/magdalenaqnkova/RiderProjects/LerningApp/.keys"))
-        .SetApplicationName("LerningApp.SharedAuth");
 
 builder.Services.AddCors(options =>
 {
@@ -36,19 +30,6 @@ builder.Services.AddCors(options =>
         });
 });
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-        options.LoginPath = "/Identity/Account/Login";
-        options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-        options.LogoutPath = "/Identity/Account/Logout";
-        options.ExpireTimeSpan = TimeSpan.FromHours(12);
-        options.SlidingExpiration = true;
-        options.Cookie.HttpOnly = true;
-        options.Cookie.Name = "DeutchBuddy.Auth";
-        options.Cookie.Path = "/";
-        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-        options.Cookie.SameSite = SameSiteMode.Lax;
-});
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
