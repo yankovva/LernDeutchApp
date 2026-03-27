@@ -64,11 +64,12 @@ app.MapControllerRoute(
 
 app.MapRazorPages();
 
+await app.ApplyMigrations();
+
 if (app.Environment.IsDevelopment())
 {
     await DbSeeder.SeedAsync(app.Services);
 }
-
-await app.ApplyMigrations();
+await app.SeedRolesAndAdminAsync();
 
 app.Run();
