@@ -6,6 +6,7 @@ public class Teacher
     
     public bool IsApproved { get; set; }
     
+    public DateTime? TeacherSince { get; set; }
     public string? Qualification { get; set; }
     
     public string? Biography { get; set; }

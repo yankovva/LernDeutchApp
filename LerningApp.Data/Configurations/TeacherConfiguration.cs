@@ -21,6 +21,10 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
             .HasMaxLength(QualificationMaxLength);
         
         builder
+            .Property(x => x.TeacherSince)
+            .HasColumnType("datetime2");
+        
+        builder
             .HasOne( x => x.User)
             .WithOne(u => u.Teacher)
             .HasForeignKey<Teacher>( x => x.UserId);
