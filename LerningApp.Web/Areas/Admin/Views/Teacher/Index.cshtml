@@ -189,7 +189,7 @@
                             <span class="teacher-badge teacher-badge-rejected">Rejected</span>
                         }else if (teacher.Status == "Draft")
                         {
-                            <span class="teacher-badge teacher-badge-draft">Pending</span>
+                            <span class="teacher-badge teacher-badge-draft">Draft</span>
                         }
                     </td>
                     <td>@teacher.TeacherSince</td>
@@ -198,7 +198,7 @@
                             <a asp-area="Admin"
                                asp-controller="Teacher"
                                asp-action="Details"
-                               asp-route-id="@teacher.Id"
+                               asp-route-id="@teacher.TeacherId"
                                class="teacher-btn-profile">
                                 Check Profile
                             </a>
@@ -206,7 +206,7 @@
                             <a asp-area="Admin"
                                asp-controller="Teacher"
                                asp-action="Edit"
-                               asp-route-id="@teacher.Id"
+                               asp-route-id="@teacher.UserId"
                                class="teacher-btn-manage">
                                 Manage
                             </a>
@@ -214,7 +214,7 @@
                             <form asp-area="Admin"
                                   asp-controller="Teacher"
                                   asp-action="RemoveTeacherRole"
-                                  asp-route-id="@teacher.Id"
+                                  asp-route-id="@teacher.UserId"
                                   method="post"
                                   class="d-inline">
                                 @Html.AntiForgeryToken()

@@ -1,0 +1,296 @@
+@using LerningApp.Web.ViewModels.Admin.Teacher
+@model AdminTeacherDetailsViewModel
+
+@{
+    ViewData["Title"] = "Teacher Details";
+}
+
+<style>
+    .teacher-details-page {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .teacher-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .teacher-header h2 {
+        margin: 0;
+        font-size: 1.6rem;
+        font-weight: 700;
+    }
+
+    .teacher-header p {
+        margin: 0.45rem 0 0;
+        color: #64748b;
+    }
+
+    .teacher-status-badge {
+        display: inline-block;
+        padding: 0.5rem 0.9rem;
+        border-radius: 999px;
+        font-size: 0.85rem;
+        font-weight: 700;
+    }
+
+    .teacher-status-approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .teacher-status-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .teacher-status-rejected {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .teacher-status-draft {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
+
+    .teacher-main-grid {
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        gap: 1.5rem;
+    }
+
+    .teacher-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 1.5rem;
+    }
+
+    .teacher-photo-box {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        border-radius: 16px;
+        overflow: hidden;
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .teacher-photo-box img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .teacher-photo-placeholder {
+        color: #94a3b8;
+        font-weight: 600;
+    }
+
+    .teacher-info-list {
+        display: grid;
+        gap: 0.9rem;
+    }
+
+    .teacher-info-item strong {
+        display: block;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #64748b;
+        margin-bottom: 0.25rem;
+    }
+
+    .teacher-info-item span {
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .teacher-section {
+        margin-bottom: 1.25rem;
+    }
+
+    .teacher-section:last-child {
+        margin-bottom: 0;
+    }
+
+    .teacher-section h3 {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 0.7rem;
+    }
+
+    .teacher-section p {
+        margin: 0;
+        color: #475569;
+        line-height: 1.7;
+    }
+
+    .teacher-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .teacher-actions a,
+    .teacher-actions button {
+        border: none;
+        border-radius: 12px;
+        padding: 0.7rem 1rem;
+        font-size: 0.92rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .teacher-btn-approve {
+        background: #166534;
+        color: white;
+    }
+
+    .teacher-btn-approve:hover {
+        background: #14532d;
+        color: white;
+    }
+
+    .teacher-btn-reject {
+        background: #b91c1c;
+        color: white;
+    }
+
+    .teacher-btn-reject:hover {
+        background: #991b1b;
+        color: white;
+    }
+
+    .teacher-btn-back {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .teacher-btn-back:hover {
+        background: #cbd5e1;
+        color: #0f172a;
+    }
+
+    @@media (max-width: 900px) {
+        .teacher-main-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .teacher-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<div class="teacher-details-page">
+    <div class="teacher-header">
+        <div>
+            <h2>@(Model.FirstName ?? "Unknown") @(Model.LastName ?? "Teacher")</h2>
+            <p>Review teacher information, qualifications, biography, and approval status.</p>
+        </div>
+
+        <div>
+            @if (Model.Status == "Approved")
+            {
+                <span class="teacher-status-badge teacher-status-approved">Approved</span>
+            }
+            else if (Model.Status == "PendingReview")
+            {
+                <span class="teacher-status-badge teacher-status-pending">Pending Review</span>
+            }
+            else if (Model.Status == "Rejected")
+            {
+                <span class="teacher-status-badge teacher-status-rejected">Rejected</span>
+            }
+            else
+            {
+                <span class="teacher-status-badge teacher-status-draft">Draft</span>
+            }
+        </div>
+    </div>
+
+    <div class="teacher-main-grid">
+        <div class="teacher-card">
+            <div class="teacher-photo-box">
+                @if (!string.IsNullOrWhiteSpace(Model.ProfileImage))
+                {
+                    <img src="@Model.ProfileImage" alt="Teacher Photo" />
+                }
+                else
+                {
+                    <div class="teacher-photo-placeholder">No Photo</div>
+                }
+            </div>
+
+            <div class="teacher-info-list">
+                <div class="teacher-info-item">
+                    <strong>Email</strong>
+                    <span>@(Model.Email ?? "No email")</span>
+                </div>
+
+                <div class="teacher-info-item">
+                    <strong>Username</strong>
+                    <span>@(Model.UserName ?? "Not set")</span>
+                </div>
+
+                <div class="teacher-info-item">
+                    <strong>Teacher Since</strong>
+                    <span>@(Model.TeacherSince ?? "Pending")</span>
+                </div>
+
+                <div class="teacher-info-item">
+                    <strong>Status</strong>
+                    <span>@Model.Status</span>
+                </div>
+                <div class="teacher-info-item">
+                    <strong>Phone Number</strong>
+                    <span>@(Model.PhoneNumber ?? "Not provided")</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="teacher-card">
+            <div class="teacher-section">
+                <h3>Biography</h3>
+                <p>@(string.IsNullOrWhiteSpace(Model.Biography) ? "No biography provided yet." : Model.Biography)</p>
+            </div>
+
+            <div class="teacher-section">
+                <h3>Qualifications</h3>
+                <p>@(string.IsNullOrWhiteSpace(Model.Qualifications) ? "No qualifications added yet." : Model.Qualifications)</p>
+            </div>
+
+            <div class="teacher-section">
+                <h3>Administrative Actions</h3>
+                <div class="teacher-actions">
+                    <form asp-area="Admin" asp-controller="Teacher" asp-action="Approve" asp-route-id="@Model.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="teacher-btn-approve">Approve Teacher</button>
+                    </form>
+
+                    <form asp-area="Admin" asp-controller="Teacher" asp-action="Reject" asp-route-id="@Model.Id" method="post" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="teacher-btn-reject">Reject Teacher</button>
+                    </form>
+
+                    <a asp-area="Admin" asp-controller="Teacher" asp-action="Index" class="teacher-btn-back">
+                        Back to Teachers
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

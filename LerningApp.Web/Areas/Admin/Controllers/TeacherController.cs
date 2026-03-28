@@ -6,13 +6,39 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LerningApp.Areas.Admin.Controllers;
 
+[Area("Admin")]
+[Authorize(Roles = "Admin")]
 public class TeacherController(IAdminTeacherService teacherService) : Controller
 {
-    [Area("Admin")]
-    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Index()
     {
         var model = await teacherService.GetAllTeachersAsync();
         return View(model);
     }
+  
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> MakeTeacher(string id)
+    {
+        var result = await teacherService.MakeUserTeacherAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
+        }
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Details(string id)
+    {
+        var result = await teacherService.GetTeacherDetailsAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
+        }
+        return View(result.Data);
+    }
+    
 }

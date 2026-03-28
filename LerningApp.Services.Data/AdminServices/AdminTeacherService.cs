@@ -3,8 +3,11 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces.AdminInterfaces;
 using LerningApp.Web.ViewModels.Admin.Teacher;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data.AdminServices;
 
@@ -18,7 +21,8 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             .GetAllAttached()
             .Select(t => new AdminTeacherIndexViewModel()
             {
-                Id = t.Id.ToString(),
+                UserId = t.UserId.ToString(),
+                TeacherId = t.Id.ToString(),
                 Email = t.User.Email,
                 FirstName = t.User.FirstName,
                 LastName = t.User.LastName,
@@ -30,5 +34,63 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             .ToListAsync();
 
         return teachers;
+    }
+
+    public async Task<ServiceResult> MakeUserTeacherAsync(string id)
+    {
+        var user = await userManager.FindByIdAsync(id);
+        if (user == null)
+        {
+            return ServiceResult.Fail("No user found");
+        }
+        bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
+        if (!isTeacher)
+        {
+            var newTeacher = new Teacher()
+            {
+                UserId = Guid.Parse(id),
+                Status = TeacherStatus.Draft
+            };
+            
+            teacherRepository.Add(newTeacher);
+            await teacherRepository.SaveChangesAsync();
+        }
+        return ServiceResult.Success();
+    }
+
+    public async  Task<ServiceResultT<AdminTeacherDetailsViewModel>> GetTeacherDetailsAsync(string teacherId)
+    {
+        Guid userGuid = Guid.TryParse(teacherId, out Guid teacherGuid)
+            ? teacherGuid
+            : Guid.Empty;
+        
+        Teacher? teacher = await teacherRepository
+            .GetAllAttached()
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Id == teacherGuid);
+        
+        if (teacher == null)
+        {
+            return ServiceResultT<AdminTeacherDetailsViewModel>.Fail("User is not Teacher");
+        }
+
+        var result = new AdminTeacherDetailsViewModel()
+        {
+            Id = teacher.UserId.ToString(),
+            Email = teacher.User.Email,
+            FirstName = teacher.User.FirstName,
+            LastName = teacher.User.LastName,
+            UserName = teacher.User.UserName,
+            PhoneNumber = teacher.User.PhoneNumber,
+            Qualifications = teacher.Qualification,
+            Status = teacher.Status.ToString(),
+            Biography = teacher.Biography,
+            TeacherSince = teacher.TeacherSince.HasValue
+                ? teacher.TeacherSince.Value.ToString("MM/dd/yyyy")
+                : "Pending",
+            ProfileImage = teacher.User.ProfileImage
+        };
+        
+        return ServiceResultT<AdminTeacherDetailsViewModel>.Success(result);
     }
 }
