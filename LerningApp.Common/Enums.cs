@@ -14,4 +14,12 @@ public class Enums
         TranslationExercise = 2,
         ListeningExercise = 3
     }
+
+    public enum TeacherStatus
+    {
+        Draft = 1,
+        Approved = 2,
+        Rejected = 3,
+        PendingReview = 4,
+    }
 }
