@@ -20,12 +20,14 @@ public class AdminUserService(UserManager<ApplicationUser> userManager) : IAdmin
             var userLogs = await userManager.GetLoginsAsync(u);
             bool isFbUser = userLogs
                 .Any(l => l.LoginProvider == "Facebook");
-            
+            var userRoles = await userManager.GetRolesAsync(u);
             result.Add(new AdminUserIndexViewModel()
             {
                 Id = u.Id.ToString(),
                 Email = u.Email,
                 LastName = u.LastName,
+                Roles = userRoles,
+                UserName = u.UserName,
                 FirstName = u.FirstName,
                 RegisteredOn = DateTime.UtcNow.ToString("MM/dd/yyyy"),
                 IsFacebookUser = isFbUser

@@ -157,7 +157,7 @@
         @if (!Model.Any())
         {
             <tr>
-                <td colspan="7" class="user-empty">No users found.</td>
+                <td colspan="6" class="user-empty">No users found.</td>
             </tr>
         }
         else
@@ -181,7 +181,7 @@
                     </td>
                     <td>
                         <div class="user-actions">
-                        @*   <a asp-area="Admin"
+                            @*   <a asp-area="Admin"
                                asp-controller="User"
                                asp-action="Details"
                                asp-route-id="@user.Id"
@@ -189,13 +189,20 @@
                                 Check Profile
                             </a> *@
 
-                            <a asp-area="Admin"
-                               asp-controller="User"
-                               asp-action="Manage"
-                               asp-route-id="@user.Id"
-                               class="user-btn-manage">
+                            <button type="button"
+                                    class="manage-user-btn user-btn-manage"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#manageUserModal"
+                                    data-id="@user.Id"
+                                    data-first-name="@user.FirstName"
+                                    data-last-name="@user.LastName"
+                                    data-roles = "@user.Roles"
+                                    data-email="@user.Email"
+                                    data-username="@user.UserName"
+                                    data-auth-type="@(user.IsFacebookUser ? "Facebook" : "Local")">
                                 Manage
-                            </a>
+                            </button>
+
 
                             <form asp-area="Admin"
                                   asp-controller="User"
@@ -216,3 +223,45 @@
         </tbody>
     </table>
 </div>
+<div class="modal fade" id="manageUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Manage User</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>First Name:</strong> <span id="modalFirstName"></span></p>
+                <p><strong>Last Name:</strong> <span id="modalLastName"></span></p>
+                <p><strong>Email:</strong> <span id="modalEmail"></span></p>
+                <p><strong>Username:</strong> <span id="modalUserName"></span></p>
+                <p><strong>Authentication:</strong> <span id="modalAuthType"></span></p>
+                <p><strong>Current Roles:</strong> <span id="modalRoles"></span></p>
+            </div>
+            <div class="modal-footer">
+                <form id="makeTeacherForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-primary">Make Teacher</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.manage-user-btn').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.getElementById('modalFirstName').textContent = this.dataset.firstName || 'Not set';
+                document.getElementById('modalLastName').textContent = this.dataset.lastName || 'Not set';
+                document.getElementById('modalEmail').textContent = this.dataset.email || 'No email';
+                document.getElementById('modalUserName').textContent = this.dataset.username || 'Not set';
+                document.getElementById('modalAuthType').textContent = this.dataset.authType || 'Local';
+                document.getElementById('modalRoles').textContent = this.dataset.authType || 'User';
+
+                document.getElementById('makeTeacherForm').action =
+                    '/Admin/User/MakeTeacher/' + this.dataset.id;
+            });
+        });
+    </script>
+}
