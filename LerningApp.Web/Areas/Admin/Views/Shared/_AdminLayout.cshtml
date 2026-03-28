@@ -1,0 +1,249 @@
+@{
+    var pageTitle = ViewData["Title"]?.ToString() ?? "Admin";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@pageTitle - Admin Panel</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        :root {
+            --admin-bg: #eef2f6;
+            --admin-surface: #ffffff;
+            --admin-sidebar: #0f172a;
+            --admin-sidebar-alt: #111827;
+            --admin-border: #d9e1ea;
+            --admin-text: #0f172a;
+            --admin-muted: #64748b;
+            --admin-accent: #1d4ed8;
+            --admin-accent-hover: #1e40af;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            background: var(--admin-bg);
+            color: var(--admin-text);
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .admin-shell {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            min-height: 100vh;
+        }
+
+        .admin-sidebar {
+            background: linear-gradient(180deg, var(--admin-sidebar), var(--admin-sidebar-alt));
+            color: white;
+            padding: 1.75rem 1.1rem;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255,255,255,0.06);
+        }
+
+        .admin-logo {
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            margin-bottom: 2rem;
+        }
+
+        .admin-logo span {
+            display: block;
+            margin-top: 0.35rem;
+            font-size: 0.82rem;
+            color: rgba(255,255,255,0.55);
+            font-weight: 400;
+        }
+
+        .admin-nav-group-title {
+            font-size: 0.74rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.42);
+            margin-bottom: 0.75rem;
+            padding-left: 0.3rem;
+        }
+
+        .admin-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 0.55rem;
+        }
+
+        .admin-nav a {
+            display: block;
+            text-decoration: none;
+            color: rgba(255,255,255,0.9);
+            padding: 0.9rem 1rem;
+            border-radius: 14px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            font-weight: 600;
+            transition: background 0.18s ease, transform 0.18s ease;
+        }
+
+        .admin-nav a:hover {
+            background: rgba(255,255,255,0.09);
+            color: white;
+            transform: translateX(2px);
+        }
+
+        .admin-sidebar-footer {
+            margin-top: auto;
+            padding-top: 1.5rem;
+            font-size: 0.88rem;
+            color: rgba(255,255,255,0.55);
+        }
+
+        .admin-main {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .admin-topbar {
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--admin-border);
+            padding: 1.2rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .admin-topbar-title h1 {
+            margin: 0;
+            font-size: 1.55rem;
+            font-weight: 700;
+        }
+
+        .admin-topbar-title p {
+            margin: 0.3rem 0 0;
+            color: var(--admin-muted);
+            font-size: 0.95rem;
+        }
+
+        .admin-topbar-actions {
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .admin-topbar-actions a {
+            text-decoration: none;
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            font-weight: 600;
+            font-size: 0.92rem;
+        }
+
+        .admin-btn-main {
+            background: var(--admin-accent);
+            color: white;
+        }
+
+        .admin-btn-main:hover {
+            background: var(--admin-accent-hover);
+            color: white;
+        }
+
+        .admin-btn-light {
+            background: white;
+            color: var(--admin-text);
+            border: 1px solid var(--admin-border);
+        }
+
+        .admin-btn-light:hover {
+            background: #f8fafc;
+            color: var(--admin-text);
+        }
+
+        .admin-content {
+            padding: 2rem;
+        }
+
+        .admin-page-card {
+            background: var(--admin-surface);
+            border: 1px solid var(--admin-border);
+            border-radius: 20px;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.05);
+            padding: 1.5rem;
+        }
+
+        @@media (max-width: 900px) {
+            .admin-shell {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-sidebar {
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.06);
+            }
+
+            .admin-topbar {
+                padding: 1rem 1.25rem;
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .admin-content {
+                padding: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="admin-shell">
+    <aside class="admin-sidebar">
+        <div class="admin-logo">
+            Admin Panel
+            <span>Learning Application Control</span>
+        </div>
+
+        <div class="admin-nav-group-title">Management</div>
+        <nav class="admin-nav">
+            <a asp-area="Admin" asp-controller="Home" asp-action="Index">Dashboard</a>
+            <a asp-area="Admin" asp-controller="Teacher" asp-action="Index">Teachers</a>
+            <a asp-area="Admin" asp-controller="User" asp-action="Index">Users</a>
+            <a asp-area="Admin" asp-controller="Content" asp-action="Index">Learning Content</a>
+            <a asp-area="Admin" asp-controller="Reports" asp-action="Index">Reports</a>
+        </nav>
+
+        <div class="admin-sidebar-footer">
+            Restricted administrative area for platform management.
+        </div>
+    </aside>
+
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <div class="admin-topbar-title">
+                <h1>@pageTitle</h1>
+                <p>Administrative workspace for users, teachers, reports, and content.</p>
+            </div>
+
+            <div class="admin-topbar-actions">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="admin-btn-light">Main Site</a>
+                <a asp-area="Admin" asp-controller="Home" asp-action="Index" class="admin-btn-main">Dashboard</a>
+            </div>
+        </header>
+
+        <section class="admin-content">
+            <div class="admin-page-card">
+                @RenderBody()
+            </div>
+        </section>
+    </main>
+</div>
+
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

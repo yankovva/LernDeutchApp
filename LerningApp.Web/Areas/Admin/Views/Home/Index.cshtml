@@ -1,0 +1,194 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<style>
+    .admin-dashboard {
+        background: #f4f6f8;
+        min-height: 100vh;
+    }
+
+    .admin-hero {
+        background: linear-gradient(135deg, #1f2937, #111827);
+        color: white;
+        border-radius: 24px;
+        padding: 2.5rem;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.18);
+    }
+
+    .admin-hero p {
+        color: rgba(255, 255, 255, 0.8);
+        margin-bottom: 0;
+    }
+
+    .admin-card {
+        border: none;
+        border-radius: 20px;
+        background: white;
+        box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+        transition: transform 0.18s ease, box-shadow 0.18s ease;
+        height: 100%;
+    }
+
+    .admin-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 18px 35px rgba(15, 23, 42, 0.12);
+    }
+
+    .admin-card .card-body {
+        padding: 1.75rem;
+    }
+
+    .admin-card h3 {
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.85rem;
+    }
+
+    .admin-card p {
+        color: #6b7280;
+        min-height: 72px;
+    }
+
+    .admin-btn {
+        border-radius: 12px;
+        padding: 0.65rem 1rem;
+        font-weight: 600;
+    }
+
+    .admin-btn-primary {
+        background-color: #1f2937;
+        border-color: #1f2937;
+        color: white;
+    }
+
+    .admin-btn-primary:hover {
+        background-color: #111827;
+        border-color: #111827;
+        color: white;
+    }
+
+    .admin-btn-secondary {
+        border: 1px solid #cbd5e1;
+        color: #1f2937;
+        background: #f8fafc;
+    }
+
+    .admin-btn-secondary:hover {
+        background: #e5e7eb;
+        color: #111827;
+    }
+
+    .admin-list {
+        padding-left: 1rem;
+        color: #4b5563;
+        margin-bottom: 1.25rem;
+    }
+
+    .admin-list li {
+        margin-bottom: 0.55rem;
+    }
+
+    .admin-section-title {
+        font-size: 0.85rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #6b7280;
+        margin-bottom: 0.8rem;
+    }
+</style>
+
+<section class="admin-dashboard py-5">
+    <div class="container">
+        <div class="admin-hero mb-5">
+            <div class="admin-section-title">Control Center</div>
+            <h1 class="display-6 fw-bold mb-3">Admin Dashboard</h1>
+            <p class="fs-5">
+                Manage teachers, users, and educational content from one central workspace.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="card admin-card">
+                    <div class="card-body">
+                        <div class="admin-section-title">People</div>
+                        <h3>Manage Teachers</h3>
+                        <p>
+                            Review teacher accounts, assign responsibilities, and control access to teaching features.
+                        </p>
+                        <a asp-area="Admin" asp-controller="Teacher" asp-action="Index"
+                           class="btn admin-btn admin-btn-primary">
+                            Manage Teachers
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card admin-card">
+                    <div class="card-body">
+                        <div class="admin-section-title">People</div>
+                        <h3>Manage Users</h3>
+                        <p>
+                            View registered users, inspect accounts, and apply restrictions or permissions when needed.
+                        </p>
+                        <a asp-area="Admin" asp-controller="User" asp-action="Index"
+                           class="btn admin-btn admin-btn-primary">
+                            Manage Users
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card admin-card">
+                    <div class="card-body">
+                        <div class="admin-section-title">Content</div>
+                        <h3>Manage Learning Content</h3>
+                        <p>
+                            Oversee courses, lessons, exercises, and vocabulary resources across the platform.
+                        </p>
+                        <a asp-area="Admin" asp-controller="Content" asp-action="Index"
+                           class="btn admin-btn admin-btn-primary">
+                            Manage Content
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-1">
+            <div class="col-lg-6">
+                <div class="card admin-card">
+                    <div class="card-body">
+                        <div class="admin-section-title">Overview</div>
+                        <h3>Platform Overview</h3>
+                        <p>
+                            Use this panel as a starting point for administrative actions, moderation, and future reporting.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="card admin-card">
+                    <div class="card-body">
+                        <div class="admin-section-title">Quick Actions</div>
+                        <h3>Administrative Tasks</h3>
+                        <ul class="admin-list">
+                            <li>Review flagged content</li>
+                            <li>Check newly assigned teachers</li>
+                            <li>Inspect course and lesson activity</li>
+                        </ul>
+                        <a asp-area="Admin" asp-controller="Home" asp-action="Index"
+                           class="btn admin-btn admin-btn-secondary">
+                            Refresh Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
