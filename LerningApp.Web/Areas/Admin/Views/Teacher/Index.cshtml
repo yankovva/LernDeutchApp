@@ -1,0 +1,217 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using LerningApp.Web.ViewModels.Admin.Teacher
+@model IEnumerable<AdminTeacherIndexViewModel>
+
+@{
+    ViewData["Title"] = "Teachers";
+}
+
+<style>
+    .teacher-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .teacher-toolbar h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .teacher-toolbar p {
+        margin: 0.35rem 0 0;
+        color: #64748b;
+    }
+
+    .teacher-table-wrap {
+        overflow-x: auto;
+    }
+
+    .teacher-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 950px;
+    }
+
+    .teacher-table thead th {
+        text-align: left;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #64748b;
+        padding: 1rem 0.9rem;
+        border-bottom: 1px solid #dbe3ec;
+        background: #f8fafc;
+    }
+
+    .teacher-table tbody td {
+        padding: 1rem 0.9rem;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: middle;
+        color: #0f172a;
+    }
+
+    .teacher-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .teacher-email,
+    .teacher-name {
+        font-weight: 600;
+    }
+
+    .teacher-badge {
+        display: inline-block;
+        padding: 0.42rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .teacher-badge-approved {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .teacher-badge-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .teacher-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+    }
+
+    .teacher-actions a,
+    .teacher-actions button {
+        border: none;
+        border-radius: 10px;
+        padding: 0.58rem 0.85rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .teacher-btn-profile {
+        background: #1d4ed8;
+        color: white;
+    }
+
+    .teacher-btn-profile:hover {
+        background: #1e40af;
+        color: white;
+    }
+
+    .teacher-btn-manage {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .teacher-btn-manage:hover {
+        background: #cbd5e1;
+    }
+
+    .teacher-btn-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .teacher-btn-danger:hover {
+        background: #fecaca;
+    }
+
+    .teacher-empty {
+        padding: 2rem;
+        text-align: center;
+        color: #64748b;
+    }
+</style>
+
+<div class="teacher-toolbar">
+    <div>
+        <h2>Teacher Management</h2>
+        <p>Review teacher profiles, approval status, and administrative actions.</p>
+    </div>
+</div>
+
+<div class="teacher-table-wrap">
+    <table class="teacher-table">
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Approved</th>
+            <th>Teacher Since</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="6" class="teacher-empty">No teachers found.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var teacher in Model)
+            {
+                <tr>
+                    <td class="teacher-name">@(teacher.FirstName ?? "Not set")</td>
+                    <td class="teacher-name">@(teacher.LastName ?? "Not set")</td>
+                    <td class="teacher-email">@(teacher.Email ?? "No email")</td>
+                    <td>
+                        @if (teacher.IsApproved)
+                        {
+                            <span class="teacher-badge teacher-badge-approved">Approved</span>
+                        }
+                        else
+                        {
+                            <span class="teacher-badge teacher-badge-pending">Pending</span>
+                        }
+                    </td>
+                    <td>@teacher.TeacherSince</td>
+                    <td>
+                        <div class="teacher-actions">
+                            <a asp-area="Admin"
+                               asp-controller="Teacher"
+                               asp-action="Details"
+                               asp-route-id="@teacher.Id"
+                               class="teacher-btn-profile">
+                                Check Profile
+                            </a>
+
+                            <a asp-area="Admin"
+                               asp-controller="Teacher"
+                               asp-action="Edit"
+                               asp-route-id="@teacher.Id"
+                               class="teacher-btn-manage">
+                                Manage
+                            </a>
+
+                            <form asp-area="Admin"
+                                  asp-controller="Teacher"
+                                  asp-action="RemoveTeacherRole"
+                                  asp-route-id="@teacher.Id"
+                                  method="post"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="teacher-btn-danger">
+                                    Remove Teacher
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>
