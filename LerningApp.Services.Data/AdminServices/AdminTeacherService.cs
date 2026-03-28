@@ -65,6 +65,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         {
             return ServiceResult.Fail("No user found.");
         }
+        
         bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
         if (!isTeacher)
         {
@@ -87,9 +88,29 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         return ServiceResult.Success();
     }
 
+    public async Task<ServiceResult> RemovePendingTeacherAsync(string teacherId)
+    {
+        Guid id = Guid.TryParse(teacherId, out Guid teacherGuid)
+            ? teacherGuid
+            : Guid.Empty;
+        
+        Teacher? teacher = await teacherRepository
+            .GetAllAttached()
+            .FirstOrDefaultAsync(t => t.Id == teacherGuid);
+        if (teacher == null)
+        {
+            return ServiceResult.Fail("User does not have a pending teacher request.");
+        }
+        
+        teacherRepository.DeleteByEntity(teacher);
+        await teacherRepository.SaveChangesAsync();
+        
+        return ServiceResult.Success();
+    }
+
     public async  Task<ServiceResultT<AdminTeacherDetailsViewModel>> GetTeacherDetailsAsync(string teacherId)
     {
-        Guid userGuid = Guid.TryParse(teacherId, out Guid teacherGuid)
+        Guid id = Guid.TryParse(teacherId, out Guid teacherGuid)
             ? teacherGuid
             : Guid.Empty;
         

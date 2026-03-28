@@ -224,9 +224,9 @@
                                 <form asp-area="Admin"
                                       asp-controller="Teacher"
                                       asp-action="RemoveTeacherRole"
-                                      asp-route-id="@teacher.UserId"
+                                      asp-route-id="@teacher.TeacherSince"
                                       method="post"
-                                      onsubmit="return confirm(`Are you sure you want to remove role Teacher for user ${@teacher.FirstName @teacher.LastName}`);"
+                                      onsubmit="return confirm(`Are you sure you want to remove role Teacher for user @teacher.FirstName @teacher.LastName?`);"
                                       class="d-inline">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="teacher-btn-danger">
@@ -238,14 +238,14 @@
                             {
                                 <form asp-area="Admin"
                                       asp-controller="Teacher"
-                                      asp-action="RemoveTeacher"
-                                      asp-route-id="@teacher.UserId"
+                                      asp-action="RemoveTeacherRequest"
+                                      asp-route-id="@teacher.TeacherId"
                                       method="post"
-                                      onsubmit="return confirm(`Are you sure you want to remove teacher request for user ${@teacher.FirstName @teacher.LastName}`);"
+                                      onsubmit="return confirm(`Are you sure you want to remove teacher request for user @teacher.FirstName @teacher.LastName?`);"
                                       class="d-inline">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="teacher-btn-warning">
-                                        Remove Role Request
+                                        Remove Teacher Request
                                     </button>
                                 </form>
                             }
