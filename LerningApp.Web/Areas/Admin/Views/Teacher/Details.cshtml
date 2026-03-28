@@ -276,12 +276,12 @@
             <div class="teacher-section">
                 <h3>Administrative Actions</h3>
                 <div class="teacher-actions">
-                    <form asp-area="Admin" asp-controller="Teacher" asp-action="Approve" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    <form asp-area="Admin" asp-controller="Teacher" asp-action="Approve" asp-route-id="@Model.UserId" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="teacher-btn-approve">Approve Teacher</button>
                     </form>
 
-                    <form asp-area="Admin" asp-controller="Teacher" asp-action="Reject" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    <form asp-area="Admin" asp-controller="Teacher" asp-action="Reject" asp-route-id="@Model.UserId" method="post" class="d-inline">
                         @Html.AntiForgeryToken()
                         <button type="submit" class="teacher-btn-reject">Reject Teacher</button>
                     </form>

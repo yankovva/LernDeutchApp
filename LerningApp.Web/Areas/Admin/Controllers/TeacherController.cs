@@ -18,15 +18,28 @@ public class TeacherController(IAdminTeacherService teacherService) : Controller
   
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> MakeTeacher(string id)
+    public async Task<IActionResult> MakeTeacherRequest(string id)
     {
-        var result = await teacherService.MakeUserTeacherAsync(id);
+        var result = await teacherService.AddPendingTeacherAsync(id);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
             return RedirectToAction(nameof(Index));
         }
-        TempData["SuccessMessage"] = "Successfully made teacher";
+        TempData["SuccessMessage"] = "Successfully created teacher request.";
+        return RedirectToAction(nameof(Index));
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Approve(string id)
+    {
+        var result = await teacherService.AddUserTeacherRoleAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
+        }
+        TempData["SuccessMessage"] = "Successfully added teacher role.";
         return RedirectToAction(nameof(Index));
     }
 

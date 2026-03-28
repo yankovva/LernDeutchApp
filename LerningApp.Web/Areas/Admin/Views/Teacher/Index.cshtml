@@ -224,7 +224,7 @@
                                 <form asp-area="Admin"
                                       asp-controller="Teacher"
                                       asp-action="RemoveTeacherRole"
-                                      asp-route-id="@teacher.TeacherSince"
+                                      asp-route-id="@teacher.UserId"
                                       method="post"
                                       onsubmit="return confirm(`Are you sure you want to remove role Teacher for user @teacher.FirstName @teacher.LastName?`);"
                                       class="d-inline">
@@ -248,6 +248,16 @@
                                         Remove Teacher Request
                                     </button>
                                 </form>
+                            }
+                            else
+                            {
+                                <div class="modal-footer">
+                                    <form id="makeTeacherForm" asp-controller="Teacher" asp-area="Admin" asp-action="ReturnReacher" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" value="@teacher.UserId" name="id" />
+                                        <button type="submit" class="btn btn-primary">Return Teacher</button>
+                                    </form>
+                                </div>
                             }
                         </div>
                     </td>

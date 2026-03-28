@@ -36,7 +36,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         return teachers;
     }
 
-    public async Task<ServiceResult> MakeUserTeacherAsync(string id)
+    public async Task<ServiceResult> AddPendingTeacherAsync(string id)
     {
         var user = await userManager.FindByIdAsync(id);
         if (user == null)
@@ -55,6 +55,35 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             teacherRepository.Add(newTeacher);
             await teacherRepository.SaveChangesAsync();
         }
+        return ServiceResult.Success();
+    }
+
+    public async Task<ServiceResult> AddUserTeacherRoleAsync(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return ServiceResult.Fail("No user found");
+        }
+        
+        bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
+        if (isTeacher)
+        {
+            return ServiceResult.Fail("User already teacher.");
+        }
+        
+        Guid userGuid = Guid.Parse(userId);
+        var teacher = await teacherRepository
+            .FirstorDefaultAsync(t => t.UserId == userGuid);
+        if (teacher == null)
+        {
+            return ServiceResult.Fail("No teacher found");
+        }
+        
+        teacher.Status = TeacherStatus.Approved;
+        await teacherRepository.SaveChangesAsync();
+        await userManager.AddToRoleAsync(user, "Teacher");
+        
         return ServiceResult.Success();
     }
 
@@ -126,7 +155,8 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
 
         var result = new AdminTeacherDetailsViewModel()
         {
-            Id = teacher.UserId.ToString(),
+            UserId = teacher.UserId.ToString(),
+            TeacherId = teacher.Id.ToString(),
             Email = teacher.User.Email,
             FirstName = teacher.User.FirstName,
             LastName = teacher.User.LastName,
