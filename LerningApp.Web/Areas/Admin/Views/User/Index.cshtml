@@ -1,0 +1,218 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using LerningApp.Web.ViewModels.Admin.User
+@model IEnumerable<AdminUserIndexViewModel>
+
+@{
+    ViewData["Title"] = "Users";
+}
+
+<style>
+    .user-toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .user-toolbar h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 700;
+    }
+
+    .user-toolbar p {
+        margin: 0.35rem 0 0;
+        color: #64748b;
+    }
+
+    .user-table-wrap {
+        overflow-x: auto;
+    }
+
+    .user-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 1100px;
+    }
+
+    .user-table thead th {
+        text-align: left;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #64748b;
+        padding: 1rem 0.9rem;
+        border-bottom: 1px solid #dbe3ec;
+        background: #f8fafc;
+    }
+
+    .user-table tbody td {
+        padding: 1rem 0.9rem;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: middle;
+        color: #0f172a;
+    }
+
+    .user-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .user-name,
+    .user-email,
+    .user-username {
+        font-weight: 600;
+    }
+
+    .user-badge {
+        display: inline-block;
+        padding: 0.42rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .user-badge-facebook {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .user-badge-local {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .user-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+    }
+
+    .user-actions a,
+    .user-actions button {
+        border: none;
+        border-radius: 10px;
+        padding: 0.58rem 0.85rem;
+        font-size: 0.88rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .user-btn-profile {
+        background: #1d4ed8;
+        color: white;
+    }
+
+    .user-btn-profile:hover {
+        background: #1e40af;
+        color: white;
+    }
+
+    .user-btn-manage {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .user-btn-manage:hover {
+        background: #cbd5e1;
+    }
+
+    .user-btn-danger {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .user-btn-danger:hover {
+        background: #fecaca;
+    }
+
+    .user-empty {
+        padding: 2rem;
+        text-align: center;
+        color: #64748b;
+    }
+</style>
+
+<div class="user-toolbar">
+    <div>
+        <h2>User Management</h2>
+        <p>Review registered users and inspect account details.</p>
+    </div>
+</div>
+
+<div class="user-table-wrap">
+    <table class="user-table">
+        <thead>
+        <tr>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th>Registered On</th>
+            <th>Registered With</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (!Model.Any())
+        {
+            <tr>
+                <td colspan="7" class="user-empty">No users found.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td class="user-name">@(user.FirstName ?? "Not set")</td>
+                    <td class="user-name">@(user.LastName ?? "Not set")</td>
+                    <td class="user-email">@(user.Email ?? "No email")</td>
+                    <td>@(user.RegisteredOn ?? "-")</td>
+                    <td>
+                        @if (user.IsFacebookUser)
+                        {
+                            <span class="user-badge user-badge-facebook">Facebook</span>
+                        }
+                        else
+                        {
+                            <span class="user-badge user-badge-local">Local</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="user-actions">
+                        @*   <a asp-area="Admin"
+                               asp-controller="User"
+                               asp-action="Details"
+                               asp-route-id="@user.Id"
+                               class="user-btn-profile">
+                                Check Profile
+                            </a> *@
+
+                            <a asp-area="Admin"
+                               asp-controller="User"
+                               asp-action="Manage"
+                               asp-route-id="@user.Id"
+                               class="user-btn-manage">
+                                Manage
+                            </a>
+
+                            <form asp-area="Admin"
+                                  asp-controller="User"
+                                  asp-action="Delete"
+                                  asp-route-id="@user.Id"
+                                  method="post"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="user-btn-danger">
+                                    Delete User
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        }
+        </tbody>
+    </table>
+</div>
