@@ -181,14 +181,6 @@
                     </td>
                     <td>
                         <div class="user-actions">
-                            @*   <a asp-area="Admin"
-                               asp-controller="User"
-                               asp-action="Details"
-                               asp-route-id="@user.Id"
-                               class="user-btn-profile">
-                                Check Profile
-                            </a> *@
-
                             <button type="button"
                                     class="manage-user-btn user-btn-manage"
                                     data-bs-toggle="modal"
@@ -196,13 +188,12 @@
                                     data-id="@user.Id"
                                     data-first-name="@user.FirstName"
                                     data-last-name="@user.LastName"
-                                    data-roles = "@user.Roles"
+                                    data-roles="@string.Join(", ", user.Roles)"
                                     data-email="@user.Email"
                                     data-username="@user.UserName"
                                     data-auth-type="@(user.IsFacebookUser ? "Facebook" : "Local")">
                                 Manage
                             </button>
-
 
                             <form asp-area="Admin"
                                   asp-controller="User"
@@ -239,8 +230,9 @@
                 <p><strong>Current Roles:</strong> <span id="modalRoles"></span></p>
             </div>
             <div class="modal-footer">
-                <form id="makeTeacherForm" method="post">
+                <form id="makeTeacherForm" asp-controller="Teacher" asp-area="Admin" asp-action="MakeTeacher" method="post">
                     @Html.AntiForgeryToken()
+                    <input type="hidden" id="modalUserId" name="id" />
                     <button type="submit" class="btn btn-primary">Make Teacher</button>
                 </form>
             </div>
@@ -257,10 +249,8 @@
                 document.getElementById('modalEmail').textContent = this.dataset.email || 'No email';
                 document.getElementById('modalUserName').textContent = this.dataset.username || 'Not set';
                 document.getElementById('modalAuthType').textContent = this.dataset.authType || 'Local';
-                document.getElementById('modalRoles').textContent = this.dataset.authType || 'User';
-
-                document.getElementById('makeTeacherForm').action =
-                    '/Admin/User/MakeTeacher/' + this.dataset.id;
+                document.getElementById('modalRoles').textContent = this.dataset.roles || 'User';
+                document.getElementById('modalUserId').value = this.dataset.id;
             });
         });
     </script>
