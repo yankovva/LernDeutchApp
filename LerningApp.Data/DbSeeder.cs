@@ -1,7 +1,11 @@
+using LerningApp.Common;
 using LerningApp.Data.Models;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Data;
 
@@ -47,7 +51,7 @@ public class DbSeeder
                 "I'm a teacher! The Best ever! You can learn a lot from me and be the best student ever to exist! Join my Courses now!",
             Qualification = "I have studied something with computers!",
             UserId = seedUser.Id,
-            IsApproved = true
+            Status = TeacherStatus.Approved
         };
 
         var a1 = new Level

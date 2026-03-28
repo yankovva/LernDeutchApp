@@ -2,7 +2,9 @@ using LerningApp.Common;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
+
 using Microsoft.EntityFrameworkCore;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data;
 
@@ -12,7 +14,7 @@ public class TeacherService(IRepository<Teacher, Guid> teacherRepository) : ITea
     {
         bool result = await  teacherRepository
             .GetAllAttached()
-            .AnyAsync(t => t.UserId.ToString()== userId && t.IsApproved == true);
+            .AnyAsync(t => t.UserId.ToString()== userId && t.Status == TeacherStatus.Approved);
 
         return result;
     }
@@ -25,7 +27,7 @@ public class TeacherService(IRepository<Teacher, Guid> teacherRepository) : ITea
             return null;
         }
         Teacher? teacher = await teacherRepository
-            .FirstorDefaultAsync(t => t.UserId == userGuid && t.IsApproved == true);
+            .FirstorDefaultAsync(t => t.UserId == userGuid && t.Status == TeacherStatus.Approved);
 
         if (teacher == null)
         {

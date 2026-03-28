@@ -1,10 +1,13 @@
+using LerningApp.Common;
+using static LerningApp.Common.Enums;
+
 namespace LerningApp.Data.Models;
 
 public class Teacher
 {
     public Guid Id { get; set; } = Guid.NewGuid();
     
-    public bool IsApproved { get; set; }
+    public TeacherStatus Status { get; set; }
     
     public DateTime? TeacherSince { get; set; }
     public string? Qualification { get; set; }

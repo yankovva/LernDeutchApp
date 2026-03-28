@@ -4,6 +4,7 @@ using LerningApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LerningApp.Data.Migrations
 {
     [DbContext(typeof(LerningAppContext))]
-    partial class LerningAppContextModelSnapshot : ModelSnapshot
+    [Migration("20260328122143_AddTeacherSincePropertyInTeacher")]
+    partial class AddTeacherSincePropertyInTeacher
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -459,12 +462,12 @@ namespace LerningApp.Data.Migrations
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
 
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Qualification")
                         .HasMaxLength(70)
                         .HasColumnType("nvarchar(70)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.Property<DateTime?>("TeacherSince")
                         .HasColumnType("datetime2");
