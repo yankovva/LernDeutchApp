@@ -1,5 +1,6 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @using LerningApp.Web.ViewModels.Admin.Teacher
+@using static LerningApp.Common.Enums
 @model IEnumerable<AdminTeacherIndexViewModel>
 
 @{
@@ -74,6 +75,10 @@
     .teacher-badge-approved {
         background: #dcfce7;
         color: #166534;
+    }
+    .teacher-badge-inactive{
+        background: #a3a2a2;
+        color: #000000;
     }
 
     .teacher-badge-pending {
@@ -177,19 +182,22 @@
                     <td class="teacher-name">@(teacher.LastName ?? "Not set")</td>
                     <td class="teacher-email">@(teacher.Email ?? "No email")</td>
                     <td>
-                        @if (teacher.Status == "Approved")
+                        @if (teacher.Status == TeacherStatus.Approved.ToString())
                         {
                             <span class="teacher-badge teacher-badge-approved">Approved</span>
                         }
-                        else if (teacher.Status == "PendingReview")
+                        else if (teacher.Status == TeacherStatus.PendingReview.ToString())
                         {
                             <span class="teacher-badge teacher-badge-pending">Pending</span>
-                        }else if (teacher.Status == "Rejected")
+                        }else if (teacher.Status == TeacherStatus.Rejected.ToString())
                         {
                             <span class="teacher-badge teacher-badge-rejected">Rejected</span>
-                        }else if (teacher.Status == "Draft")
+                        }else if (teacher.Status == TeacherStatus.Draft.ToString())
                         {
                             <span class="teacher-badge teacher-badge-draft">Draft</span>
+                        }else if (teacher.Status == TeacherStatus.Inactive.ToString())
+                        {
+                            <span class="teacher-badge teacher-badge-inactive">Inactive</span>
                         }
                     </td>
                     <td>@teacher.TeacherSince</td>
@@ -211,17 +219,36 @@
                                 Manage
                             </a>
 
-                            <form asp-area="Admin"
-                                  asp-controller="Teacher"
-                                  asp-action="RemoveTeacherRole"
-                                  asp-route-id="@teacher.UserId"
-                                  method="post"
-                                  class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="teacher-btn-danger">
-                                    Remove Teacher
-                                </button>
-                            </form>
+                            @if (teacher.Status == TeacherStatus.Approved.ToString())
+                            {
+                                <form asp-area="Admin"
+                                      asp-controller="Teacher"
+                                      asp-action="RemoveTeacherRole"
+                                      asp-route-id="@teacher.UserId"
+                                      method="post"
+                                      onsubmit="return confirm(`Are you sure you want to remove role Teacher for user ${@teacher.FirstName @teacher.LastName}`);"
+                                      class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="teacher-btn-danger">
+                                        Remove Teacher Role
+                                    </button>
+                                </form>
+                            }
+                            else if(teacher.Status != TeacherStatus.Approved.ToString() && teacher.Status != TeacherStatus.Inactive.ToString())
+                            {
+                                <form asp-area="Admin"
+                                      asp-controller="Teacher"
+                                      asp-action="RemoveTeacher"
+                                      asp-route-id="@teacher.UserId"
+                                      method="post"
+                                      onsubmit="return confirm(`Are you sure you want to remove teacher request for user ${@teacher.FirstName @teacher.LastName}`);"
+                                      class="d-inline">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="teacher-btn-warning">
+                                        Remove Role Request
+                                    </button>
+                                </form>
+                            }
                         </div>
                     </td>
                 </tr>

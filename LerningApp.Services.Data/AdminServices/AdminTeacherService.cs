@@ -58,6 +58,35 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         return ServiceResult.Success();
     }
 
+    public async Task<ServiceResult> RemoveTeacherRoleAsync(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return ServiceResult.Fail("No user found.");
+        }
+        bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
+        if (!isTeacher)
+        {
+            return ServiceResult.Fail("User not in role teacher.");
+        }
+        Guid parsedUserId = Guid.Parse(userId);
+        
+        var teacher = await teacherRepository
+            .FirstorDefaultAsync(u => u.UserId == parsedUserId);
+        
+        if (teacher == null)
+        {
+            return ServiceResult.Fail("User not a teacher.");
+        }
+        
+        teacher.Status = TeacherStatus.Inactive;
+        await teacherRepository.SaveChangesAsync();
+        await userManager.RemoveFromRoleAsync(user, "Teacher");
+        
+        return ServiceResult.Success();
+    }
+
     public async  Task<ServiceResultT<AdminTeacherDetailsViewModel>> GetTeacherDetailsAsync(string teacherId)
     {
         Guid userGuid = Guid.TryParse(teacherId, out Guid teacherGuid)

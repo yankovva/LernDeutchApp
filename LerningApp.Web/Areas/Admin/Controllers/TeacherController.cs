@@ -26,6 +26,7 @@ public class TeacherController(IAdminTeacherService teacherService) : Controller
             TempData["ErrorMessage"] = result.Message;
             return RedirectToAction(nameof(Index));
         }
+        TempData["SuccessMessage"] = "Successfully made teacher";
         return RedirectToAction(nameof(Index));
     }
 
@@ -39,6 +40,20 @@ public class TeacherController(IAdminTeacherService teacherService) : Controller
             return RedirectToAction(nameof(Index));
         }
         return View(result.Data);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> RemoveTeacherRole(string id)
+    {
+        var result = await teacherService.RemoveTeacherRoleAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
+        }
+        TempData["SuccessMessage"] = "Successfully removed user form teacher role";
+        return RedirectToAction(nameof(Index));
     }
     
 }

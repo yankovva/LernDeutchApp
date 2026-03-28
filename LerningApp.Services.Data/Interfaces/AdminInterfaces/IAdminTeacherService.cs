@@ -7,5 +7,6 @@ public interface IAdminTeacherService
 {
     Task<IEnumerable<AdminTeacherIndexViewModel>> GetAllTeachersAsync();
     Task<ServiceResult> MakeUserTeacherAsync(string userId);
+    Task<ServiceResult> RemoveTeacherRoleAsync(string userId);
     Task<ServiceResultT<AdminTeacherDetailsViewModel>> GetTeacherDetailsAsync(string userId);
 }
