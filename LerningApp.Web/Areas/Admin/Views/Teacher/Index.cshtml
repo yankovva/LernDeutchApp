@@ -80,6 +80,15 @@
         background: #fef3c7;
         color: #92400e;
     }
+    .teacher-badge-rejected {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .teacher-badge-draft {
+        background: #e0f2fe;
+        color: #0369a1;
+    }
 
     .teacher-actions {
         display: flex;
@@ -147,7 +156,7 @@
             <th>First Name</th>
             <th>Last Name</th>
             <th>Email</th>
-            <th>Approved</th>
+            <th>Status</th>
             <th>Teacher Since</th>
             <th>Actions</th>
         </tr>
@@ -168,13 +177,19 @@
                     <td class="teacher-name">@(teacher.LastName ?? "Not set")</td>
                     <td class="teacher-email">@(teacher.Email ?? "No email")</td>
                     <td>
-                        @if (teacher.IsApproved)
+                        @if (teacher.Status == "Approved")
                         {
                             <span class="teacher-badge teacher-badge-approved">Approved</span>
                         }
-                        else
+                        else if (teacher.Status == "PendingReview")
                         {
                             <span class="teacher-badge teacher-badge-pending">Pending</span>
+                        }else if (teacher.Status == "Rejected")
+                        {
+                            <span class="teacher-badge teacher-badge-rejected">Rejected</span>
+                        }else if (teacher.Status == "Draft")
+                        {
+                            <span class="teacher-badge teacher-badge-draft">Pending</span>
                         }
                     </td>
                     <td>@teacher.TeacherSince</td>
