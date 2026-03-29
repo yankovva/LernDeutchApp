@@ -46,18 +46,21 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         {
             return ServiceResult.Fail("No user found.");
         }
-        bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
-        if (!isTeacher)
+        bool isTeacherRole = await userManager.IsInRoleAsync(user, TeacherRole);
+        if (isTeacherRole && user.Teacher != null)
         {
-            var newTeacher = new Teacher()
-            {
-                UserId = Guid.Parse(id),
-                Status = TeacherStatus.Draft
-            };
-            
-            teacherRepository.Add(newTeacher);
-            await teacherRepository.SaveChangesAsync();
+            return ServiceResult.Fail("User is a teacher or has already been requested.");
         }
+
+        var newTeacher = new Teacher()
+        {
+            UserId = Guid.Parse(id),
+            Status = TeacherStatus.Draft
+        };
+            
+        teacherRepository.Add(newTeacher);
+        await teacherRepository.SaveChangesAsync();
+        
         return ServiceResult.Success();
     }
 
@@ -86,7 +89,11 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         teacher.TeacherSince = DateTime.UtcNow;
         teacher.Status = TeacherStatus.Approved;
         await teacherRepository.SaveChangesAsync();
-        await userManager.AddToRoleAsync(user, TeacherRole);
+        var result = await userManager.AddToRoleAsync(user, TeacherRole);
+        if (!result.Succeeded)
+        {
+            return ServiceResult.Fail("Failed to add teacher.");
+        }
         
         return ServiceResult.Success();
     }
@@ -111,7 +118,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         {
             return ServiceResult.Fail("No teacher request found.");
         }
-        teacher.Status = TeacherStatus.Draft;
+        teacher.Status = TeacherStatus.Rejected;
         await teacherRepository.SaveChangesAsync();
         
         return ServiceResult.Success();
@@ -140,10 +147,14 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             return ServiceResult.Fail("User not a teacher.");
         }
         
+        var roleResult = await userManager.RemoveFromRoleAsync(user, TeacherRole);
+        if (!roleResult.Succeeded)
+        {
+            return ServiceResult.Fail("Failed to remove teacher role.");
+        }
         teacher.Status = TeacherStatus.Inactive;
         await teacherRepository.SaveChangesAsync();
-        await userManager.RemoveFromRoleAsync(user, TeacherRole);
-        
+       
         return ServiceResult.Success();
     }
 
@@ -155,7 +166,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         
         Teacher? teacher = await teacherRepository
             .GetAllAttached()
-            .FirstOrDefaultAsync(t => t.Id == teacherGuid);
+            .FirstOrDefaultAsync(t => t.Id == teacherGuid && t.Status == TeacherStatus.PendingReview);
         if (teacher == null)
         {
             return ServiceResult.Fail("User does not have a pending teacher request.");

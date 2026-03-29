@@ -66,18 +66,26 @@ public class AdminUserService(UserManager<ApplicationUser> userManager,
         var userTeacher = await teacherRepository
             .FirstorDefaultAsync(t => t.UserId == parsedUserId);
         
-        if (userTeacher != null)
+        if ((userTeacher != null) && userTeacher.Status == Enums.TeacherStatus.Approved)
         {
             var roles = await userManager.GetRolesAsync(user);
             foreach (var role in roles)
             {
-                await userManager.RemoveFromRoleAsync(user, role);
+                var removedRole = await userManager.RemoveFromRoleAsync(user, role);
+                if (!removedRole.Succeeded)
+                {
+                    return ServiceResult.Fail($"Failed to remove user role {role}.");
+                }
             }
 
             var logins = await userManager.GetLoginsAsync(user);
             foreach (var login in logins)
             {
-                await userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
+               var removedLogins = await userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
+               if (!removedLogins.Succeeded)
+               {
+                   return ServiceResult.Fail("Failed to delete user logins.");
+               }
             }
             
             user.LastName = "User";

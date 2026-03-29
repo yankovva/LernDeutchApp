@@ -21,7 +21,7 @@ public class Enums
         Approved = 2,
         Rejected = 3,
         PendingReview = 4,
-        Inactive = 5
+        Inactive = 5,
     }
     public enum ExerciseDifficultyLevel
     {
