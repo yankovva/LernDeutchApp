@@ -229,11 +229,12 @@
                 <p><strong>Authentication:</strong> <span id="modalAuthType"></span></p>
                 <p><strong>Current Roles:</strong> <span id="modalRoles"></span></p>
             </div>
+           
             <div class="modal-footer">
-                <form id="makeTeacherForm" asp-controller="Teacher" asp-area="Admin" asp-action="MakeTeacher" method="post">
+                <form id="makeTeacherForm" asp-controller="Teacher" asp-area="Admin" asp-action="MakeTeacherRequest" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" id="modalUserId" name="id" />
-                    <button type="submit" class="btn btn-primary">Make Teacher</button>
+                    <button type="submit" class="btn btn-primary btn-make-teacher">Make Teacher Request</button>
                 </form>
             </div>
         </div>
@@ -251,6 +252,10 @@
                 document.getElementById('modalAuthType').textContent = this.dataset.authType || 'Local';
                 document.getElementById('modalRoles').textContent = this.dataset.roles || 'User';
                 document.getElementById('modalUserId').value = this.dataset.id;
+                
+                if (this.dataset.roles.includes("Teacher")){
+                    document.getElementById("makeTeacherForm").style.display = "none";
+                }
             });
         });
     </script>
