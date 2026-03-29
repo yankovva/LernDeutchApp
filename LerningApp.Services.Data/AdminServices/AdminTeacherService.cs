@@ -15,10 +15,12 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
     RoleManager<ApplicationRole> roleManager,
     IRepository<Teacher, Guid> teacherRepository) : IAdminTeacherService
 {
-    public async Task<IEnumerable<AdminTeacherIndexViewModel>> GetAllTeachersAsync()
+    public async Task<IEnumerable<AdminTeacherIndexViewModel>> GetAllTeachersNotDeletedAsync()
     {
         var teachers = await teacherRepository
             .GetAllAttached()
+            .Include(x => x.User)
+            .Where(t => t.User.IsDeleted == false)
             .Select(t => new AdminTeacherIndexViewModel()
             {
                 UserId = t.UserId.ToString(),
@@ -80,6 +82,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             return ServiceResult.Fail("No teacher found.");
         }
         
+        teacher.TeacherSince = DateTime.UtcNow;
         teacher.Status = TeacherStatus.Approved;
         await teacherRepository.SaveChangesAsync();
         await userManager.AddToRoleAsync(user, "Teacher");
