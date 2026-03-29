@@ -23,7 +23,7 @@ public class DbSeeder
         if (await db.Levels.AnyAsync())
             return;
 
-        var seedEmail = "seed.user@gmail.com";
+        var seedEmail = "teacher@gmail.com";
         var seedUser = await userManager.FindByEmailAsync(seedEmail);
 
         if (seedUser == null)
@@ -32,16 +32,20 @@ public class DbSeeder
             {
                 UserName = seedEmail,
                 Email = seedEmail,
-                EmailConfirmed = true
+                EmailConfirmed = true,
+                FirstName = "Best",
+                LastName = "Teacher",
             };
 
-            var createResult = await userManager.CreateAsync(seedUser, "User123!");
+            var createResult = await userManager.CreateAsync(seedUser, "Teacher123!");
             if (!createResult.Succeeded)
             {
                 throw new InvalidOperationException(
                     "Failed to create seed user: " +
                     string.Join(", ", createResult.Errors.Select(e => e.Description)));
             }
+
+            await userManager.AddToRoleAsync(seedUser, "Teacher");
         }
 
         var teacher = new Teacher
@@ -51,7 +55,8 @@ public class DbSeeder
                 "I'm a teacher! The Best ever! You can learn a lot from me and be the best student ever to exist! Join my Courses now!",
             Qualification = "I have studied something with computers!",
             UserId = seedUser.Id,
-            Status = TeacherStatus.Approved
+            Status = TeacherStatus.Approved,
+            TeacherSince = DateTime.UtcNow,
         };
 
         var a1 = new Level

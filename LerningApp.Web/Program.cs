@@ -69,10 +69,10 @@ app.MapRazorPages();
 
 await app.ApplyMigrations();
 
+await app.SeedRolesAndAdminAsync();
 if (app.Environment.IsDevelopment())
 {
     await DbSeeder.SeedAsync(app.Services);
 }
-await app.SeedRolesAndAdminAsync();
 
 app.Run();
