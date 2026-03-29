@@ -33,13 +33,27 @@ public class TeacherController(IAdminTeacherService teacherService) : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Approve(string id)
     {
-        var result = await teacherService.AddUserTeacherRoleAsync(id);
+        var result = await teacherService.ApproveUserTeacherRoleAsync(id);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
             return RedirectToAction(nameof(Index));
         }
         TempData["SuccessMessage"] = "Successfully added teacher role.";
+        return RedirectToAction(nameof(Index));
+    }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Reject(string id)
+    {
+        var result = await teacherService.RejectTeacherRequestAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
+        }
+        TempData["SuccessMessage"] = "Successfully rejected teacher request.";
         return RedirectToAction(nameof(Index));
     }
 
@@ -96,5 +110,6 @@ public class TeacherController(IAdminTeacherService teacherService) : Controller
         TempData["SuccessMessage"] = "Successfully returned teacher.";
         return RedirectToAction(nameof(Index));
     }
+    
     
 }

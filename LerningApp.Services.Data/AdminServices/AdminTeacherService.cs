@@ -41,7 +41,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         var user = await userManager.FindByIdAsync(id);
         if (user == null)
         {
-            return ServiceResult.Fail("No user found");
+            return ServiceResult.Fail("No user found.");
         }
         bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
         if (!isTeacher)
@@ -58,12 +58,12 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> AddUserTeacherRoleAsync(string userId)
+    public async Task<ServiceResult> ApproveUserTeacherRoleAsync(string userId)
     {
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return ServiceResult.Fail("No user found");
+            return ServiceResult.Fail("No user found.");
         }
         
         bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
@@ -77,12 +77,38 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             .FirstorDefaultAsync(t => t.UserId == userGuid);
         if (teacher == null)
         {
-            return ServiceResult.Fail("No teacher found");
+            return ServiceResult.Fail("No teacher found.");
         }
         
         teacher.Status = TeacherStatus.Approved;
         await teacherRepository.SaveChangesAsync();
         await userManager.AddToRoleAsync(user, "Teacher");
+        
+        return ServiceResult.Success();
+    }
+
+    public async Task<ServiceResult> RejectTeacherRequestAsync(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return ServiceResult.Fail("No user found.");
+        }
+        bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
+        if (isTeacher)
+        {
+            return ServiceResult.Fail("User is already in role Teacher.");
+        }
+        
+        Guid userGuid = Guid.Parse(userId);
+        var teacher = await teacherRepository
+            .FirstorDefaultAsync(t => t.UserId == userGuid);
+        if (teacher == null)
+        {
+            return ServiceResult.Fail("No teacher request found.");
+        }
+        teacher.Status = TeacherStatus.Draft;
+        await teacherRepository.SaveChangesAsync();
         
         return ServiceResult.Success();
     }
