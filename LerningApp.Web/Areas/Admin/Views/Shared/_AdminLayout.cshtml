@@ -9,6 +9,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>@pageTitle - Admin Panel</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
     <style>
         :root {
             --admin-bg: #eef2f6;
@@ -243,8 +244,12 @@
         </section>
     </main>
 </div>
+
+<script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 @await RenderSectionAsync("Scripts", required: false)
+<partial name="~/Views/Shared/_NotificationsPartial.cshtml" />
 </body>
 </html>
