@@ -182,7 +182,6 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
 
         var exercise = await exerciseRepository
             .GetAllAttached()
-            .Include(c => c.Options)
             .FirstOrDefaultAsync(c => c.Id == exerciseGuidId);
 
         if (exercise == null)
