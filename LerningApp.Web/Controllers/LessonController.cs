@@ -104,7 +104,7 @@ public class LessonController(ILessonService lessonService,
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(AddLessonInputModel model)
     {
-        if (ModelState.IsValid)
+        if (!ModelState.IsValid)
         {
             model.Courses = await courseService.GetCourseOptionsAsync();
             return View(model);

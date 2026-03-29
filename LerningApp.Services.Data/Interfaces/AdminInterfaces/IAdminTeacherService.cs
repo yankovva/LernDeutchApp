@@ -5,7 +5,7 @@ namespace LerningApp.Services.Data.Interfaces.AdminInterfaces;
 
 public interface IAdminTeacherService
 {
-    Task<IEnumerable<AdminTeacherIndexViewModel>> GetAllTeachersAsync();
+    Task<IEnumerable<AdminTeacherIndexViewModel>> GetAllTeachersNotDeletedAsync();
     Task<ServiceResultT<AdminTeacherDetailsViewModel>> GetTeacherDetailsAsync(string userId);
     Task<ServiceResult> AddPendingTeacherAsync(string userId);
     Task<ServiceResult> ApproveUserTeacherRoleAsync(string userId);

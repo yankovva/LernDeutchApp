@@ -5,6 +5,6 @@ namespace LerningApp.Services.Data.Interfaces.AdminInterfaces;
 
 public interface IAdminUserService
 {
-    Task<IEnumerable<AdminUserIndexViewModel>> GetAllUsersAsync();
+    Task<IEnumerable<AdminUserIndexViewModel>> GetAllUsersNotDeletedAsync();
     Task<ServiceResult>DeleteUserAsync(string userId);
 }

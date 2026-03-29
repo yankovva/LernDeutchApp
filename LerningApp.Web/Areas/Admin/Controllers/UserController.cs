@@ -10,7 +10,7 @@ public class UserController(IAdminUserService userService) : Controller
 {
     public async Task<IActionResult> Index()
     {
-        var model = await userService.GetAllUsersAsync();
+        var model = await userService.GetAllUsersNotDeletedAsync();
         return View(model);
     }
     [HttpPost]

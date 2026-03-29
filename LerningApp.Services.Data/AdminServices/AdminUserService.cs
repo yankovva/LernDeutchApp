@@ -1,4 +1,7 @@
+using LerningApp.Common;
 using LerningApp.Data.Models;
+using LerningApp.Data.Repository.Interfaces;
+using LerningApp.Services.Data.Interfaces;
 using LerningApp.Services.Data.Interfaces.AdminInterfaces;
 using LerningApp.Web.ViewModels.Admin.User;
 using Microsoft.AspNetCore.Identity;
@@ -6,11 +9,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Services.Data.AdminServices;
 
-public class AdminUserService(UserManager<ApplicationUser> userManager) : IAdminUserService
+public class AdminUserService(UserManager<ApplicationUser> userManager,
+    IFileService fileService,
+    IRepository<Teacher,Guid> teacherRepository) : IAdminUserService
 {
-    public async Task<IEnumerable<AdminUserIndexViewModel>> GetAllUsersAsync()
+    public async Task<IEnumerable<AdminUserIndexViewModel>> GetAllUsersNotDeletedAsync()
     {
         var allUsers = await userManager.Users
+            .Where(u => u.IsDeleted == false)
             .OrderBy(u => u.UserName)
             .ToListAsync();
 
@@ -35,5 +41,77 @@ public class AdminUserService(UserManager<ApplicationUser> userManager) : IAdmin
         }
         
         return result;
+    }
+
+    public async Task<ServiceResult> DeleteUserAsync(string userId)
+    {
+        if (!Guid.TryParse(userId, out Guid parsedUserId))
+        {
+            return ServiceResult.Fail("Invalid user id.");
+        }
+
+        ApplicationUser? user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+           return ServiceResult.Fail("User not found.");
+        }
+        
+        string? userPhoto = user.ProfileImage;
+        if (userPhoto != null)
+        {
+            fileService.DeleteFile(userPhoto);
+        }
+        
+        var userTeacher = await teacherRepository
+            .FirstorDefaultAsync(t => t.UserId == parsedUserId);
+        
+        if (userTeacher != null)
+        {
+            var roles = await userManager.GetRolesAsync(user);
+            foreach (var role in roles)
+            {
+                await userManager.RemoveFromRoleAsync(user, role);
+            }
+
+            var logins = await userManager.GetLoginsAsync(user);
+            foreach (var login in logins)
+            {
+                await userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
+            }
+            
+            user.LastName = "User";
+            user.FirstName = "Deleted";
+            user.ProfileImage = null;
+            user.Email = $"deleted-{user.Id}@deleted.local";
+            user.UserName = $"deleted-{user.Id}";
+            user.NormalizedEmail = user.Email.ToUpper();
+            user.NormalizedUserName = user.UserName.ToUpper();
+            user.IsDeleted = true;
+            user.DeletedAt = DateTime.UtcNow;
+            user.PhoneNumber = null;
+            user.PasswordHash = null;
+            user.EmailConfirmed = false;
+            user.LockoutEnabled = true;
+            user.LockoutEnd = DateTimeOffset.MaxValue;
+
+            userTeacher.Status = Enums.TeacherStatus.Inactive;
+            
+            var updateResult = await userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                return ServiceResult.Fail("Failed to anonymize user.");
+            }
+
+            await teacherRepository.SaveChangesAsync();
+            return ServiceResult.Success();
+        }
+        
+        var result = await userManager.DeleteAsync(user);
+        if (!result.Succeeded)
+        {
+            return ServiceResult.Fail("Failed to delete user.");
+        }
+        
+        return ServiceResult.Success();
     }
 }
