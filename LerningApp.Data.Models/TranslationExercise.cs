@@ -20,7 +20,7 @@ public class TranslationExercise
     public bool IsDeleted { get; set; } 
     
     [Comment("The difficulty level of the exercise")]
-    public int DifficultyLevel { get; set; }
+    public ExerciseDifficultyLevel DifficultyLevel { get; set; }
    
     [Comment("Foreign key to Lesson")]
     public Guid LessonId { get; set; }

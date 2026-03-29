@@ -104,7 +104,7 @@ public class DbSeeder
             GermanSentence = "Die Tür ist offen.",
             BulgarianSentence = "Вратата е отворена.",
             EnglishSentence = "The door is open.",
-            DifficultyLevel = 1,
+            DifficultyLevel = ExerciseDifficultyLevel.Easy,
             PublisherId = teacher.Id
         };
 
@@ -115,7 +115,7 @@ public class DbSeeder
             GermanSentence = "Das Haus ist groß.",
             BulgarianSentence = "Къщата е голяма.",
             EnglishSentence = "The house is big.",
-            DifficultyLevel = 1,
+            DifficultyLevel = ExerciseDifficultyLevel.Medium,
             PublisherId = teacher.Id
         };
         

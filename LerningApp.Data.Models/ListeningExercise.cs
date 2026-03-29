@@ -1,3 +1,4 @@
+using static LerningApp.Common.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace LerningApp.Data.Models;
@@ -10,7 +11,7 @@ public class ListeningExercise
     public string AudioPath { get; set; } = null!;
     
     [Comment("The difficulty level of the exercise")]
-    public int DifficultyLevel { get; set; }
+    public ExerciseDifficultyLevel DifficultyLevel { get; set; }
     
     [Comment("Shows if the exercise is deleted")]
     public bool IsDeleted { get; set; } 

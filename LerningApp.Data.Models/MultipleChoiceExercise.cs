@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 
+using static LerningApp.Common.Enums;
+
+
 namespace LerningApp.Data.Models;
 
 public class MultipleChoiceExercise
@@ -7,7 +10,7 @@ public class MultipleChoiceExercise
     public Guid Id { get; set; } = Guid.NewGuid();
     
     [Comment("The difficulty level of the exercise")]
-    public int DifficultyLevel { get; set; }
+    public ExerciseDifficultyLevel DifficultyLevel { get; set; }
     public bool IsDeleted { get; set; } 
    
     [Comment("Foreign key to Lesson")]

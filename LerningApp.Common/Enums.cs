@@ -23,4 +23,12 @@ public class Enums
         PendingReview = 4,
         Inactive = 5
     }
+    public enum ExerciseDifficultyLevel
+    {
+        VeryEasy = 0,
+        Easy = 1,
+        Medium = 2,
+        Hard = 3,
+        VeryHard = 4
+    }
 }
