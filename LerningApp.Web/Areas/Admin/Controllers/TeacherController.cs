@@ -1,18 +1,19 @@
-using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces.AdminInterfaces;
+
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+
+using static LerningApp.Common.ApplicationConstants;
 
 namespace LerningApp.Areas.Admin.Controllers;
 
-[Area("Admin")]
-[Authorize(Roles = "Admin")]
+[Area(AdminRole)]
+[Authorize(Roles = AdminRole)]
 public class TeacherController(IAdminTeacherService teacherService) : Controller
 {
     public async Task<IActionResult> Index()
     {
-        var model = await teacherService.GetAllTeachersAsync();
+        var model = await teacherService.GetAllTeachersNotDeletedAsync();
         return View(model);
     }
   

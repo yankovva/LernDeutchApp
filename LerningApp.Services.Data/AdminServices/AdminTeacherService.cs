@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.Enums;
+using static LerningApp.Common.ApplicationConstants;
 
 namespace LerningApp.Services.Data.AdminServices;
 
@@ -45,7 +46,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         {
             return ServiceResult.Fail("No user found.");
         }
-        bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
+        bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
         if (!isTeacher)
         {
             var newTeacher = new Teacher()
@@ -68,7 +69,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             return ServiceResult.Fail("No user found.");
         }
         
-        bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
+        bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
         if (isTeacher)
         {
             return ServiceResult.Fail("User already teacher.");
@@ -85,7 +86,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         teacher.TeacherSince = DateTime.UtcNow;
         teacher.Status = TeacherStatus.Approved;
         await teacherRepository.SaveChangesAsync();
-        await userManager.AddToRoleAsync(user, "Teacher");
+        await userManager.AddToRoleAsync(user, TeacherRole);
         
         return ServiceResult.Success();
     }
@@ -97,7 +98,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         {
             return ServiceResult.Fail("No user found.");
         }
-        bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
+        bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
         if (isTeacher)
         {
             return ServiceResult.Fail("User is already in role Teacher.");
@@ -124,7 +125,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             return ServiceResult.Fail("No user found.");
         }
         
-        bool isTeacher = await userManager.IsInRoleAsync(user, "Teacher");
+        bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
         if (!isTeacher)
         {
             return ServiceResult.Fail("User not in role teacher.");
@@ -141,7 +142,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         
         teacher.Status = TeacherStatus.Inactive;
         await teacherRepository.SaveChangesAsync();
-        await userManager.RemoveFromRoleAsync(user, "Teacher");
+        await userManager.RemoveFromRoleAsync(user, TeacherRole);
         
         return ServiceResult.Success();
     }

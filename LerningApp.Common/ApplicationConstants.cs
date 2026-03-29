@@ -8,4 +8,7 @@ public class ApplicationConstants
 
     public static readonly string[] AllowedImageExtensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp"];
     public const long MaxFileSize = 5 * 1024 * 1024;
+    
+    public const string AdminRole = "Admin";
+    public const string TeacherRole = "Teacher";
 }

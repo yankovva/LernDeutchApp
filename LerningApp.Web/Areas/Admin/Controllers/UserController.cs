@@ -1,11 +1,15 @@
 using LerningApp.Services.Data.Interfaces.AdminInterfaces;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+using static LerningApp.Common.ApplicationConstants;
+
+
 namespace LerningApp.Areas.Admin.Controllers;
 
-[Area("Admin")]
-[Authorize(Roles = "Admin")]
+[Area(AdminRole)]
+[Authorize(Roles = AdminRole)]
 public class UserController(IAdminUserService userService) : Controller
 {
     public async Task<IActionResult> Index()
