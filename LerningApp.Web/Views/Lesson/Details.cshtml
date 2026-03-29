@@ -534,7 +534,7 @@
                          await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                     {
                         <div class="listening-exercise-admin">
-                            <form asp-action="SoftDelete" asp-controller="MultipleChoiceExerciseApi" method="post"
+                            <form asp-action="SoftDelete" asp-controller="ListeningExerciseApi" method="post"
                                   class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <input type="hidden" name="id" value="@ex.Id"/>
@@ -595,7 +595,7 @@
                      await teacherService.IsUserTeacherAsync(User.GetUserId()!))
                 {
                     <div class="translation-exercise-admin">
-                        <form asp-action="SoftDelete" asp-controller="MultipleChoiceExerciseApi" method="post"
+                        <form asp-action="SoftDelete" asp-controller="TranslationExerciseApi" method="post"
                               class="d-inline">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="id" value="@ex.Id"/>
