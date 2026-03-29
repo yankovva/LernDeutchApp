@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-
+using static LerningApp.Common.Enums;
 using static LerningApp.Common.EntityValidationConstants.TranslationExercise;
 
 namespace LerningApp.Web.ViewModels.TranslationExercise;
@@ -23,8 +23,7 @@ public class CreateTranslationExerciseViewModel
     [MinLength(SentenceMinLength)]
     [MaxLength(SentenceMaxLength)]
     public string SentenceBg { get; set; } = null!;
+    public ExerciseDifficultyLevel DifficultyLevel { get; set; }
     
-    [Range(1,5)]
-    public int DifficultyLevel { get; set; }
     public int OrderIndex { get; set; }
 }

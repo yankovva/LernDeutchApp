@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 
-using static LerningApp.Common.EntityValidationConstants.ListeningExercise;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Web.ViewModels.ListeningExercise;
 
@@ -9,10 +9,7 @@ public class CreateListeningExerciseViewModel
 { 
      [Required]
      public string LessonId { get; set; } = null!;
-     
-     [Required]
-     [Range(1,5)]
-     public int DifficultyLevel { get; set; }
+     public ExerciseDifficultyLevel DifficultyLevel { get; set; }
      
      [Required]
      public IFormFile AudioFile { get; set; } = null!;

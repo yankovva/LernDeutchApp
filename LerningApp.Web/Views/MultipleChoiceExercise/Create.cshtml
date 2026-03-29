@@ -1,8 +1,16 @@
 @using LerningApp.Web.ViewModels.MultipleChoiceExercise
+@using static LerningApp.Common.Enums;
 @model CreateMultipleChoiceExerciseViewModel
 
 @{
     ViewData["Title"] = "Create Multiple Choice Exercise";
+    var difficultyOptions = Enum.GetValues<ExerciseDifficultyLevel>()
+        .Select(x => new
+        {
+            Value = (int)x,
+            Text = x.ToString()
+        })
+        .ToList();
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -31,11 +39,10 @@
                     <div class="mb-3">
                         <label asp-for="DifficultyLevel" class="form-label">Трудност</label>
                         <select asp-for="DifficultyLevel" class="form-select">
-                            <option value="1">Very Easy</option>
-                            <option value="2">Easy</option>
-                            <option value="3">Medium</option>
-                            <option value="4">Hard</option>
-                            <option value="5">Very Hard</option>
+                            @foreach( var option in difficultyOptions)
+                            {
+                                <option value="@option.Value">@option.Text</option>
+                            }
                         </select>
                         <span asp-validation-for="DifficultyLevel" class="text-danger"></span>
                     </div>

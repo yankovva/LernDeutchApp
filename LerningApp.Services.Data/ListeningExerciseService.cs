@@ -98,7 +98,7 @@ public class ListeningExerciseService(
         ListeningExercise exercise = new()
         {
             LessonId = lessonId,
-            DifficultyLevel = model.DifficultyLevel,
+            DifficultyLevel = Enums.ExerciseDifficultyLevel.Hard,
             PublisherId = teacherId.Value,
             AudioPath = $"/{audioPath}",
         };

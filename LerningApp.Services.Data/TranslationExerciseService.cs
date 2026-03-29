@@ -6,6 +6,7 @@ using LerningApp.Web.ViewModels.TranslationExercise;
 
 using Microsoft.EntityFrameworkCore;
 
+using static LerningApp.Common.Enums;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Exercise;
@@ -73,7 +74,7 @@ public class TranslationExerciseService(
             EnglishSentence = model.SentenceEn,
             BulgarianSentence = model.SentenceBg,
             PublisherId = teacherId.Value,
-            DifficultyLevel = model.DifficultyLevel,
+            DifficultyLevel = ExerciseDifficultyLevel.Hard,
         };
 
         exerciseRepository.Add(exercise);
