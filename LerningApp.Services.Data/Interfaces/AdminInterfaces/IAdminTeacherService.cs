@@ -11,4 +11,5 @@ public interface IAdminTeacherService
     Task<ServiceResult> RemoveTeacherRoleAsync(string userId);
     Task<ServiceResult> RemovePendingTeacherAsync(string teacherId);
     Task<ServiceResultT<AdminTeacherDetailsViewModel>> GetTeacherDetailsAsync(string userId);
+    Task<ServiceResult> ReturnRemovedTeacher(string userId);
 }

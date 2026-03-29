@@ -252,7 +252,7 @@
                             else
                             {
                                 <div class="modal-footer">
-                                    <form id="makeTeacherForm" asp-controller="Teacher" asp-area="Admin" asp-action="ReturnReacher" method="post">
+                                    <form id="makeTeacherForm" asp-controller="Teacher" asp-area="Admin" asp-action="ReturnTeacher" method="post">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" value="@teacher.UserId" name="id" />
                                         <button type="submit" class="btn btn-primary">Return Teacher</button>

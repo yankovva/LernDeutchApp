@@ -173,4 +173,27 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         
         return ServiceResultT<AdminTeacherDetailsViewModel>.Success(result);
     }
+
+    public async Task<ServiceResult> ReturnRemovedTeacher(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return ServiceResult.Fail("No user found.");
+        }
+        Guid id = Guid.TryParse(userId, out Guid userGuid)
+            ? userGuid
+            : Guid.Empty;
+        Teacher? userTeacher = await teacherRepository
+            .FirstorDefaultAsync(t => t.UserId == userGuid);
+        if (userTeacher == null)
+        {
+            return ServiceResult.Fail("No teacher found.");
+        }
+        
+        userTeacher.Status = TeacherStatus.Draft;
+        await teacherRepository.SaveChangesAsync();
+        
+        return ServiceResult.Success();
+    }
 }

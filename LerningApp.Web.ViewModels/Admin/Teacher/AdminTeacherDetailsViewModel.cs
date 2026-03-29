@@ -2,7 +2,8 @@ namespace LerningApp.Web.ViewModels.Admin.Teacher;
 
 public class AdminTeacherDetailsViewModel
 { 
-    public string Id { get; set; } = null!;
+    public string UserId { get; set; } = null!;
+    public string TeacherId { get; set; } = null!;
     public string? FirstName { get; set; } 
     public string? LastName { get; set; } 
     public string? Email { get; set; }

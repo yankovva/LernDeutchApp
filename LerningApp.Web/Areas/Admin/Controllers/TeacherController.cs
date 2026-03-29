@@ -82,5 +82,19 @@ public class TeacherController(IAdminTeacherService teacherService) : Controller
         TempData["SuccessMessage"] = "Successfully removed teacher request.";
         return RedirectToAction(nameof(Index));
     }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> ReturnTeacher(string id)
+    {
+        var result = await teacherService.ReturnRemovedTeacher(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction(nameof(Index));
+        }
+        TempData["SuccessMessage"] = "Successfully returned teacher.";
+        return RedirectToAction(nameof(Index));
+    }
     
 }
