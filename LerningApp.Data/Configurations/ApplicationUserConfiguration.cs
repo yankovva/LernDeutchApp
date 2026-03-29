@@ -18,6 +18,10 @@ public class ApplicationUserConfiguration: IEntityTypeConfiguration<ApplicationU
             .HasMaxLength(LastNameMaxLength)
             .IsRequired(false);
 
+
+        builder.Property(x => x.DeletedAt)
+            .HasColumnType("datetime2");
+        
         builder.Property(x => x.ProfileImage)
             .HasMaxLength(ProfileImageMaxLength)
             .IsRequired(false);

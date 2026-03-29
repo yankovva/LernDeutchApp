@@ -19,6 +19,10 @@ public class ApplicationUser : IdentityUser<Guid>
     
     [PersonalData]
     public string? ProfileImage { get; set; }
+    
+    public bool IsDeleted { get; set; }
+    
+    public DateTime DeletedAt { get; set; }
 
     public Teacher? Teacher { get; set; }
 
