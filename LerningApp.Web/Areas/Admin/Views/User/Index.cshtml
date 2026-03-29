@@ -198,9 +198,10 @@
                             <form asp-area="Admin"
                                   asp-controller="User"
                                   asp-action="Delete"
-                                  asp-route-id="@user.Id"
+                                  asp-route-userId="@user.Id"
                                   method="post"
-                                  class="d-inline">
+                                  class="d-inline"
+                                  onsubmit="return confirm('Are you sure you want to delete @user.Email?');">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="user-btn-danger">
                                     Delete User
@@ -252,9 +253,13 @@
                 document.getElementById('modalAuthType').textContent = this.dataset.authType || 'Local';
                 document.getElementById('modalRoles').textContent = this.dataset.roles || 'User';
                 document.getElementById('modalUserId').value = this.dataset.id;
-                
-                if (this.dataset.roles.includes("Teacher")){
-                    document.getElementById("makeTeacherForm").style.display = "none";
+
+                const makeTeacherForm = document.getElementById("makeTeacherForm");
+
+                if ((this.dataset.roles || "").includes("Teacher")) {
+                    makeTeacherForm.style.display = "none";
+                } else {
+                    makeTeacherForm.style.display = "block";
                 }
             });
         });
