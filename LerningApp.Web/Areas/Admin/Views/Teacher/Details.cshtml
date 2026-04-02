@@ -58,6 +58,10 @@
         background: #e0f2fe;
         color: #0369a1;
     }
+    .teacher-status-inactive {
+        background: #a3a2a2;
+        color: #000000;
+    }
 
     .teacher-main-grid {
         display: grid;
@@ -214,6 +218,9 @@
             else if (Model.Status == "Rejected")
             {
                 <span class="teacher-status-badge teacher-status-rejected">Rejected</span>
+            }else if (Model.Status == "Inactive")
+            {
+                <span class="teacher-status-badge teacher-status-inactive">Inactive</span>
             }
             else
             {
@@ -276,15 +283,19 @@
             <div class="teacher-section">
                 <h3>Administrative Actions</h3>
                 <div class="teacher-actions">
-                    <form asp-area="Admin" asp-controller="Teacher" asp-action="Approve" asp-route-id="@Model.UserId" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="teacher-btn-approve">Approve Teacher</button>
-                    </form>
+                    
+                    @if (Model.Status == "PendingReview")
+                    {
+                        <form asp-area="Admin" asp-controller="Teacher" asp-action="Approve" asp-route-id="@Model.UserId" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="teacher-btn-approve">Approve Teacher</button>
+                        </form>
 
-                    <form asp-area="Admin" asp-controller="Teacher" asp-action="Reject" asp-route-id="@Model.UserId" method="post" class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <button type="submit" class="teacher-btn-reject">Reject Teacher</button>
-                    </form>
+                        <form asp-area="Admin" asp-controller="Teacher" asp-action="Reject" asp-route-id="@Model.UserId" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="teacher-btn-reject">Reject Teacher</button>
+                        </form>
+                    }
 
                     <a asp-area="Admin" asp-controller="Teacher" asp-action="Index" class="teacher-btn-back">
                         Back to Teachers
