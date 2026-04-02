@@ -1,0 +1,270 @@
+@{
+    ViewData["Title"] = "Teacher Dashboard";
+}
+
+<style>
+    .teacher-dashboard {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .teacher-hero {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1.5rem;
+        padding: 1.75rem;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #0f766e, #134e4a);
+        color: white;
+        box-shadow: 0 18px 40px rgba(15, 118, 110, 0.18);
+    }
+
+    .teacher-hero h2 {
+        margin: 0;
+        font-size: 1.85rem;
+        font-weight: 800;
+    }
+
+    .teacher-hero p {
+        margin: 0.7rem 0 0;
+        color: rgba(255,255,255,0.82);
+        max-width: 720px;
+        line-height: 1.65;
+    }
+
+    .teacher-hero-badge {
+        display: inline-block;
+        padding: 0.55rem 0.9rem;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.18);
+        font-size: 0.85rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .teacher-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 1.25rem;
+    }
+
+    .teacher-card {
+        background: #fff;
+        border: 1px solid #d9e7e5;
+        border-radius: 20px;
+        padding: 1.4rem;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        display: flex;
+        flex-direction: column;
+        min-height: 230px;
+    }
+
+    .teacher-card-label {
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        color: #64748b;
+        margin-bottom: 0.75rem;
+    }
+
+    .teacher-card h3 {
+        margin: 0 0 0.8rem;
+        font-size: 1.18rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .teacher-card p {
+        margin: 0;
+        color: #475569;
+        line-height: 1.65;
+        flex-grow: 1;
+    }
+
+    .teacher-card a {
+        display: inline-block;
+        margin-top: 1.15rem;
+        text-decoration: none;
+        border-radius: 12px;
+        padding: 0.72rem 1rem;
+        font-weight: 700;
+        transition: 0.18s ease;
+    }
+
+    .teacher-btn-main {
+        background: #0f766e;
+        color: white;
+    }
+
+    .teacher-btn-main:hover {
+        background: #115e59;
+        color: white;
+    }
+
+    .teacher-btn-secondary {
+        background: #e2e8f0;
+        color: #102542;
+    }
+
+    .teacher-btn-secondary:hover {
+        background: #cbd5e1;
+        color: #102542;
+    }
+
+    .teacher-bottom-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .teacher-panel {
+        background: #fff;
+        border: 1px solid #d9e7e5;
+        border-radius: 20px;
+        padding: 1.4rem;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+    }
+
+    .teacher-panel h3 {
+        margin: 0 0 0.85rem;
+        font-size: 1.08rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .teacher-panel p,
+    .teacher-panel li {
+        color: #475569;
+        line-height: 1.65;
+    }
+
+    .teacher-panel ul {
+        margin: 0;
+        padding-left: 1.1rem;
+    }
+
+    @@media (max-width: 1100px) {
+        .teacher-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .teacher-bottom-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .teacher-hero {
+            flex-direction: column;
+        }
+
+        .teacher-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="teacher-dashboard">
+    <section class="teacher-hero">
+        <div>
+            <h2>Teacher Dashboard</h2>
+            <p>
+                Use this area to manage your courses, lessons, exercises, and teacher profile from one focused workspace.
+            </p>
+        </div>
+
+        <div class="teacher-hero-badge">
+            Teaching Workspace
+        </div>
+    </section>
+
+    <section class="teacher-grid">
+        <div class="teacher-card">
+            <div class="teacher-card-label">Profile</div>
+            <h3>Teacher Profile</h3>
+            <p>
+                Complete and maintain your biography, qualifications, and teacher-specific details.
+            </p>
+            <a asp-area="Teacher" asp-controller="Profile" asp-action="Index" class="teacher-btn-main">
+                Open Profile
+            </a>
+        </div>
+
+        <div class="teacher-card">
+            <div class="teacher-card-label">Courses</div>
+            <h3>Manage Courses</h3>
+            <p>
+                Review your courses, update course information, and organize teaching materials.
+            </p>
+            <a asp-area="" asp-controller="Course" asp-action="Index" class="teacher-btn-main">
+                Open Courses
+            </a>
+        </div>
+
+        <div class="teacher-card">
+            <div class="teacher-card-label">Lessons</div>
+            <h3>Manage Lessons</h3>
+            <p>
+                Create new lessons, improve lesson content, and keep your structure consistent.
+            </p>
+            <a asp-area="" asp-controller="Lesson" asp-action="Index" class="teacher-btn-main">
+                Open Lessons
+            </a>
+        </div>
+
+        <div class="teacher-card">
+            <div class="teacher-card-label">Exercises</div>
+            <h3>Exercise Management</h3>
+            <p>
+                Work on multiple choice, listening, and translation exercises linked to your lessons.
+            </p>
+            <a asp-area="" asp-controller="Lesson" asp-action="Index" class="teacher-btn-secondary">
+                Open Exercise Tools
+            </a>
+        </div>
+
+        <div class="teacher-card">
+            <div class="teacher-card-label">Vocabulary</div>
+            <h3>Vocabulary Cards</h3>
+            <p>
+                Add supporting vocabulary cards to improve learning flow and lesson quality.
+            </p>
+            <a asp-area="" asp-controller="VocabularyCard" asp-action="Create" class="teacher-btn-secondary">
+                Create Cards
+            </a>
+        </div>
+
+        <div class="teacher-card">
+            <div class="teacher-card-label">Overview</div>
+            <h3>Workspace Summary</h3>
+            <p>
+                Keep your teaching content organized and make sure your teacher profile stays ready for review.
+            </p>
+            <a asp-area="Teacher" asp-controller="Home" asp-action="Index" class="teacher-btn-secondary">
+                Refresh Dashboard
+            </a>
+        </div>
+    </section>
+
+    <section class="teacher-bottom-grid">
+        <div class="teacher-panel">
+            <h3>Teacher Workspace</h3>
+            <p>
+                This panel is intended to help teachers manage content and profile information in a more focused way than the public application area.
+            </p>
+        </div>
+
+        <div class="teacher-panel">
+            <h3>Quick Focus</h3>
+            <ul>
+                <li>Update your teacher profile</li>
+                <li>Review course and lesson content</li>
+                <li>Prepare exercises and vocabulary</li>
+                <li>Keep your materials ready for students</li>
+            </ul>
+        </div>
+    </section>
+</div>
