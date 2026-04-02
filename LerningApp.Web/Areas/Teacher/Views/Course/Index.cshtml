@@ -1,0 +1,214 @@
+@using LerningApp.Web.ViewModels.Teacher
+@model IEnumerable<CourseTeacherIndexViewModel>
+
+@{
+    ViewData["Title"] = "Courses";
+}
+
+<style>
+    .teacher-courses-page {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .teacher-courses-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .teacher-courses-header h2 {
+        margin: 0;
+        font-size: 1.55rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .teacher-courses-header p {
+        margin: 0.45rem 0 0;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .teacher-create-btn {
+        display: inline-block;
+        text-decoration: none;
+        border-radius: 14px;
+        padding: 0.8rem 1rem;
+        font-weight: 700;
+        background: #0f766e;
+        color: white;
+        white-space: nowrap;
+    }
+
+    .teacher-create-btn:hover {
+        background: #115e59;
+        color: white;
+    }
+
+    .teacher-courses-table-wrap {
+        overflow-x: auto;
+    }
+
+    .teacher-courses-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 900px;
+        background: white;
+        border-radius: 18px;
+        overflow: hidden;
+    }
+
+    .teacher-courses-table thead th {
+        text-align: left;
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #64748b;
+        padding: 1rem 0.9rem;
+        border-bottom: 1px solid #dbe3ec;
+        background: #f8fafc;
+    }
+
+    .teacher-courses-table tbody td {
+        padding: 1rem 0.9rem;
+        border-bottom: 1px solid #e5e7eb;
+        vertical-align: middle;
+        color: #102542;
+    }
+
+    .teacher-courses-table tbody tr:hover {
+        background: #f8fafc;
+    }
+
+    .teacher-course-name {
+        font-weight: 700;
+    }
+
+    .teacher-course-badge {
+        display: inline-block;
+        padding: 0.42rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .teacher-course-badge-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .teacher-course-badge-inactive {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .teacher-course-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.55rem;
+    }
+
+    .teacher-course-actions a {
+        border: none;
+        border-radius: 10px;
+        padding: 0.58rem 0.9rem;
+        font-size: 0.88rem;
+        font-weight: 700;
+        text-decoration: none;
+        cursor: pointer;
+        background: #e2e8f0;
+        color: #102542;
+    }
+
+    .teacher-course-actions a:hover {
+        background: #cbd5e1;
+        color: #102542;
+    }
+
+    .teacher-empty-state {
+        padding: 2rem;
+        text-align: center;
+        color: #64748b;
+        border: 1px dashed #cbd5e1;
+        border-radius: 18px;
+        background: #f8fafc;
+    }
+
+    @@media (max-width: 768px) {
+        .teacher-courses-header {
+            flex-direction: column;
+        }
+    }
+</style>
+
+<div class="teacher-courses-page">
+    <div class="teacher-courses-header">
+        <div>
+            <h2>Course Management</h2>
+            <p>
+                Review your courses, monitor their status, and manage each course from one place.
+            </p>
+        </div>
+
+        <a asp-area="" asp-controller="Course" asp-action="Create" class="teacher-create-btn">
+            Create New Course
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="teacher-empty-state">
+            No courses found yet. Start by creating your first course.
+        </div>
+    }
+    else
+    {
+        <div class="teacher-courses-table-wrap">
+            <table class="teacher-courses-table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Level</th>
+                    <th>Price</th>
+                    <th>Enrolled</th>
+                    <th>Active</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                @foreach (var course in Model)
+                {
+                    <tr>
+                        <td class="teacher-course-name">@course.Name</td>
+                        <td>@course.LevelName</td>
+                        <td>@course.Price.ToString("F2")</td>
+                        <td>@course.EnrolledStudentsCount</td>
+                        <td>
+                            @if (course.IsPublished)
+                            {
+                                <span class="teacher-course-badge teacher-course-badge-active">Active</span>
+                            }
+                            else
+                            {
+                                <span class="teacher-course-badge teacher-course-badge-inactive">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="teacher-course-actions">
+                                <a asp-area="Teacher"
+                                   asp-controller="Course"
+                                   asp-action="Manage"
+                                   asp-route-id="@course.Id">
+                                    Manage
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
