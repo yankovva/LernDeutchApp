@@ -1,3 +1,4 @@
+using LerningApp.Common;
 using LerningApp.Data;
 using LerningApp.Data.Models;
 using Microsoft.AspNetCore.Builder;
@@ -32,6 +33,10 @@ public static class ExtensionMethods
         
         IConfiguration configuration = serviceScope.ServiceProvider
             .GetRequiredService<IConfiguration>();
+        
+        var dbContext = serviceScope.ServiceProvider
+            .GetRequiredService<LerningAppContext>();
+        
 
         var email = configuration["ApplicationAdmin:Email"] 
                        ?? throw new InvalidOperationException("Email is missing.");
@@ -56,8 +61,10 @@ public static class ExtensionMethods
         }
         
         ApplicationUser adminUser = await CreateAdminAsync(email, password, userName, userManager);
-        bool isInRole = await userManager.IsInRoleAsync(adminUser, "Admin");
-        if (!isInRole)
+        bool isInAdminRole = await userManager.IsInRoleAsync(adminUser, "Admin");
+        bool isInRoleTeacher = await userManager.IsInRoleAsync(adminUser, "Teacher");
+      
+        if (!isInAdminRole)
         {
             var result = await userManager.AddToRoleAsync(adminUser, "Admin");
             if (!result.Succeeded)
@@ -65,6 +72,32 @@ public static class ExtensionMethods
                 throw new InvalidOperationException("Failed to assign Admin role.");
             }
         }
+        
+        if (!isInRoleTeacher)
+        {
+            var teacherResult = await userManager.AddToRoleAsync(adminUser, "Teacher");
+            if (!teacherResult.Succeeded)
+            {
+                throw new InvalidOperationException("Failed to assign Teacher role.");
+            }
+        }
+        
+        bool teacherExists = await dbContext.Teachers
+            .AnyAsync(t => t.UserId == adminUser.Id);
+            
+        if (!teacherExists)
+        {
+            Teacher teacher = new()
+            {
+                Status = Enums.TeacherStatus.Approved,
+                TeacherSince = DateTime.UtcNow,
+                UserId = adminUser.Id
+            };
+
+            dbContext.Teachers.Add(teacher);
+            await dbContext.SaveChangesAsync();
+        }
+        
         return builder;
     }
 
