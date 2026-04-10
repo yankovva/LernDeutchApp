@@ -14,6 +14,7 @@ public class LessonController(ILessonService lessonService,
     ITeacherService teacherService) : BaseController
 {
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Index()
     { 
         string userId = User.GetUserId()!;
@@ -41,6 +42,7 @@ public class LessonController(ILessonService lessonService,
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> AddToCourse(string id)
     {
         string userId = User.GetUserId()!;
@@ -57,6 +59,7 @@ public class LessonController(ILessonService lessonService,
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> AddToCourse(AddLessonToCourseViewModel model)
     {
         if (!this.ModelState.IsValid)
@@ -84,6 +87,7 @@ public class LessonController(ILessonService lessonService,
     }
 
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create()
     {
         string userId = User.GetUserId()!;
@@ -102,6 +106,7 @@ public class LessonController(ILessonService lessonService,
     
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create(AddLessonInputModel model)
     {
         if (!ModelState.IsValid)
@@ -124,6 +129,7 @@ public class LessonController(ILessonService lessonService,
     }
     
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Edit(string id)
     {
         string userId = User.GetUserId()!;
@@ -141,6 +147,7 @@ public class LessonController(ILessonService lessonService,
     
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Edit(LessonEditInputModel model, string id)
     {
         if (!ModelState.IsValid)
@@ -163,6 +170,7 @@ public class LessonController(ILessonService lessonService,
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> SoftDelete(string id)
     {
         string userId = User.GetUserId()!;

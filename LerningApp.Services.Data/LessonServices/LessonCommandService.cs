@@ -5,18 +5,20 @@ using LerningApp.Services.Data.Interfaces;
 using LerningApp.Services.Data.Interfaces.LessonInterfaces;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
-
+using static LerningApp.Common.ApplicationConstants;
 
 namespace LerningApp.Services.Data.LessonServices;
 
 public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
     ITeacherService teacherService,
-    IRepository<Course, Guid> courseRepository) : ILessonCommandService
+    IRepository<Course, Guid> courseRepository,
+    UserManager<ApplicationUser> userManager) : ILessonCommandService
 {
      //TODO add logic for the order of the lessons in a course
     public async Task<ServiceResult> AddLessonAsync(AddLessonInputModel model, string userId)
@@ -75,8 +77,11 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
             return ServiceResultT<LessonEditInputModel>.Fail(LessonNotFoundMessage);
         }
         
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || lesson.PublisherId != teacherId)
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
             return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
         }
@@ -127,11 +132,14 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || teacherId != lessonToChange.PublisherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lessonToChange.PublisherId != teacherId))
         {
-            return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage);
         }
-
+        
         lessonToChange.Name = model.Name;
         lessonToChange.Content = model.Content;
         lessonToChange.CourseId = courseId;
