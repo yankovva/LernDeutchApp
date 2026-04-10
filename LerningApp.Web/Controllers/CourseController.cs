@@ -42,6 +42,7 @@ public class CourseController(ICourseService courseService,
     //Done
     [Authorize]
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create()
     {
         string userId = User.GetUserId()!;
@@ -65,6 +66,7 @@ public class CourseController(ICourseService courseService,
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create(AddCourseViewModel model)
     {
         if (!ModelState.IsValid)
@@ -98,6 +100,7 @@ public class CourseController(ICourseService courseService,
     //Done
     [Authorize]
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Edit(string id)
     {
         string userId = User.GetUserId()!;
@@ -118,6 +121,7 @@ public class CourseController(ICourseService courseService,
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Edit(CourseEditViewModel model, string id)
     {
         if (!ModelState.IsValid)
@@ -152,6 +156,7 @@ public class CourseController(ICourseService courseService,
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Deactivate(string id)
     {
         string userId = User.GetUserId()!;
@@ -171,6 +176,7 @@ public class CourseController(ICourseService courseService,
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Restore(string id)
     {
         string userId = User.GetUserId()!;
@@ -190,6 +196,7 @@ public class CourseController(ICourseService courseService,
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Enroll(string courseId)
     {
         Guid userId = Guid.Parse(User.GetUserId()!);
@@ -208,6 +215,7 @@ public class CourseController(ICourseService courseService,
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> SoftDelete(string id)
     {
         string userId = User.GetUserId()!;

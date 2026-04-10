@@ -3,15 +3,18 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Course;
+using static LerningApp.Common.ApplicationConstants;
 
 namespace LerningApp.Services.Data.CourseServices;
 
 public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
-    ITeacherService teacherService) : ICourseLifecycleService
+    ITeacherService teacherService,
+    UserManager<ApplicationUser> userManager) : ICourseLifecycleService
 {
     public async Task<ServiceResult> DeactivateCourseAsync(string id,string userId)
     {
@@ -29,7 +32,10 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || course.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || course.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
@@ -56,7 +62,10 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || course.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || course.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
@@ -85,7 +94,10 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || course.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || course.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }

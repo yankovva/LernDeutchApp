@@ -4,15 +4,19 @@ using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
 
+using Microsoft.AspNetCore.Identity;
+
 using static LerningApp.Common.EntityErrorMessages.Level;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Course;
+using static LerningApp.Common.ApplicationConstants;
 
 namespace LerningApp.Services.Data.CourseServices;
 
 public class CourseCommandService( IRepository<Course, Guid> courseRepository,
     IRepository<Level, Guid> levelRepository,
-    ITeacherService teacherService) : ICourseCommandService
+    ITeacherService teacherService,
+    UserManager<ApplicationUser> userManager) : ICourseCommandService
 {
     public async Task<ServiceResult> AddCourseAsync(AddCourseViewModel model, string userId)
     {
@@ -67,7 +71,10 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || course.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || course.PublisherId != teacherId))
         {
             return ServiceResultT<CourseEditViewModel>.Fail(AccessDeniedMessage);
         }
@@ -98,9 +105,12 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
         {
             return ServiceResult.Fail(CourseNotFoundMessage, nameof(id));
         }
-        
+       
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || courseToChange.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || courseToChange.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
