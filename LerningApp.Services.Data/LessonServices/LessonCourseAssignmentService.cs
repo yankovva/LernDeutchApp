@@ -5,12 +5,13 @@ using LerningApp.Services.Data.Interfaces;
 using LerningApp.Services.Data.Interfaces.LessonInterfaces;
 using LerningApp.Web.ViewModels.Course;
 using LerningApp.Web.ViewModels.Lesson;
-
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.EntityErrorMessages.Common;
+using static LerningApp.Common.ApplicationConstants;
 
 namespace LerningApp.Services.Data.LessonServices;
 
@@ -18,7 +19,8 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
     IRepository<Course, Guid> courseRepository,
     ITeacherService teacherService,
     IRepository<UserLessonProgress, Guid> lessonProgressRepository,
-    IRepository<UserCourse, object> userCourseRepository) : ILessonCourseAssignmentService
+    IRepository<UserCourse, object> userCourseRepository,
+    UserManager<ApplicationUser> userManager) : ILessonCourseAssignmentService
 {
     public async Task<ServiceResultT<AddLessonToCourseViewModel>> GetAddLessonToCourseByIdAsync(string id,string userId)
     {
@@ -36,7 +38,10 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
         }
         
         var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || lesson.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
             return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
         }
@@ -74,9 +79,12 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
         }
         
         var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || lesson.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage);
         }
        
         //TODO: Delete UserLessonProgress records for enrolled users when a lesson is removed from a course (decide: hard delete vs soft delete).
