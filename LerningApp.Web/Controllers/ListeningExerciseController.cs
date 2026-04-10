@@ -14,6 +14,7 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
 {
     //Done
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create(string lessonId)
     {
         string userId = User.GetUserId()!;
@@ -29,6 +30,7 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
     //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create(CreateListeningExerciseViewModel model)
     {
         if (!ModelState.IsValid)

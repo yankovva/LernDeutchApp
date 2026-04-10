@@ -4,7 +4,7 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.ListeningExercise;
-
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Common;
@@ -20,7 +20,8 @@ public class ListeningExerciseService(
     IRepository<UserLessonProgress, Guid> userLessonProgressRepository,
     IUserExerciseProgressService userExerciseProgressService,
     ITeacherService teacherService,
-    IFileService fileService) : IListeningExerciseService
+    IFileService fileService,
+    UserManager<ApplicationUser> userManager) : IListeningExerciseService
 {
     public async Task<ServiceResultT<CreateListeningExerciseViewModel>> CreateGetListeningExercise(string lessonId,
         string userId)
@@ -36,9 +37,12 @@ public class ListeningExerciseService(
         {
             return ServiceResultT<CreateListeningExerciseViewModel>.Fail(LessonNotFoundMessage);
         }
-
+        
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || lesson.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
             return ServiceResultT<CreateListeningExerciseViewModel>.Fail(AccessDeniedMessage);
         }
@@ -67,7 +71,10 @@ public class ListeningExerciseService(
         }
 
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || lesson.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
@@ -194,7 +201,6 @@ public class ListeningExerciseService(
         if (!isUnlocked)
         {
             return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
-
         }
         
         if (!Guid.TryParse(dto.ExerciseId, out var exerciseGuidId))
@@ -276,7 +282,10 @@ public class ListeningExerciseService(
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || exercise.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }

@@ -4,11 +4,14 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Exercise;
+using static LerningApp.Common.ApplicationConstants;
+
 
 namespace LerningApp.Services.Data;
 
@@ -16,7 +19,8 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
     IRepository<MultipleChoiceExercise, Guid> exerciseRepository,
     IRepository<UserLessonProgress, Guid> userLessonProgressRepository,
     ITeacherService teacherService,
-    IUserExerciseProgressService userExerciseProgressService) : IMultipleChoiceExerciseService
+    IUserExerciseProgressService userExerciseProgressService,
+    UserManager<ApplicationUser> userManager) : IMultipleChoiceExerciseService
 {
     public async  Task<ServiceResultT<CreateMultipleChoiceExerciseViewModel>> GetCreateAsync(string lessonId, string userId)
     {
@@ -33,9 +37,12 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || lesson.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail("Нямате права.");
+            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail(AccessDeniedMessage);
         }
        
         var model = new CreateMultipleChoiceExerciseViewModel()
@@ -60,12 +67,16 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         {
                 return ServiceResult.Fail(LessonNotFoundMessage);
         }
-        
+       
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || lesson.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
+        
         var filledOptions = model.Options
             .Where(o => !string.IsNullOrWhiteSpace(o.AnswerText))
             .ToList();
@@ -149,7 +160,6 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         
         var correctOption = exercise.Options
             .FirstOrDefault(x => x.IsCorrect)!;
-        bool isCorrect;
 
         var resultDto = new MultipleChoiceCheckResultDto()
         {
@@ -190,7 +200,10 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || exercise.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }

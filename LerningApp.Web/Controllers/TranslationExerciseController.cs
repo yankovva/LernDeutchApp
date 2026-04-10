@@ -11,6 +11,7 @@ public class TranslationExerciseController(ITranslationExerciseService translati
 {
     //Done
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create(string lessonId)
     {
         var userId = User.GetUserId();
@@ -26,6 +27,7 @@ public class TranslationExerciseController(ITranslationExerciseService translati
     //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create(CreateTranslationExerciseViewModel model)
     {
         if (!ModelState.IsValid)

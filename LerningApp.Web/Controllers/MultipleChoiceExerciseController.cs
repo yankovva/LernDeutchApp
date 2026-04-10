@@ -17,6 +17,8 @@ public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exe
 {
     //Done
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
+
     public async Task<IActionResult> Create(string lessonId)
     { 
        string userId = User.GetUserId()!;
@@ -32,6 +34,7 @@ public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exe
     //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create(CreateMultipleChoiceExerciseViewModel model)
     {
         if (!ModelState.IsValid)

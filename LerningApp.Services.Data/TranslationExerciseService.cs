@@ -3,13 +3,14 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.TranslationExercise;
-
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.Enums;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Exercise;
+using static LerningApp.Common.ApplicationConstants;
 
 namespace LerningApp.Services.Data;
 
@@ -18,7 +19,8 @@ public class TranslationExerciseService(
     IRepository<Lesson, Guid> lessonRepository,
     IRepository<UserLessonProgress, Guid> userLessonProgressRepository,
     ITeacherService teacherService,
-    IUserExerciseProgressService userExerciseProgressService) : ITranslationExerciseService
+    IUserExerciseProgressService userExerciseProgressService,
+    UserManager<ApplicationUser> userManager) : ITranslationExerciseService
 {
     public async Task<ServiceResultT<CreateTranslationExerciseViewModel>> GetAddTranslationExercisesAsync(string lessonId, string userId)
     {
@@ -35,7 +37,10 @@ public class TranslationExerciseService(
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || lesson.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
             return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(AccessDeniedMessage);
         }
@@ -62,7 +67,10 @@ public class TranslationExerciseService(
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || lesson.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
             return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(AccessDeniedMessage);
         }
@@ -149,7 +157,10 @@ public class TranslationExerciseService(
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null || exercise.PublisherId != teacherId)
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
