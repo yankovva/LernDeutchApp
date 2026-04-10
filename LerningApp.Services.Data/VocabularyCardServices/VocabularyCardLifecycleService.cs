@@ -3,26 +3,23 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Card;
 using static LerningApp.Common.EntityErrorMessages.Common;
+using static LerningApp.Common.ApplicationConstants;
 
 namespace LerningApp.Services.Data.VocabularyCardServices;
 
 public class VocabularyCardLifecycleService(
     IRepository<VocabularyCard, Guid> vocabularyCardRepository,
     ITeacherService teacherService,
-    IFileService fileService) : IVocabularyCardLifecycleService
+    IFileService fileService,
+    UserManager<ApplicationUser> userManager) : IVocabularyCardLifecycleService
 {
     public async Task<ServiceResult> DeleteCardByIdAsync(string id, string userId)
     {
-        var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null)
-        {
-            return ServiceResult.Fail(AccessDeniedMessage);
-        }
-
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
             return ServiceResult.Fail(InvalidCardIdMessage);
@@ -38,7 +35,11 @@ public class VocabularyCardLifecycleService(
             return ServiceResult.Fail(CardNotFoundMessage);
         }
 
-        if (card.Lesson.PublisherId != teacherId)
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
@@ -56,12 +57,6 @@ public class VocabularyCardLifecycleService(
 
     public async Task<ServiceResult> SoftDeleteCardAsync(string id, string userId)
     {
-        var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null)
-        {
-            return ServiceResult.Fail(AccessDeniedMessage);
-        }
-
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
             return ServiceResult.Fail(InvalidCardIdMessage);
@@ -78,11 +73,15 @@ public class VocabularyCardLifecycleService(
             return ServiceResult.Fail(CardNotFoundMessage);
         }
 
-        if (card.Lesson.PublisherId != teacherId)
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
-
+        
         card.IsDeleted = true;
 
         foreach (var term in card.Terms)

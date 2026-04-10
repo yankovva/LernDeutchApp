@@ -42,6 +42,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     }
     //Done
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create(string lessonId)
     {
         var userId = User.GetUserId()!;
@@ -57,6 +58,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Create(VocabularyCardCreateInputModel model)
     {
         if (!ModelState.IsValid)
@@ -78,6 +80,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     }
     //Done
     [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Edit(string id)
     {
         var userId = User.GetUserId();
@@ -94,6 +97,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Edit(VocabularyCardEditInputModel model,string id)
     {
         var userId = User.GetUserId()!;
@@ -108,6 +112,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Delete(string id, string lessonId)
     {
         var userId = User.GetUserId();
@@ -124,6 +129,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     //Done
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> SoftDelete(string id, string lessonId)
     {
         var userId = User.GetUserId()!;

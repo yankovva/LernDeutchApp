@@ -4,6 +4,7 @@ using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.VocabularyCard;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.ApplicationConstants;
@@ -12,6 +13,8 @@ using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.File;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.PartOfSpeech;
+using static LerningApp.Common.ApplicationConstants;
+
 
 namespace LerningApp.Services.Data.VocabularyCardServices;
 
@@ -21,16 +24,11 @@ public class VocabularyCardCommandService(
     IRepository<PartOfSpeech, Guid> partOfSpeechRepository,
     ITeacherService teacherService,
     IFileService fileService,
-    IPartOfSpeechService partOfSpeechService) : IVocabularyCardCommandService
+    IPartOfSpeechService partOfSpeechService,
+    UserManager<ApplicationUser> userManager) : IVocabularyCardCommandService
 {
     public async Task<ServiceResultT<VocabularyCardCreateInputModel>> GetCreateVocabularyCardAsync(string lessonId, string userId)
     {
-        var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null)
-        {
-            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(AccessDeniedMessage);
-        }
-
         if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuid))
         {
             return ServiceResultT<VocabularyCardCreateInputModel>.Fail(LessonNotFoundMessage);
@@ -41,8 +39,12 @@ public class VocabularyCardCommandService(
         {
             return ServiceResultT<VocabularyCardCreateInputModel>.Fail(LessonNotFoundMessage);
         }
-
-        if (lesson.PublisherId != teacherId)
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
             return ServiceResultT<VocabularyCardCreateInputModel>.Fail(AccessDeniedMessage);
         }
@@ -57,12 +59,6 @@ public class VocabularyCardCommandService(
 
     public async Task<ServiceResult> CreateVocabularyCardAsync(VocabularyCardCreateInputModel model, string userId)
     {
-        var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null)
-        {
-            return ServiceResult.Fail(AccessDeniedMessage);
-        }
-
         if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
             return ServiceResult.Fail(InvalidLessonIdMessage, string.Empty);
@@ -73,12 +69,16 @@ public class VocabularyCardCommandService(
         {
             return ServiceResult.Fail(LessonNotFoundMessage, string.Empty);
         }
-
-        if (lesson.PublisherId != teacherId)
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage);
         }
-
+        
         if (string.IsNullOrEmpty(model.PartOfSpeechId) || !Guid.TryParse(model.PartOfSpeechId, out Guid partOfSpeechId))
         {
             return ServiceResult.Fail(InvalidPartOfSpeechIdMessage, nameof(model.PartOfSpeechId));
@@ -143,12 +143,6 @@ public class VocabularyCardCommandService(
 
     public async Task<ServiceResultT<VocabularyCardEditInputModel>> GetCardEditByIdAsync(string id, string userId)
     {
-        var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null)
-        {
-            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage);
-        }
-
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
             return ServiceResultT<VocabularyCardEditInputModel>.Fail(InvalidCardIdMessage);
@@ -165,8 +159,11 @@ public class VocabularyCardCommandService(
         {
             return ServiceResultT<VocabularyCardEditInputModel>.Fail(CardNotFoundMessage);
         }
-
-        if (card.Lesson.PublisherId != teacherId)
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
         {
             return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage);
         }
@@ -192,12 +189,6 @@ public class VocabularyCardCommandService(
 
     public async Task<ServiceResult> PostCardEditByIdAsync(VocabularyCardEditInputModel model, string id, string userId)
     {
-        var teacherId = await teacherService.GetTeacherIdAsync(userId);
-        if (teacherId == null)
-        {
-            return ServiceResult.Fail(AccessDeniedMessage);
-        }
-
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
             return ServiceResult.Fail(InvalidCardIdMessage);
@@ -215,9 +206,13 @@ public class VocabularyCardCommandService(
             return ServiceResult.Fail(CardNotFoundMessage);
         }
 
-        if (card.Lesson.PublisherId != teacherId)
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage);
         }
 
         if (string.IsNullOrEmpty(model.PartOfSpeechId) || !Guid.TryParse(model.PartOfSpeechId, out Guid partOfSpeechId))
