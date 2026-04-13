@@ -196,7 +196,6 @@ public class CourseController(ICourseService courseService,
     [Authorize]
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> Enroll(string courseId)
     {
         Guid userId = Guid.Parse(User.GetUserId()!);
