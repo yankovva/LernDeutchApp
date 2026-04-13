@@ -1,19 +1,192 @@
 @using LerningApp.Data.Models
+@using LerningApp.Services.Data.Interfaces
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 
-@inject SignInManager<ApplicationUser> SignInManager
+@inject ITeacherService TeacherService
 @inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
-@if (SignInManager.IsSignedIn(User))
+<style>
+    .account-nav {
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .account-dropdown-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        border: none;
+        background: transparent;
+        color: #111827;
+        padding: 0;
+    }
+
+    .account-dropdown-toggle:hover,
+    .account-dropdown-toggle:focus {
+        color: #111827;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .account-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        background: #f8fafc;
+        border: 1px solid #dbe3ec;
+        color: #475569;
+        font-size: 1.2rem;
+        transition: background 0.18s ease, border-color 0.18s ease;
+    }
+
+    .account-dropdown-toggle:hover .account-avatar {
+        background: #eef2f7;
+        border-color: #cbd5e1;
+    }
+
+    .account-caret {
+        color: #6b7280;
+        font-size: 0.8rem;
+        line-height: 1;
+    }
+
+    .account-dropdown-menu {
+        min-width: 220px;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 0.5rem;
+        box-shadow: 0 20px 35px rgba(15, 23, 42, 0.14);
+        margin-top: 0.75rem;
+    }
+
+    .account-dropdown-header {
+        padding: 0.55rem 0.7rem 0.75rem;
+        border-bottom: 1px solid #eef2f7;
+        margin-bottom: 0.4rem;
+    }
+
+    .account-dropdown-name {
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .account-dropdown-subtitle {
+        font-size: 0.84rem;
+        color: #64748b;
+    }
+
+    .account-dropdown-menu .dropdown-item {
+        border-radius: 8px;
+        padding: 0.72rem 0.85rem;
+        font-weight: 600;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+
+    .account-dropdown-menu .dropdown-item:hover {
+        background: #f3f4f6;
+    }
+
+    .account-dropdown-menu .dropdown-divider {
+        margin: 0.45rem 0;
+    }
+
+    .logout-btn {
+        width: 100%;
+        border: none;
+        background: transparent;
+        text-align: left;
+        border-radius: 8px;
+        padding: 0.72rem 0.85rem;
+        font-weight: 600;
+        color: #b91c1c;
+        display: flex;
+        align-items: center;
+        gap: 0.65rem;
+    }
+
+    .logout-btn:hover {
+        background: #fef2f2;
+    }
+
+    .account-menu-icon {
+        width: 18px;
+        text-align: center;
+        color: #475569;
+    }
+</style>
+
+<ul class="navbar-nav account-nav">
+@if (User.Identity?.IsAuthenticated ?? false)
 {
-    <li class="nav-item">
-        <a id="manage" class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-    </li>
-    <li class="nav-item">
-        <form id="logoutForm" class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button id="logout" type="submit" class="btn btn-outline-secondary" >Logout</button>
-        </form>
+    <li class="nav-item dropdown">
+        <button class="btn dropdown-toggle account-dropdown-toggle"
+                type="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+            <i class="fa-solid fa-circle-user fa-2x" style="color: #ff9933;"></i>
+        </button>
+
+        <div class="dropdown-menu dropdown-menu-end account-dropdown-menu">
+            <div class="account-dropdown-header">
+                <div class="account-dropdown-name">@UserManager.GetUserName(User)</div>
+                <div class="account-dropdown-subtitle">Account workspace</div>
+            </div>
+            <a id="manage"
+               class="dropdown-item"
+               asp-area=""
+               asp-controller="Profile"
+               asp-action="Index"
+               title="Manage">
+                <i class="fa-solid fa-user-gear" style="color: #ff9933;" ></i>
+                My Profile
+            </a>
+            <a id="manage"
+               asp-area="" asp-controller="UsersCourses" asp-action="Index"
+               class="dropdown-item"
+               title="Courses">
+                <i class="fa-solid fa-graduation-cap" style="color: #ff9933;"></i>
+                My Courses
+            </a>
+            @if (User.IsInRole("Teacher"))
+            {
+                <a class="dropdown-item"
+                   asp-area="Teacher"
+                   asp-controller="Home"
+                   asp-action="Index">
+                    <i class="fa-solid fa-book" style="color: #ff9933;"></i>
+                    Teacher Panel
+                </a>
+            }
+
+            @if (User.IsInRole("Admin"))
+            {
+                <a class="dropdown-item"
+                   asp-area="Admin"
+                   asp-controller="Home"
+                   asp-action="Index">
+                    <i class="fa-solid fa-users-gear" style="color: #ff9933;"></i>
+                    Admin Panel
+                </a>
+            }
+            <div class="dropdown-divider"></div>
+
+            <form id="logoutForm"
+                  asp-area="Identity"
+                  asp-page="/Account/Logout"
+                  asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button id="logout" type="submit" class="logout-btn">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    Logout
+                </button>
+            </form>
+        </div>
     </li>
 }
 else

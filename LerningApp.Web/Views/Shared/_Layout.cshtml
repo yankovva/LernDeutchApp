@@ -12,6 +12,10 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
     <link rel="stylesheet" href="~/LerningApp.Web.styles.css" asp-append-version="true"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+          integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+          crossorigin="anonymous" 
+          referrerpolicy="no-referrer" />
 </head>
 <body>
 <header>
@@ -32,27 +36,14 @@
                         <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">About</a>
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="About">About us</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Course" asp-action="Index">Courses</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a>
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Contact">Contacts</a>
                     </li>
-                    @if (User.Identity?.IsAuthenticated ?? false)
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="UsersCourses" asp-action="Index">My Courses</a>
-                        </li>
-                        if (await teacherService.IsUserTeacherAsync(User.GetUserId()!))
-                        {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-area="" asp-controller="Lesson" asp-action="Index">Lessons</a>
-                            </li>
-                        }
-                    }
-                   
                 </ul>
 
                 <div class="ms-auto">
@@ -68,50 +59,75 @@
     </main>
 </div>
 
-<footer class="footer-mid">
-    <div class="footer-mid-wrap">
-        <div class="footer-mid-brand">
-            <div class="brand-circle">L</div>
-            <div>
-                <div class="brand-name">DeutschBuddy</div>
-                <div class="brand-sub">Learn easy german online </div>
-            </div>
+    <!-- Footer -->
+    <footer class="text-center text-white" style="background-color: #ff9933">
+        <div class="container">
+            <section class="mt-4">
+                <div class="row text-center d-flex justify-content-center pt-4">
+                    <div class="col-md-2">
+                        <h6 class="text-uppercase font-weight-bold">
+                            <a class="text-white" asp-area="" asp-controller="Home" asp-action="About">About us</a>
+                        </h6>
+                    </div>
+                    <div class="col-md-2">
+                        <h6 class="text-uppercase font-weight-bold">
+                            <a class="text-white" asp-area="" asp-controller="Course" asp-action="Index" >Courses</a>
+                        </h6>
+                    </div>
+                    <div class="col-md-2">
+                        <h6 class="text-uppercase font-weight-bold">
+                            <a class="text-white" asp-area="" asp-controller="Home" asp-action="Contact">Contacts</a>
+                        </h6>
+                    </div>
+                    <div class="col-md-2">
+                        <h6 class="text-uppercase font-weight-bold">
+                            <a href="#!" class="text-white">Privacy</a>
+                        </h6>
+                    </div>
+                </div>
+            </section>
+            <hr class="my-4" />
+                <section class="mb-4">
+                <div class="row d-flex justify-content-center">
+                    <div class="col-lg-8">
+                        <p>
+                            German learning made simple, structured, and effective.
+                        </p>
+                    </div>
+                </div>
+            </section>
+         
+            <section class="text-center mb-4">
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-google"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-linkedin"></i>
+                </a>
+                <a href="" class="text-white me-4">
+                    <i class="fab fa-github"></i>
+                </a>
+            </section>
         </div>
-
-        <div class="footer-mid-links">
-            <a asp-controller="Home" asp-action="About">
-                <svg viewBox="0 0 24 24"><path d="M12 7a5 5 0 1 0 0 10 5 5 0 0 0 0-10Zm0-5 3 4h-6l3-4Z"/></svg>
-                About
-            </a>
-            @if (User.Identity?.IsAuthenticated ?? false)
-            {
-                if (await teacherService.IsUserTeacherAsync(User.GetUserId()!))
-                {
-                    <a asp-controller="Lesson" asp-action="Index">
-                        <svg viewBox="0 0 24 24"><path d="M4 4h16v4H4zM4 10h10v4H4zM4 16h16v4H4z"/></svg>
-                        Lessons
-                    </a>
-                }
-            }
-            <a asp-controller="Course" asp-action="Index">
-                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM6 7v10h12V7z"/></svg>
-                Courses
-            </a>
-            <a asp-controller="Home" asp-action="Contact">
-                <svg viewBox="0 0 24 24"><path d="M4 5h16v14H4zM6 7v10h12V7z"/></svg>
-                Contact
-            </a>
-            <a asp-controller="Home" asp-action="Privacy">
-                <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.5 9.7 8 11 4.5-1.3 8-6 8-11V5l-8-3Z"/></svg>
-                Privacy
+        <div
+            class="text-center p-3"
+            style="background-color: rgba(0, 0, 0, 0.2)">
+            © 2026 Copyright:
+            <a class="text-white" href="https://mdbootstrap.com/">
+                Deutsch Buddy
             </a>
         </div>
-
-        <div class="footer-mid-copy">
-            © @DateTime.Now.Year • DeutchBuddy 
-        </div>
-    </div>
-</footer>
+    </footer>
+    <!-- Footer -->
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
