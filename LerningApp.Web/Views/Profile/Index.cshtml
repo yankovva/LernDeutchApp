@@ -1,0 +1,474 @@
+@using LerningApp.Web.ViewModels.UserProfile
+@model UserProfileOverviewViewModel
+
+@{
+    ViewData["Title"] = "My Account";
+}
+
+<style>
+    .profile-page {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .profile-hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 1.75rem;
+        padding: 1.9rem;
+        border-radius: 30px;
+        background:
+            radial-gradient(circle at top left, rgba(249, 115, 22, 0.14), transparent 30%),
+            linear-gradient(135deg, #fffaf2 0%, #ffffff 48%, #f8fbff 100%);
+        border: 1px solid #e7eaf0;
+        box-shadow: 0 22px 45px rgba(15, 23, 42, 0.08);
+    }
+
+    .profile-edit-btn {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-radius: 999px;
+        padding: 0.7rem 1rem;
+        text-decoration: none;
+        font-weight: 700;
+        background: #ffffff;
+        color: #0f172a;
+        border: 1px solid #dbe3ec;
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.05);
+    }
+
+    .profile-edit-btn:hover {
+        background: #f8fafc;
+        color: #0f172a;
+    }
+
+    .profile-avatar-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+    }
+
+    .profile-avatar {
+        width: 188px;
+        height: 188px;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 6px solid white;
+        box-shadow: 0 18px 30px rgba(15, 23, 42, 0.12);
+        background: #e5e7eb;
+    }
+
+    .profile-hero-main {
+        display: grid;
+        gap: 1.1rem;
+        align-content: center;
+    }
+
+    .profile-summary h1 {
+        margin: 0;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #102542;
+        line-height: 1.08;
+    }
+
+    .profile-summary-subtitle {
+        margin-top: 0.55rem;
+        color: #475569;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .profile-summary-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.6rem;
+        margin-top: 1rem;
+    }
+
+    .profile-badge {
+        display: inline-block;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .profile-summary-meta {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.9rem 1.4rem;
+        margin-top: 1.15rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eef2f7;
+    }
+
+    .profile-meta-item {
+        display: grid;
+        gap: 0.18rem;
+    }
+
+    .profile-meta-label {
+        font-size: 0.74rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+    }
+
+    .profile-meta-value {
+        color: #0f172a;
+        font-weight: 700;
+    }
+
+    .profile-section {
+        background: white;
+        border: 1px solid #e5e7eb;
+        border-radius: 22px;
+        padding: 1.5rem;
+        box-shadow: 0 14px 28px rgba(15, 23, 42, 0.04);
+    }
+
+    .profile-section h2 {
+        margin: 0 0 1rem;
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .profile-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem 2rem;
+    }
+
+    .profile-info-item {
+        display: grid;
+        gap: 0.2rem;
+    }
+
+    .profile-info-label {
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .profile-info-value {
+        font-size: 1rem;
+        color: #0f172a;
+        font-weight: 600;
+    }
+
+    .profile-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+    }
+
+    .profile-stat-card {
+        background: #f8fafc;
+        border: 1px solid #e5e7eb;
+        border-radius: 18px;
+        padding: 1.1rem;
+    }
+
+    .profile-stat-number {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .profile-stat-label {
+        margin-top: 0.35rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .profile-courses-table-wrap {
+        overflow-x: auto;
+    }
+
+    .profile-courses-table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border-radius: 18px;
+    }
+
+    .profile-courses-table th,
+    .profile-courses-table td {
+        padding: 0.9rem 0.75rem;
+        border-bottom: 1px solid #e5e7eb;
+        text-align: left;
+    }
+
+    .profile-courses-table th {
+        font-size: 0.82rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        background: #f8fafc;
+    }
+
+    .profile-courses-table td {
+        color: #0f172a;
+    }
+
+    .profile-course-name {
+        font-weight: 700;
+    }
+
+    .profile-course-level {
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    .profile-course-status {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.42rem 0.75rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .profile-course-status-completed {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .profile-course-status-progress {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .profile-course-open {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        border-radius: 10px;
+        padding: 0.6rem 0.85rem;
+        font-size: 0.88rem;
+        font-weight: 700;
+        background: #102542;
+        color: white;
+    }
+
+    .profile-course-open:hover {
+        background: #1e3a5f;
+        color: white;
+    }
+
+    .profile-section-subtitle {
+        margin: -0.3rem 0 1rem;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .profile-link-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin-top: 1rem;
+        text-decoration: none;
+        font-weight: 700;
+        color: #ea580c;
+    }
+
+    .profile-link-btn:hover {
+        color: #c2410c;
+    }
+
+    @@media (max-width: 960px) {
+        .profile-hero {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-info-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-stats-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .profile-stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .profile-edit-btn {
+            position: static;
+            margin-bottom: 1rem;
+            width: fit-content;
+        }
+
+        .profile-summary-meta {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<div class="profile-page">
+    <section class="profile-hero">
+        <a asp-controller="Profile" asp-action="Edit" class="profile-edit-btn">
+            <i class="fa-solid fa-pencil" style="color: #ff9933;"></i>
+        </a>
+
+        <div class="profile-avatar-wrap">
+            <img class="profile-avatar"
+                 src="@(string.IsNullOrWhiteSpace(Model.ProfileImageUrl) ? "/images/Common/default-profile-picture.jpg" : Model.ProfileImageUrl)"
+                 alt="Profile Image" />
+        </div>
+
+        <div class="profile-hero-main">
+            <div class="profile-summary">
+                <h1>@Model.FullName</h1>
+                <div class="profile-summary-subtitle">@Model.Email</div>
+
+                <div class="profile-summary-badges">
+                    <span class="profile-badge">@Model.UserName</span>
+
+                    @if (Model.IsTeacher)
+                    {
+                        <span class="profile-badge">Teacher</span>
+                    }
+
+                    @if (Model.IsAdmin)
+                    {
+                        <span class="profile-badge">Admin</span>
+                    }
+                </div>
+            </div>
+
+            <div class="profile-summary-meta">
+                <div class="profile-meta-item">
+                    <div class="profile-meta-label">First Name</div>
+                    <div class="profile-meta-value">@(Model.FirstName ?? "Not set")</div>
+                </div>
+
+                <div class="profile-meta-item">
+                    <div class="profile-meta-label">Last Name</div>
+                    <div class="profile-meta-value">@(Model.LastName ?? "Not set")</div>
+                </div>
+
+                <div class="profile-meta-item">
+                    <div class="profile-meta-label">Username</div>
+                    <div class="profile-meta-value">@(Model.UserName ?? "Not set")</div>
+                </div>
+
+                <div class="profile-meta-item">
+                    <div class="profile-meta-label">Email</div>
+                    <div class="profile-meta-value">@(Model.Email ?? "Not set")</div>
+                </div>
+
+                <div class="profile-meta-item">
+                    <div class="profile-meta-label">Phone Number</div>
+                    <div class="profile-meta-value">@(Model.PhoneNumber ?? "Not set")</div>
+                </div>
+
+                <div class="profile-meta-item">
+                    <div class="profile-meta-label">Native Language</div>
+                    <div class="profile-meta-value">@Model.NativeLanguage</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <h2>Learning Overview</h2>
+
+        <div class="profile-stats-grid">
+            <div class="profile-stat-card">
+                <div class="profile-stat-number">@Model.EnrolledCoursesCount</div>
+                <div class="profile-stat-label">Enrolled Courses</div>
+            </div>
+
+            <div class="profile-stat-card">
+                <div class="profile-stat-number">@Model.CompletedCoursesCount</div>
+                <div class="profile-stat-label">Completed Courses</div>
+            </div>
+
+            <div class="profile-stat-card">
+                <div class="profile-stat-number">@Model.LearnedWordsCount</div>
+                <div class="profile-stat-label">Learned Words</div>
+            </div>
+
+            <div class="profile-stat-card">
+                <div class="profile-stat-number">@Model.CompletedLessonsCount</div>
+                <div class="profile-stat-label">Completed Lessons</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="profile-section">
+        <h2>My Courses</h2>
+        <p class="profile-section-subtitle">
+            A quick overview of the courses you are currently enrolled in and your progress in each one.
+        </p>
+
+        @if (!Model.EnrolledCourses.Any())
+        {
+            <p>You have not enrolled in any courses yet.</p>
+        }
+        else
+        {
+            <div class="profile-courses-table-wrap">
+                <table class="profile-courses-table">
+                    <thead>
+                    <tr>
+                        <th>Course</th>
+                        <th>Level</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var course in Model.EnrolledCourses)
+                    {
+                        bool isCompleted = course.Status.Equals("completed", StringComparison.OrdinalIgnoreCase);
+
+                        <tr>
+                            <td class="profile-course-name">@course.Name</td>
+                            <td class="profile-course-level">@course.LevelName</td>
+                            <td>
+                                @if (isCompleted)
+                                {
+                                    <span class="profile-course-status profile-course-status-completed">Completed</span>
+                                }
+                                else
+                                {
+                                    <span class="profile-course-status profile-course-status-progress">In Progress</span>
+                                }
+                            </td>
+                            <td>
+                                <a asp-controller="Course"
+                                   asp-action="Details"
+                                   asp-route-id="@course.Id"
+                                   class="profile-course-open">
+                                    Open Course
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        }
+
+        <a asp-controller="UsersCourses" asp-action="Index" class="profile-link-btn">
+            View All My Courses
+        </a>
+    </section>
+</div>
