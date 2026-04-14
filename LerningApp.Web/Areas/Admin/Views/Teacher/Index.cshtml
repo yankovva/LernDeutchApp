@@ -145,6 +145,16 @@
         text-align: center;
         color: #64748b;
     }
+    .teacher-badge-pending-changes {
+        background: #fde68a;
+        color: #92400e;
+    }
+
+    .teacher-badge-no-pending {
+        background: #dcfce7;
+        color: #166534;
+    }
+
 </style>
 
 <div class="teacher-toolbar">
@@ -162,6 +172,7 @@
             <th>Last Name</th>
             <th>Email</th>
             <th>Status</th>
+            <th>Pending Changes</th>
             <th>Teacher Since</th>
             <th>Actions</th>
         </tr>
@@ -170,7 +181,7 @@
         @if (!Model.Any())
         {
             <tr>
-                <td colspan="6" class="teacher-empty">No teachers found.</td>
+                <td colspan="7" class="teacher-empty">No teachers found.</td>
             </tr>
         }
         else
@@ -200,6 +211,17 @@
                             <span class="teacher-badge teacher-badge-inactive">Inactive</span>
                         }
                     </td>
+                    <td>
+                        @if (teacher.HasPendingProfileChanges)
+                        {
+                            <span class="teacher-badge teacher-badge-pending-changes">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="teacher-badge teacher-badge-no-pending">No</span>
+                        }
+                    </td>
+
                     <td>@teacher.TeacherSince</td>
                     <td>
                         <div class="teacher-actions">
@@ -209,14 +231,6 @@
                                asp-route-id="@teacher.TeacherId"
                                class="teacher-btn-profile">
                                 Check Profile
-                            </a>
-
-                            <a asp-area="Admin"
-                               asp-controller="Teacher"
-                               asp-action="Edit"
-                               asp-route-id="@teacher.UserId"
-                               class="teacher-btn-manage">
-                                Manage
                             </a>
 
                             @if (teacher.Status == TeacherStatus.Approved.ToString())

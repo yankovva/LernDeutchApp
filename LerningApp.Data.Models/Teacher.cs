@@ -6,12 +6,11 @@ namespace LerningApp.Data.Models;
 public class Teacher
 {
     public Guid Id { get; set; } = Guid.NewGuid();
-    
     public TeacherStatus Status { get; set; }
     
+    public bool HasProfileChangesPendingReview { get; set; }
     public DateTime? TeacherSince { get; set; }
     public string? Qualification { get; set; }
-    
     public string? Biography { get; set; }
 
     public Guid UserId { get; set; } 
