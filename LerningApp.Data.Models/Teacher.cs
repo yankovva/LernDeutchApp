@@ -12,10 +12,20 @@ public class Teacher
     public DateTime? TeacherSince { get; set; }
     public string? Qualification { get; set; }
     public string? Biography { get; set; }
-
     public Guid UserId { get; set; } 
-    
     public ApplicationUser User { get; set; } = null!;
+    
+    public string? PendingFirstName { get; set; }
+
+    public string? PendingLastName { get; set; }
+
+    public string? PendingPhoneNumber { get; set; }
+
+    public string? PendingProfileImage { get; set; }
+
+    public string? PendingBiography { get; set; }
+
+    public string? PendingQualification { get; set; }
     
     public virtual ICollection<Course> CreatedCourses { get; set; } = new HashSet<Course>();
     public virtual ICollection<Lesson> CreatedLessons { get; set; } = new HashSet<Lesson>();

@@ -24,6 +24,31 @@ public class TeacherConfiguration : IEntityTypeConfiguration<Teacher>
             .Property(x => x.TeacherSince)
             .HasColumnType("datetime2");
         
+        builder.Property(t => t.PendingFirstName)
+            .HasMaxLength(FirstNameMaxLength)
+            .IsRequired(false);
+
+        builder.Property(t => t.PendingLastName)
+            .HasMaxLength(LastNameMaxLength)
+            .IsRequired(false);
+
+        builder.Property(t => t.PendingPhoneNumber)
+            .HasMaxLength(PhoneNumberMaxLength)
+            .IsRequired(false);
+
+        builder.Property(t => t.PendingProfileImage)
+            .HasMaxLength(ProfileImageMaxLength)
+            .IsRequired(false);
+
+        builder.Property(t => t.PendingBiography)
+            .HasMaxLength(BiographyMaxLength)
+            .IsRequired(false);
+
+        builder.Property(t => t.PendingQualification)
+            .HasMaxLength(2000)
+            .IsRequired(false);
+
+        
         builder
             .HasOne( x => x.User)
             .WithOne(u => u.Teacher)
