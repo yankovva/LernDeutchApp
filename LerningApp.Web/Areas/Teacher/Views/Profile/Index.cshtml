@@ -1,0 +1,287 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model LerningApp.Web.ViewModels.Teacher.ProfileIndexViewModel
+
+@{
+    ViewData["Title"] = "Teacher Profile";
+}
+
+<style>
+    .teacher-profile-page {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .teacher-profile-hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: 220px 1fr;
+        gap: 1.75rem;
+        padding: 2rem;
+        border-radius: 26px;
+        background:
+            radial-gradient(circle at top left, rgba(15, 118, 110, 0.14), transparent 28%),
+            linear-gradient(135deg, #f8fbff 0%, #ffffff 52%, #f2f7fb 100%);
+        border: 1px solid #d9e3ef;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+    }
+
+    .teacher-profile-edit-btn {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        border-radius: 999px;
+        text-decoration: none;
+        background: #ffffff;
+        border: 1px solid #d9e3ef;
+        color: #0f766e;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+        transition: 0.18s ease;
+    }
+
+    .teacher-profile-edit-btn:hover {
+        background: #f8fafc;
+        color: #115e59;
+    }
+
+    .teacher-profile-avatar-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .teacher-profile-avatar {
+        width: 190px;
+        height: 190px;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 6px solid #ffffff;
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+        background: #e5e7eb;
+    }
+
+    .teacher-profile-main {
+        display: grid;
+        gap: 1.2rem;
+        align-content: center;
+    }
+
+    .teacher-profile-heading h1 {
+        margin: 0;
+        font-size: 2.1rem;
+        font-weight: 800;
+        color: #102542;
+        line-height: 1.08;
+    }
+
+    .teacher-profile-subtitle {
+        margin-top: 0.45rem;
+        color: #64748b;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .teacher-profile-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin-top: 0.9rem;
+    }
+
+    .teacher-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .teacher-badge-status {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .teacher-badge-since {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .teacher-profile-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem 1.5rem;
+        margin-top: 0.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e6edf5;
+    }
+
+    .teacher-profile-item {
+        display: grid;
+        gap: 0.18rem;
+    }
+
+    .teacher-profile-label {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+        color: #94a3b8;
+    }
+
+    .teacher-profile-value {
+        font-size: 1rem;
+        font-weight: 700;
+        color: #0f172a;
+        word-break: break-word;
+    }
+
+    .teacher-profile-section {
+        background: #ffffff;
+        border: 1px solid #d9e3ef;
+        border-radius: 22px;
+        padding: 1.5rem;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.04);
+    }
+
+    .teacher-profile-section h2 {
+        margin: 0 0 1rem;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .teacher-profile-text-block {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 1.1rem 1.15rem;
+        color: #334155;
+        line-height: 1.7;
+        white-space: pre-line;
+        min-height: 120px;
+    }
+
+    .teacher-profile-empty {
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+    .teacher-profile-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem 2rem;
+    }
+
+    @@media (max-width: 960px) {
+        .teacher-profile-hero {
+            grid-template-columns: 1fr;
+        }
+
+        .teacher-profile-grid,
+        .teacher-profile-info-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .teacher-profile-edit-btn {
+            position: static;
+            margin-bottom: 0.75rem;
+        }
+    }
+</style>
+
+<div class="teacher-profile-page">
+    <section class="teacher-profile-hero">
+        <a asp-area="Teacher"
+           asp-controller="Profile"
+           asp-action="Edit"
+           class="teacher-profile-edit-btn"
+           title="Edit teacher profile">
+            <i class="fa-solid fa-pen"></i>
+        </a>
+
+        <div class="teacher-profile-avatar-wrap">
+            <img class="teacher-profile-avatar"
+                 src="@(string.IsNullOrWhiteSpace(Model.ProfileImage) ? "/images/Common/default-profile-picture.jpg" : Model.ProfileImage)"
+                 alt="Teacher profile image" />
+        </div>
+
+        <div class="teacher-profile-main">
+            <div class="teacher-profile-heading">
+                <h1>@($"{Model.FirstName ?? "Unknown"} {Model.LastName ?? "Teacher"}")</h1>
+                <div class="teacher-profile-subtitle">@(Model.Email ?? "No email added")</div>
+
+                <div class="teacher-profile-badges">
+                    <span class="teacher-badge teacher-badge-status">@Model.Status</span>
+                    <span class="teacher-badge teacher-badge-since">Teacher Since: @(Model.TeacherSince ?? "Pending")</span>
+                </div>
+            </div>
+
+            <div class="teacher-profile-grid">
+                <div class="teacher-profile-item">
+                    <div class="teacher-profile-label">First Name</div>
+                    <div class="teacher-profile-value">@(Model.FirstName ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-profile-item">
+                    <div class="teacher-profile-label">Last Name</div>
+                    <div class="teacher-profile-value">@(Model.LastName ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-profile-item">
+                    <div class="teacher-profile-label">Username</div>
+                    <div class="teacher-profile-value">@(Model.UserName ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-profile-item">
+                    <div class="teacher-profile-label">Phone Number</div>
+                    <div class="teacher-profile-value">@(Model.PhoneNumber ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-profile-item">
+                    <div class="teacher-profile-label">Email</div>
+                    <div class="teacher-profile-value">@(Model.Email ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-profile-item">
+                    <div class="teacher-profile-label">Current Status</div>
+                    <div class="teacher-profile-value">@Model.Status</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="teacher-profile-section">
+        <h2>Professional Summary</h2>
+        <div class="teacher-profile-text-block">
+            @if (string.IsNullOrWhiteSpace(Model.Biography))
+            {
+                <span class="teacher-profile-empty">No biography has been added yet.</span>
+            }
+            else
+            {
+                @Model.Biography
+            }
+        </div>
+    </section>
+
+    <section class="teacher-profile-section">
+        <h2>Qualifications</h2>
+        <div class="teacher-profile-text-block">
+            @if (string.IsNullOrWhiteSpace(Model.Qualifications))
+            {
+                <span class="teacher-profile-empty">No qualifications have been added yet.</span>
+            }
+            else
+            {
+                @Model.Qualifications
+            }
+        </div>
+    </section>
+</div>
