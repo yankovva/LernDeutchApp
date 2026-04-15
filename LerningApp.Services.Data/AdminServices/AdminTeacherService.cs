@@ -232,6 +232,16 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             return ServiceResult.Fail("No teacher found.");
         }
         
+        bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
+        if (!isTeacher)
+        {
+            var roleResult = await userManager.AddToRoleAsync(user, TeacherRole);
+            if (!roleResult.Succeeded)
+            {
+                return ServiceResult.Fail("Failed to restore teacher role.");
+            }
+        }
+
         userTeacher.Status = TeacherStatus.Draft;
         await teacherRepository.SaveChangesAsync();
         

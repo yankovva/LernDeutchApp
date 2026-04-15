@@ -111,10 +111,13 @@ public static class EntityValidationConstants
         public const int LastNameMaxLength = 50;
         
         public const int BiographyMinLength = 20;
-        public const int BiographyMaxLength = 250;
+        public const int BiographyMaxLength = 2000;
         
         public const int QualificationMinLength = 20;
-        public const int QualificationMaxLength = 70;
+        public const int QualificationMaxLength = 1000;
+        
+        public const int PhoneNumberMinLength = 5;
+        public const int PhoneNumberMaxLength = 20;
         
         public const int ProfileImageMinLength = 150;
         public const int ProfileImageMaxLength = 350;
