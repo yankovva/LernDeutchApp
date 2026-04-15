@@ -1,0 +1,267 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model LerningApp.Web.ViewModels.Teacher.ProfileEditViewModel
+
+@{
+    ViewData["Title"] = "Edit Teacher Profile";
+}
+
+<style>
+    .teacher-edit-page {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .teacher-edit-card {
+        background: #ffffff;
+        border: 1px solid #d9e3ef;
+        border-radius: 24px;
+        box-shadow: 0 16px 32px rgba(15, 23, 42, 0.05);
+        overflow: hidden;
+    }
+
+    .teacher-edit-header {
+        padding: 1.75rem 1.75rem 1.25rem;
+        background:
+            radial-gradient(circle at top left, rgba(15, 118, 110, 0.14), transparent 28%),
+            linear-gradient(135deg, #f8fbff 0%, #ffffff 52%, #f2f7fb 100%);
+        border-bottom: 1px solid #e5edf5;
+    }
+
+    .teacher-edit-header h1 {
+        margin: 0;
+        font-size: 1.9rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .teacher-edit-header p {
+        margin: 0.55rem 0 0;
+        color: #64748b;
+        max-width: 760px;
+        line-height: 1.6;
+    }
+
+    .teacher-edit-body {
+        padding: 1.75rem;
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .teacher-edit-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem 1.5rem;
+    }
+
+    .teacher-edit-field {
+        display: grid;
+        gap: 0.45rem;
+    }
+
+    .teacher-edit-field-full {
+        grid-column: 1 / -1;
+    }
+
+    .teacher-edit-label {
+        font-size: 0.84rem;
+        font-weight: 700;
+        color: #475569;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .teacher-edit-input,
+    .teacher-edit-textarea {
+        width: 100%;
+        border: 1px solid #cbd5e1;
+        border-radius: 14px;
+        padding: 0.85rem 1rem;
+        font-size: 0.98rem;
+        color: #0f172a;
+        background: #ffffff;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .teacher-edit-input:focus,
+    .teacher-edit-textarea:focus {
+        outline: none;
+        border-color: #0f766e;
+        box-shadow: 0 0 0 4px rgba(15, 118, 110, 0.12);
+    }
+
+    .teacher-edit-textarea {
+        min-height: 150px;
+        resize: vertical;
+        line-height: 1.6;
+    }
+
+    .teacher-edit-note {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 1rem 1.1rem;
+        color: #475569;
+        line-height: 1.6;
+    }
+
+    .teacher-edit-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #e5edf5;
+    }
+
+    .teacher-edit-actions-left,
+    .teacher-edit-actions-right {
+        display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .teacher-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: none;
+        border-radius: 12px;
+        padding: 0.82rem 1.2rem;
+        font-size: 0.95rem;
+        font-weight: 700;
+        text-decoration: none;
+        transition: 0.18s ease;
+        cursor: pointer;
+    }
+
+    .teacher-btn-secondary {
+        background: #e2e8f0;
+        color: #0f172a;
+    }
+
+    .teacher-btn-secondary:hover {
+        background: #cbd5e1;
+        color: #0f172a;
+    }
+
+    .teacher-btn-primary {
+        background: #0f766e;
+        color: #ffffff;
+    }
+
+    .teacher-btn-primary:hover {
+        background: #115e59;
+        color: #ffffff;
+    }
+
+    .teacher-validation {
+        font-size: 0.88rem;
+    }
+
+    @@media (max-width: 860px) {
+        .teacher-edit-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .teacher-edit-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .teacher-edit-actions-left,
+        .teacher-edit-actions-right {
+            width: 100%;
+        }
+
+        .teacher-btn {
+            width: 100%;
+        }
+    }
+</style>
+
+<div class="teacher-edit-page">
+    <div class="teacher-edit-card">
+        <div class="teacher-edit-header">
+            <h1>Edit Teacher Profile</h1>
+            <p>
+                Complete or update your teacher information. When you submit this form,
+                your profile can be sent for admin review and your request status can move to pending.
+            </p>
+        </div>
+
+        <form asp-controller="Profile"
+              asp-action="TeacherEdit"
+              method="post"
+              class="teacher-edit-body">
+            @Html.AntiForgeryToken()
+
+            <input asp-for="TeacherId" type="hidden" />
+            <input asp-for="UserId" type="hidden" />
+
+            <div asp-validation-summary="ModelOnly" class="text-danger teacher-validation"></div>
+
+            <div class="teacher-edit-grid">
+                <div class="teacher-edit-field">
+                    <label asp-for="FirstName" class="teacher-edit-label">First Name</label>
+                    <input asp-for="FirstName" class="teacher-edit-input" />
+                    <span asp-validation-for="FirstName" class="text-danger teacher-validation"></span>
+                </div>
+
+                <div class="teacher-edit-field">
+                    <label asp-for="LastName" class="teacher-edit-label">Last Name</label>
+                    <input asp-for="LastName" class="teacher-edit-input" />
+                    <span asp-validation-for="LastName" class="text-danger teacher-validation"></span>
+                </div>
+
+                <div class="teacher-edit-field">
+                    <label asp-for="PhoneNumber" class="teacher-edit-label">Phone Number</label>
+                    <input asp-for="PhoneNumber" class="teacher-edit-input" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger teacher-validation"></span>
+                </div>
+
+                <div class="teacher-edit-field teacher-edit-field-full">
+                    <label asp-for="ProfileImage" class="teacher-edit-label">Profile Image Url</label>
+                    <input asp-for="ProfileImage" class="teacher-edit-input" />
+                    <span asp-validation-for="ProfileImage" class="text-danger teacher-validation"></span>
+                </div>
+
+                <div class="teacher-edit-field teacher-edit-field-full">
+                    <label asp-for="Qualifications" class="teacher-edit-label">Qualifications</label>
+                    <textarea asp-for="Qualifications" class="teacher-edit-textarea"></textarea>
+                    <span asp-validation-for="Qualifications" class="text-danger teacher-validation"></span>
+                </div>
+
+                <div class="teacher-edit-field teacher-edit-field-full">
+                    <label asp-for="Biography" class="teacher-edit-label">Biography</label>
+                    <textarea asp-for="Biography" class="teacher-edit-textarea"></textarea>
+                    <span asp-validation-for="Biography" class="text-danger teacher-validation"></span>
+                </div>
+            </div>
+
+            <div class="teacher-edit-note">
+                Make sure your biography and qualifications are complete before sending the approval request.
+                The admin will review your profile before approving your teacher access.
+            </div>
+
+            <div class="teacher-edit-actions">
+                <div class="teacher-edit-actions-left">
+                    <a asp-controller="Profile"
+                       asp-action="TeacherIndex"
+                       class="teacher-btn teacher-btn-secondary">
+                        Cancel
+                    </a>
+                </div>
+
+                <div class="teacher-edit-actions-right">
+                    <button type="submit" name="submitAction" value="send" class="teacher-btn teacher-btn-primary">
+                        Send Approval Request
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

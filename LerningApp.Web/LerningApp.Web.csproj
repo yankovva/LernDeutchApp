@@ -43,4 +43,9 @@
       <Content Remove="wwwroot\audios\ListeningExerciseAudios\623c65ee-29fe-4e1e-a211-bb76fd69b24d.mp3" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Areas\Teacher\Views\Profile\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Teacher\Views\Profile\Index.cshtml" />
+    </ItemGroup>
+
 </Project>

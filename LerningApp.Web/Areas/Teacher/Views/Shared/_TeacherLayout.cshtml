@@ -214,7 +214,10 @@
         <div class="teacher-nav-title">Navigation</div>
         <nav class="teacher-nav">
             <a asp-area="Teacher" asp-controller="Home" asp-action="Index">Dashboard</a>
-            <a asp-area="Teacher" asp-controller="Profile" asp-action="Index">Teacher Profile</a>
+            @if (User.IsInRole("Teacher"))
+            {
+                <a asp-area="" asp-controller="Profile" asp-action="TeacherIndex">Teacher Profile</a>
+            }
             <a asp-area="Teacher" asp-controller="Course" asp-action="Index">Courses</a>
             <a asp-area="Teacher" asp-controller="Lesson" asp-action="Index">Lessons</a>
             <a asp-area="" asp-controller="Home" asp-action="Index">Main Site</a>
