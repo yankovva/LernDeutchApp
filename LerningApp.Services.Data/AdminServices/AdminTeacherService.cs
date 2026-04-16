@@ -1,6 +1,7 @@
 using LerningApp.Common;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
+using LerningApp.Services.Data.Interfaces;
 using LerningApp.Services.Data.Interfaces.AdminInterfaces;
 using LerningApp.Web.ViewModels.Admin.Teacher;
 
@@ -13,8 +14,8 @@ using static LerningApp.Common.ApplicationConstants;
 namespace LerningApp.Services.Data.AdminServices;
 
 public class AdminTeacherService(UserManager<ApplicationUser> userManager,
-    RoleManager<ApplicationRole> roleManager,
-    IRepository<Teacher, Guid> teacherRepository) : IAdminTeacherService
+    IRepository<Teacher, Guid> teacherRepository,
+    IFileService fileService) : IAdminTeacherService
 {
     public async Task<IEnumerable<AdminTeacherIndexViewModel>> GetAllTeachersNotDeletedAsync()
     {
@@ -118,12 +119,21 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             return ServiceResult.Fail("No teacher found.");
         }
 
+        if (!string.IsNullOrWhiteSpace(teacher.PendingProfileImage))
+        {
+            if (!string.IsNullOrWhiteSpace(teacher.User.ProfileImage) &&
+                teacher.User.ProfileImage != teacher.PendingProfileImage)
+            {
+                fileService.DeleteFile(teacher.User.ProfileImage);
+            }
+            teacher.User.ProfileImage = teacher.PendingProfileImage;
+        }
+
         teacher.Qualification = teacher.PendingQualification;
         teacher.Biography = teacher.PendingBiography;
         teacher.User.FirstName = teacher.PendingFirstName;
         teacher.User.LastName = teacher.PendingLastName;
         teacher.User.PhoneNumber = teacher.PendingPhoneNumber;
-        teacher.User.ProfileImage = string.IsNullOrEmpty(teacher.PendingProfileImage) ? null : teacher.PendingProfileImage;
         teacher.Status = TeacherStatus.Approved;
 
         teacher.PendingFirstName = null;
