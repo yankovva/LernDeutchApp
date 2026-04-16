@@ -34,7 +34,7 @@ public class TeacherController(IAdminTeacherService teacherService) : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Approve(string id)
     {
-        var result = await teacherService.ApproveUserTeacherRoleAsync(id);
+        var result = await teacherService.ApproveUserProfileChangesAsync(id);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
@@ -48,7 +48,7 @@ public class TeacherController(IAdminTeacherService teacherService) : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Reject(string id)
     {
-        var result = await teacherService.RejectTeacherRequestAsync(id);
+        var result = await teacherService.RejectTeacherChangesRequestAsync(id);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
@@ -88,7 +88,7 @@ public class TeacherController(IAdminTeacherService teacherService) : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> RemoveTeacherRequest(string id)
     {
-        var result = await teacherService.RemovePendingTeacherAsync(id);
+        var result = await teacherService.RemoveTeacherRequestAsync(id);
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;

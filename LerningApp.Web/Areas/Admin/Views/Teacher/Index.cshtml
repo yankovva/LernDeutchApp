@@ -5,6 +5,7 @@
 
 @{
     ViewData["Title"] = "Teachers";
+    var pendingProfileChangesCount = Model.Count(t => t.HasPendingProfileChanges);
 }
 
 <style>
@@ -145,6 +146,29 @@
         text-align: center;
         color: #64748b;
     }
+    .teacher-pending-header {
+        position: relative;
+        display: inline-block;
+        padding-right: 2rem;
+    }
+
+    .teacher-pending-counter {
+        position: absolute;
+        top: -10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 22px;
+        height: 22px;
+        padding: 0 0.35rem;
+        border-radius: 999px;
+        background: #dc2626;
+        color: #ffffff;
+        font-size: 0.75rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+    
     .teacher-badge-pending-changes {
         background: #fde68a;
         color: #92400e;
@@ -155,14 +179,32 @@
         color: #166534;
     }
 
+    .teacher-btn-warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .teacher-btn-warning:hover {
+        background: #fde68a;
+    }
+
+    .teacher-toolbar-title-row {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
 </style>
 
 <div class="teacher-toolbar">
     <div>
-        <h2>Teacher Management</h2>
+        <div class="teacher-toolbar-title-row">
+            <h2>Teacher Management</h2>
+        </div>
         <p>Review teacher profiles, approval status, and administrative actions.</p>
     </div>
 </div>
+
 
 <div class="teacher-table-wrap">
     <table class="teacher-table">
@@ -172,7 +214,16 @@
             <th>Last Name</th>
             <th>Email</th>
             <th>Status</th>
-            <th>Pending Changes</th>
+            <th>
+                <div class="teacher-pending-header">
+                    <span>Pending Profile Changes</span>
+                    @if (pendingProfileChangesCount > 0)
+                    {
+                        <span class="teacher-pending-counter">@pendingProfileChangesCount</span>
+                    }
+                </div>
+            </th>
+
             <th>Teacher Since</th>
             <th>Actions</th>
         </tr>

@@ -14,4 +14,19 @@ public class AdminTeacherDetailsViewModel
     public string? TeacherSince { get; set; } 
     public string? Biography  { get; set; } 
     public string? Qualifications  { get; set; } 
+    
+    public string? PendingFirstName { get; set; }
+
+    public string? PendingLastName { get; set; }
+
+    public string? PendingPhoneNumber { get; set; }
+
+    public string? PendingProfileImage { get; set; }
+
+    public string? PendingBiography { get; set; }
+
+    public string? PendingQualifications { get; set; }
+
+    public bool HasPendingChanges { get; set; }
+
 }

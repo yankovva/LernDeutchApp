@@ -1,3 +1,4 @@
+@using Microsoft.AspNetCore.Mvc.TagHelpers
 @using LerningApp.Web.ViewModels.Admin.Teacher
 @model AdminTeacherDetailsViewModel
 
@@ -11,148 +12,42 @@
         gap: 1.5rem;
     }
 
-    .teacher-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 1.5rem;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .teacher-header h2 {
-        margin: 0;
-        font-size: 1.6rem;
-        font-weight: 700;
-    }
-
-    .teacher-header p {
-        margin: 0.45rem 0 0;
-        color: #64748b;
-    }
-
-    .teacher-status-badge {
-        display: inline-block;
-        padding: 0.5rem 0.9rem;
-        border-radius: 999px;
-        font-size: 0.85rem;
-        font-weight: 700;
-    }
-
-    .teacher-status-approved {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .teacher-status-pending {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .teacher-status-rejected {
-        background: #fee2e2;
-        color: #b91c1c;
-    }
-
-    .teacher-status-draft {
-        background: #e0f2fe;
-        color: #0369a1;
-    }
-    .teacher-status-inactive {
-        background: #a3a2a2;
-        color: #000000;
-    }
-
-    .teacher-main-grid {
+    .teacher-details-hero {
+        position: relative;
         display: grid;
-        grid-template-columns: 320px 1fr;
-        gap: 1.5rem;
+        grid-template-columns: 220px 1fr;
+        gap: 1.75rem;
+        padding: 2rem;
+        border-radius: 26px;
+        background:
+            radial-gradient(circle at top left, rgba(29, 78, 216, 0.12), transparent 28%),
+            linear-gradient(135deg, #f8fbff 0%, #ffffff 52%, #f2f7fb 100%);
+        border: 1px solid #d9e3ef;
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
     }
 
-    .teacher-card {
-        background: #fff;
-        border: 1px solid #e5e7eb;
-        border-radius: 18px;
-        padding: 1.5rem;
-    }
-
-    .teacher-photo-box {
-        width: 100%;
-        aspect-ratio: 1 / 1;
-        border-radius: 16px;
-        overflow: hidden;
-        background: #f8fafc;
-        border: 1px solid #e5e7eb;
-        margin-bottom: 1rem;
+    .teacher-details-actions {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
         display: flex;
+        gap: 0.75rem;
+        flex-wrap: wrap;
+    }
+
+    .teacher-details-actions form {
+        margin: 0;
+    }
+
+    .teacher-btn {
+        display: inline-flex;
         align-items: center;
         justify-content: center;
-    }
-
-    .teacher-photo-box img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-
-    .teacher-photo-placeholder {
-        color: #94a3b8;
-        font-weight: 600;
-    }
-
-    .teacher-info-list {
-        display: grid;
-        gap: 0.9rem;
-    }
-
-    .teacher-info-item strong {
-        display: block;
-        font-size: 0.78rem;
-        text-transform: uppercase;
-        letter-spacing: 0.06em;
-        color: #64748b;
-        margin-bottom: 0.25rem;
-    }
-
-    .teacher-info-item span {
-        color: #0f172a;
-        font-weight: 600;
-    }
-
-    .teacher-section {
-        margin-bottom: 1.25rem;
-    }
-
-    .teacher-section:last-child {
-        margin-bottom: 0;
-    }
-
-    .teacher-section h3 {
-        font-size: 1.1rem;
-        font-weight: 700;
-        margin-bottom: 0.7rem;
-    }
-
-    .teacher-section p {
-        margin: 0;
-        color: #475569;
-        line-height: 1.7;
-    }
-
-    .teacher-actions {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.75rem;
-        margin-top: 1rem;
-    }
-
-    .teacher-actions a,
-    .teacher-actions button {
         border: none;
         border-radius: 12px;
-        padding: 0.7rem 1rem;
+        padding: 0.72rem 1rem;
         font-size: 0.92rem;
-        font-weight: 600;
+        font-weight: 700;
         text-decoration: none;
         cursor: pointer;
     }
@@ -168,140 +63,446 @@
     }
 
     .teacher-btn-reject {
-        background: #b91c1c;
-        color: white;
+        background: #fee2e2;
+        color: #b91c1c;
     }
 
     .teacher-btn-reject:hover {
-        background: #991b1b;
-        color: white;
+        background: #fecaca;
     }
 
-    .teacher-btn-back {
-        background: #e2e8f0;
+    .teacher-avatar-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .teacher-avatar {
+        width: 190px;
+        height: 190px;
+        border-radius: 999px;
+        object-fit: cover;
+        border: 6px solid #ffffff;
+        box-shadow: 0 18px 34px rgba(15, 23, 42, 0.14);
+        background: #e5e7eb;
+    }
+
+    .teacher-main {
+        display: grid;
+        gap: 1.2rem;
+        align-content: center;
+    }
+
+    .teacher-heading h1 {
+        margin: 0;
+        font-size: 2.1rem;
+        font-weight: 800;
+        color: #102542;
+        line-height: 1.08;
+    }
+
+    .teacher-subtitle {
+        margin-top: 0.45rem;
+        color: #64748b;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .teacher-badges {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.65rem;
+        margin-top: 0.9rem;
+    }
+
+    .teacher-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.45rem 0.8rem;
+        border-radius: 999px;
+        font-size: 0.82rem;
+        font-weight: 700;
+    }
+
+    .teacher-badge-status {
+        background: #dbeafe;
+        color: #1d4ed8;
+    }
+
+    .teacher-badge-since {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .teacher-section {
+        background: #ffffff;
+        border: 1px solid #d9e3ef;
+        border-radius: 22px;
+        padding: 1.5rem;
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.04);
+    }
+
+    .teacher-section h2 {
+        margin: 0 0 1rem;
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .teacher-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem 2rem;
+    }
+
+    .teacher-info-item {
+        display: grid;
+        gap: 0.2rem;
+    }
+
+    .teacher-label {
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 700;
+        color: #94a3b8;
+    }
+
+    .teacher-value {
+        font-size: 1rem;
         color: #0f172a;
+        font-weight: 700;
+        word-break: break-word;
     }
 
-    .teacher-btn-back:hover {
-        background: #cbd5e1;
-        color: #0f172a;
+    .teacher-text-block {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 1.1rem 1.15rem;
+        color: #334155;
+        line-height: 1.7;
+        white-space: pre-line;
+        min-height: 120px;
     }
 
-    @@media (max-width: 900px) {
-        .teacher-main-grid {
+    .teacher-empty {
+        color: #94a3b8;
+        font-style: italic;
+    }
+
+    .teacher-review-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.25rem;
+    }
+
+    .teacher-review-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 1.25rem;
+    }
+
+    .teacher-review-card h3 {
+        margin: 0 0 1rem;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .teacher-review-images {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .teacher-review-image-box {
+        display: grid;
+        gap: 0.5rem;
+    }
+
+    .teacher-review-image-box img {
+        width: 100%;
+        max-width: 220px;
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 18px;
+        border: 1px solid #d9e3ef;
+        background: #e5e7eb;
+    }
+    .teacher-review-changed {
+        background: #dcfce7;
+        border: 1px solid #86efac;
+        border-radius: 12px;
+        padding: 0.55rem 0.7rem;
+    }
+
+    .teacher-text-block-changed {
+        background: #dcfce7;
+        border: 1px solid #86efac;
+    }
+
+
+    @@media (max-width: 960px) {
+        .teacher-details-hero,
+        .teacher-review-grid,
+        .teacher-info-grid,
+        .teacher-review-images {
             grid-template-columns: 1fr;
         }
 
-        .teacher-header {
-            flex-direction: column;
-            align-items: flex-start;
+        .teacher-details-actions {
+            position: static;
+            margin-bottom: 1rem;
         }
     }
 </style>
 
 <div class="teacher-details-page">
-    <div class="teacher-header">
-        <div>
-            <h2>@(Model.FirstName ?? "Unknown") @(Model.LastName ?? "Teacher")</h2>
-            <p>Review teacher information, qualifications, biography, and approval status.</p>
+    <section class="teacher-details-hero">
+        @if (Model.HasPendingChanges)
+        {
+            <div class="teacher-details-actions">
+                <form asp-area="Admin"
+                      asp-controller="Teacher"
+                      asp-action="Approve"
+                      asp-route-id="@Model.UserId"
+                      method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="teacher-btn teacher-btn-approve">
+                        Approve
+                    </button>
+                </form>
+
+                <form asp-area="Admin"
+                      asp-controller="Teacher"
+                      asp-action="Reject"
+                      asp-route-id="@Model.UserId"
+                      method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="teacher-btn teacher-btn-reject">
+                        Reject
+                    </button>
+                </form>
+            </div>
+        }
+
+        <div class="teacher-avatar-wrap">
+            <img class="teacher-avatar"
+                 src="@(string.IsNullOrWhiteSpace(Model.ProfileImage) ? "/images/Common/default-profile-picture.jpg" : Model.ProfileImage)"
+                 alt="Teacher profile image" />
         </div>
 
-        <div>
-            @if (Model.Status == "Approved")
-            {
-                <span class="teacher-status-badge teacher-status-approved">Approved</span>
-            }
-            else if (Model.Status == "PendingReview")
-            {
-                <span class="teacher-status-badge teacher-status-pending">Pending Review</span>
-            }
-            else if (Model.Status == "Rejected")
-            {
-                <span class="teacher-status-badge teacher-status-rejected">Rejected</span>
-            }else if (Model.Status == "Inactive")
-            {
-                <span class="teacher-status-badge teacher-status-inactive">Inactive</span>
-            }
-            else
-            {
-                <span class="teacher-status-badge teacher-status-draft">Draft</span>
-            }
-        </div>
-    </div>
+        <div class="teacher-main">
+            <div class="teacher-heading">
+                <h1>@($"{Model.FirstName ?? "Unknown"} {Model.LastName ?? "Teacher"}")</h1>
+                <div class="teacher-subtitle">@(Model.Email ?? "No email added")</div>
 
-    <div class="teacher-main-grid">
-        <div class="teacher-card">
-            <div class="teacher-photo-box">
-                @if (!string.IsNullOrWhiteSpace(Model.ProfileImage))
+                <div class="teacher-badges">
+                    <span class="teacher-badge teacher-badge-status">@Model.Status</span>
+                    <span class="teacher-badge teacher-badge-since">
+                        Teacher Since: @(Model.TeacherSince ?? "Pending")
+                    </span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @if (Model.HasPendingChanges)
+    {
+        <section class="teacher-section">
+            <h2>Pending Review Changes</h2>
+
+            <div class="teacher-review-grid">
+                <div class="teacher-review-card">
+                    <h3>Current</h3>
+
+                    <div class="teacher-info-grid">
+                        <div class="teacher-info-item">
+                            <div class="teacher-label">First Name</div>
+                            <div class="teacher-value">@(Model.FirstName ?? "Not set")</div>
+                        </div>
+
+                        <div class="teacher-info-item">
+                            <div class="teacher-label">Last Name</div>
+                            <div class="teacher-value">@(Model.LastName ?? "Not set")</div>
+                        </div>
+
+                        <div class="teacher-info-item">
+                            <div class="teacher-label">Phone Number</div>
+                            <div class="teacher-value">@(Model.PhoneNumber ?? "Not set")</div>
+                        </div>
+                    </div>
+
+                    <div class="teacher-review-images">
+                        <div class="teacher-review-image-box">
+                            <div class="teacher-label">Current Image</div>
+                            <img src="@(string.IsNullOrWhiteSpace(Model.ProfileImage) ? "/images/Common/default-profile-picture.jpg" : Model.ProfileImage)"
+                                 alt="Current teacher image" />
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem;">
+                        <div class="teacher-label">Biography</div>
+                        <div class="teacher-text-block">
+                            @if (string.IsNullOrWhiteSpace(Model.Biography))
+                            {
+                                <span class="teacher-empty">No biography has been added yet.</span>
+                            }
+                            else
+                            {
+                                @Model.Biography
+                            }
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem;">
+                        <div class="teacher-label">Qualifications</div>
+                        <div class="teacher-text-block">
+                            @if (string.IsNullOrWhiteSpace(Model.Qualifications))
+                            {
+                                <span class="teacher-empty">No qualifications have been added yet.</span>
+                            }
+                            else
+                            {
+                                @Model.Qualifications
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div class="teacher-review-card">
+                    <h3>Pending</h3>
+
+                    <div class="teacher-info-grid">
+                        <div class="teacher-info-item">
+                            <div class="teacher-label">First Name</div>
+                            <div class="teacher-value @(Model.PendingFirstName != null && Model.PendingFirstName != Model.FirstName ? "teacher-review-changed" : "")">
+                                @(Model.PendingFirstName ?? "No change submitted")
+                            </div>
+                        </div>
+
+                        <div class="teacher-info-item">
+                            <div class="teacher-label">Last Name</div>
+                            <div class="teacher-value @(Model.PendingLastName != null && Model.PendingLastName != Model.LastName ? "teacher-review-changed" : "")">
+                                @(Model.PendingLastName ?? "No change submitted")
+                            </div>
+                        </div>
+
+                        <div class="teacher-info-item">
+                            <div class="teacher-label">Phone Number</div>
+                            <div class="teacher-value @(Model.PendingPhoneNumber != null && Model.PendingPhoneNumber != Model.PhoneNumber ? "teacher-review-changed" : "")">
+                                @(Model.PendingPhoneNumber ?? "No change submitted")
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="teacher-review-images">
+                        <div class="teacher-review-image-box @(Model.PendingProfileImage != null && Model.PendingProfileImage != Model.ProfileImage ? "teacher-review-changed" : "")">
+                            <div class="teacher-label">Pending Image</div>
+                            <img src="@(string.IsNullOrWhiteSpace(Model.PendingProfileImage) ? "/images/Common/default-profile-picture.jpg" : Model.PendingProfileImage)"
+                                 alt="Pending teacher image" />
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem;">
+                        <div class="teacher-label">Biography</div>
+                        <div class="teacher-text-block @(Model.PendingBiography != null && Model.PendingBiography != Model.Biography ? "teacher-text-block-changed" : "")">
+
+                        @if (string.IsNullOrWhiteSpace(Model.PendingBiography))
+                            {
+                                <span class="teacher-empty">No change submitted.</span>
+                            }
+                            else
+                            {
+                                @Model.PendingBiography
+                            }
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem;">
+                        <div class="teacher-label">Qualifications</div>
+                        <div class="teacher-text-block @(Model.PendingQualifications != null && Model.PendingQualifications != Model.Qualifications ? "teacher-text-block-changed" : "")">
+                        @if (string.IsNullOrWhiteSpace(Model.PendingQualifications))
+                            {
+                                <span class="teacher-empty">No change submitted.</span>
+                            }
+                            else
+                            {
+                                @Model.PendingQualifications
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    }
+    else
+    {
+        <section class="teacher-section">
+            <h2>Current Information</h2>
+
+            <div class="teacher-info-grid">
+                <div class="teacher-info-item">
+                    <div class="teacher-label">First Name</div>
+                    <div class="teacher-value">@(Model.FirstName ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-info-item">
+                    <div class="teacher-label">Last Name</div>
+                    <div class="teacher-value">@(Model.LastName ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-info-item">
+                    <div class="teacher-label">Username</div>
+                    <div class="teacher-value">@(Model.UserName ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-info-item">
+                    <div class="teacher-label">Email</div>
+                    <div class="teacher-value">@(Model.Email ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-info-item">
+                    <div class="teacher-label">Phone Number</div>
+                    <div class="teacher-value">@(Model.PhoneNumber ?? "Not set")</div>
+                </div>
+
+                <div class="teacher-info-item">
+                    <div class="teacher-label">Status</div>
+                    <div class="teacher-value">@Model.Status</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="teacher-section">
+            <h2>Current Biography</h2>
+            <div class="teacher-text-block">
+                @if (string.IsNullOrWhiteSpace(Model.Biography))
                 {
-                    <img src="@Model.ProfileImage" alt="Teacher Photo" />
+                    <span class="teacher-empty">No biography has been added yet.</span>
                 }
                 else
                 {
-                    <div class="teacher-photo-placeholder">No Photo</div>
+                    @Model.Biography
                 }
             </div>
+        </section>
 
-            <div class="teacher-info-list">
-                <div class="teacher-info-item">
-                    <strong>Email</strong>
-                    <span>@(Model.Email ?? "No email")</span>
-                </div>
-
-                <div class="teacher-info-item">
-                    <strong>Username</strong>
-                    <span>@(Model.UserName ?? "Not set")</span>
-                </div>
-
-                <div class="teacher-info-item">
-                    <strong>Teacher Since</strong>
-                    <span>@(Model.TeacherSince ?? "Pending")</span>
-                </div>
-
-                <div class="teacher-info-item">
-                    <strong>Status</strong>
-                    <span>@Model.Status</span>
-                </div>
-                <div class="teacher-info-item">
-                    <strong>Phone Number</strong>
-                    <span>@(Model.PhoneNumber ?? "Not provided")</span>
-                </div>
+        <section class="teacher-section">
+            <h2>Current Qualifications</h2>
+            <div class="teacher-text-block">
+                @if (string.IsNullOrWhiteSpace(Model.Qualifications))
+                {
+                    <span class="teacher-empty">No qualifications have been added yet.</span>
+                }
+                else
+                {
+                    @Model.Qualifications
+                }
             </div>
-        </div>
-
-        <div class="teacher-card">
-            <div class="teacher-section">
-                <h3>Biography</h3>
-                <p>@(string.IsNullOrWhiteSpace(Model.Biography) ? "No biography provided yet." : Model.Biography)</p>
-            </div>
-
-            <div class="teacher-section">
-                <h3>Qualifications</h3>
-                <p>@(string.IsNullOrWhiteSpace(Model.Qualifications) ? "No qualifications added yet." : Model.Qualifications)</p>
-            </div>
-
-            <div class="teacher-section">
-                <h3>Administrative Actions</h3>
-                <div class="teacher-actions">
-                    
-                    @if (Model.Status == "PendingReview")
-                    {
-                        <form asp-area="Admin" asp-controller="Teacher" asp-action="Approve" asp-route-id="@Model.UserId" method="post" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="teacher-btn-approve">Approve Teacher</button>
-                        </form>
-
-                        <form asp-area="Admin" asp-controller="Teacher" asp-action="Reject" asp-route-id="@Model.UserId" method="post" class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <button type="submit" class="teacher-btn-reject">Reject Teacher</button>
-                        </form>
-                    }
-
-                    <a asp-area="Admin" asp-controller="Teacher" asp-action="Index" class="teacher-btn-back">
-                        Back to Teachers
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
+        </section>
+    }
 </div>

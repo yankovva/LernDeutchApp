@@ -29,6 +29,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
                 Email = t.User.Email,
                 FirstName = t.User.FirstName,
                 LastName = t.User.LastName,
+                HasPendingProfileChanges = t.HasProfileChangesPendingReview,
                 Status = t.Status.ToString(),
                 TeacherSince = t.TeacherSince.HasValue
                     ? t.TeacherSince.Value.ToString("MM/dd/yyyy")
@@ -64,53 +65,89 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> ApproveUserTeacherRoleAsync(string userId)
+    private async Task<bool> AssignTeacherRole(ApplicationUser user, string userId)
     {
-        var user = await userManager.FindByIdAsync(userId);
-        if (user == null)
+        var result = await userManager
+            .AddToRoleAsync(user, TeacherRole);
+        if (!result.Succeeded)
         {
-            return ServiceResult.Fail("No user found.");
-        }
-        
-        bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
-        if (isTeacher)
-        {
-            return ServiceResult.Fail("User already teacher.");
+            return false;
         }
         
         Guid userGuid = Guid.Parse(userId);
         var teacher = await teacherRepository
             .FirstorDefaultAsync(t => t.UserId == userGuid);
+        
         if (teacher == null)
         {
-            return ServiceResult.Fail("No teacher found.");
+            return false;
         }
-        
         teacher.TeacherSince = DateTime.UtcNow;
-        teacher.Status = TeacherStatus.Approved;
         await teacherRepository.SaveChangesAsync();
-        var result = await userManager.AddToRoleAsync(user, TeacherRole);
-        if (!result.Succeeded)
-        {
-            return ServiceResult.Fail("Failed to add teacher.");
-        }
         
-        return ServiceResult.Success();
+        return true;
     }
-
-    public async Task<ServiceResult> RejectTeacherRequestAsync(string userId)
+    public async Task<ServiceResult> ApproveUserProfileChangesAsync(string userId)
     {
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
         {
             return ServiceResult.Fail("No user found.");
         }
-        bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
-        if (isTeacher)
+        
+        //First request for teacher 
+        bool isTeacher = await userManager
+            .IsInRoleAsync(user, TeacherRole);
+        if (!isTeacher)
         {
-            return ServiceResult.Fail("User is already in role Teacher.");
+            bool roleAssigned = await AssignTeacherRole(user, userId);
+            if (!roleAssigned)
+            {
+                return ServiceResult.Fail("Failed to assign teacher role.");
+            }
         }
         
+        Guid userGuid = Guid.Parse(userId);
+        var teacher = await teacherRepository
+            .GetAllAttached()
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(t => t.UserId == userGuid);
+        
+        if (teacher == null)
+        {
+            return ServiceResult.Fail("No teacher found.");
+        }
+
+        teacher.Qualification = teacher.PendingQualification;
+        teacher.Biography = teacher.PendingBiography;
+        teacher.User.FirstName = teacher.PendingFirstName;
+        teacher.User.LastName = teacher.PendingLastName;
+        teacher.User.PhoneNumber = teacher.PendingPhoneNumber;
+        teacher.User.ProfileImage = string.IsNullOrEmpty(teacher.PendingProfileImage) ? null : teacher.PendingProfileImage;
+        teacher.Status = TeacherStatus.Approved;
+
+        teacher.PendingFirstName = null;
+        teacher.PendingLastName = null;
+        teacher.PendingPhoneNumber = null;
+        teacher.PendingBiography = null;
+        teacher.PendingQualification = null;
+        teacher.PendingProfileImage = null;
+        teacher.HasProfileChangesPendingReview = false;
+        
+        await teacherRepository.SaveChangesAsync();
+        
+        return ServiceResult.Success();
+    }
+
+    public async Task<ServiceResult> RejectTeacherChangesRequestAsync(string userId)
+    {
+        var user = await userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return ServiceResult.Fail("No user found.");
+        }
+        bool isTeacher = await userManager
+            .IsInRoleAsync(user, TeacherRole);
         Guid userGuid = Guid.Parse(userId);
         var teacher = await teacherRepository
             .FirstorDefaultAsync(t => t.UserId == userGuid);
@@ -118,7 +155,18 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         {
             return ServiceResult.Fail("No teacher request found.");
         }
-        teacher.Status = TeacherStatus.Rejected;
+        if (!isTeacher)
+        {
+            teacher.Status = TeacherStatus.Rejected;
+        }
+        teacher.PendingFirstName = null;
+        teacher.PendingLastName = null;
+        teacher.PendingPhoneNumber = null;
+        teacher.PendingBiography = null;
+        teacher.PendingQualification = null;
+        teacher.PendingProfileImage = null;
+        teacher.HasProfileChangesPendingReview = false;
+        teacher.Status = TeacherStatus.Approved;
         await teacherRepository.SaveChangesAsync();
         
         return ServiceResult.Success();
@@ -152,13 +200,21 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         {
             return ServiceResult.Fail("Failed to remove teacher role.");
         }
+        teacher.PendingFirstName = null;
+        teacher.PendingLastName = null;
+        teacher.PendingPhoneNumber = null;
+        teacher.PendingProfileImage = null;
+        teacher.PendingBiography = null;
+        teacher.PendingQualification = null;
+        teacher.HasProfileChangesPendingReview = false;
         teacher.Status = TeacherStatus.Inactive;
+
         await teacherRepository.SaveChangesAsync();
        
         return ServiceResult.Success();
     }
 
-    public async Task<ServiceResult> RemovePendingTeacherAsync(string teacherId)
+    public async Task<ServiceResult> RemoveTeacherRequestAsync(string teacherId)
     {
         Guid id = Guid.TryParse(teacherId, out Guid teacherGuid)
             ? teacherGuid
@@ -209,7 +265,14 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             TeacherSince = teacher.TeacherSince.HasValue
                 ? teacher.TeacherSince.Value.ToString("MM/dd/yyyy")
                 : "Pending",
-            ProfileImage = teacher.User.ProfileImage
+            ProfileImage = teacher.User.ProfileImage,
+            PendingFirstName = teacher.PendingFirstName,
+            PendingLastName = teacher.PendingLastName,
+            PendingPhoneNumber = teacher.PendingPhoneNumber,
+            PendingBiography = teacher.PendingBiography,
+            PendingProfileImage = teacher.PendingProfileImage,
+            PendingQualifications = teacher.PendingQualification,
+            HasPendingChanges = teacher.HasProfileChangesPendingReview
         };
         
         return ServiceResultT<AdminTeacherDetailsViewModel>.Success(result);
