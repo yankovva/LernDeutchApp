@@ -243,7 +243,42 @@
         background: #dcfce7;
         border: 1px solid #86efac;
     }
+    .teacher-stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 1rem;
+    }
 
+    .teacher-stat-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 18px;
+        padding: 1.1rem;
+    }
+
+    .teacher-stat-number {
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: #102542;
+    }
+
+    .teacher-stat-label {
+        margin-top: 0.35rem;
+        color: #64748b;
+        font-weight: 600;
+    }
+
+    @@media (max-width: 960px) {
+        .teacher-stats-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .teacher-stats-grid {
+            grid-template-columns: 1fr;
+        }
+    }
 
     @@media (max-width: 960px) {
         .teacher-details-hero,
@@ -258,6 +293,7 @@
             margin-bottom: 1rem;
         }
     }
+    
 </style>
 
 <div class="teacher-details-page">
@@ -504,5 +540,31 @@
                 }
             </div>
         </section>
+        <section class="teacher-section">
+            <h2>Content Overview</h2>
+
+            <div class="teacher-stats-grid">
+                <div class="teacher-stat-card">
+                    <div class="teacher-stat-number">@Model.CreatedCoursesCount</div>
+                    <div class="teacher-stat-label">Created Courses</div>
+                </div>
+
+                <div class="teacher-stat-card">
+                    <div class="teacher-stat-number">@Model.CreatedLessonsCount</div>
+                    <div class="teacher-stat-label">Created Lessons</div>
+                </div>
+
+                <div class="teacher-stat-card">
+                    <div class="teacher-stat-number">@Model.CreatedVocabularyCardsCount</div>
+                    <div class="teacher-stat-label">Vocabulary Cards</div>
+                </div>
+
+                <div class="teacher-stat-card">
+                    <div class="teacher-stat-number">@Model.TotalCreatedExercisesCount</div>
+                    <div class="teacher-stat-label">Total Exercises</div>
+                </div>
+            </div>
+        </section>
+
     }
 </div>

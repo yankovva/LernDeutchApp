@@ -28,5 +28,19 @@ public class AdminTeacherDetailsViewModel
     public string? PendingQualifications { get; set; }
 
     public bool HasPendingChanges { get; set; }
+    
+    public int CreatedCoursesCount { get; set; }
+
+    public int CreatedLessonsCount { get; set; }
+
+    public int CreatedVocabularyCardsCount { get; set; }
+
+    public int CreatedMultipleChoiceExercisesCount { get; set; }
+
+    public int CreatedTranslationExercisesCount { get; set; }
+
+    public int CreatedListeningExercisesCount { get; set; }
+    public int TotalCreatedExercisesCount { get; set; }
+
 
 }

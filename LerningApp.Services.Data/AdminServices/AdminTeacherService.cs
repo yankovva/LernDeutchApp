@@ -261,6 +261,11 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         
         Teacher? teacher = await teacherRepository
             .GetAllAttached()
+            .Include(t => t.ListeningExercises)
+            .Include(t=>t.CreatedTranslationExercises)
+            .Include(t=>t.CreatedMultipleChoiceExercises)
+            .Include(t=>t.CreatedCourses)
+            .Include(t =>t.CreatedLessons)
             .Include(t => t.User)
             .FirstOrDefaultAsync(t => t.Id == teacherGuid);
         
@@ -291,7 +296,14 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             PendingBiography = teacher.PendingBiography,
             PendingProfileImage = teacher.PendingProfileImage,
             PendingQualifications = teacher.PendingQualification,
-            HasPendingChanges = teacher.HasProfileChangesPendingReview
+            HasPendingChanges = teacher.HasProfileChangesPendingReview,
+            CreatedVocabularyCardsCount = 100,
+            CreatedCoursesCount = teacher.CreatedCourses.Count,
+            CreatedLessonsCount = teacher.CreatedLessons.Count,
+            CreatedListeningExercisesCount = teacher.ListeningExercises.Count,
+            CreatedTranslationExercisesCount = teacher.CreatedTranslationExercises.Count,
+            CreatedMultipleChoiceExercisesCount = teacher.CreatedMultipleChoiceExercises.Count,
+            TotalCreatedExercisesCount =  teacher.ListeningExercises.Count + teacher.CreatedTranslationExercises.Count + teacher.CreatedMultipleChoiceExercises.Count,
         };
         
         return ServiceResultT<AdminTeacherDetailsViewModel>.Success(result);
