@@ -146,19 +146,27 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         {
             return ServiceResult.Fail("No user found.");
         }
-        bool isTeacher = await userManager
-            .IsInRoleAsync(user, TeacherRole);
+
+        bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
+
         Guid userGuid = Guid.Parse(userId);
         var teacher = await teacherRepository
             .FirstorDefaultAsync(t => t.UserId == userGuid);
+
         if (teacher == null)
         {
             return ServiceResult.Fail("No teacher request found.");
         }
+
         if (!isTeacher)
         {
             teacher.Status = TeacherStatus.Rejected;
         }
+        else
+        {
+            teacher.Status = TeacherStatus.Approved;
+        }
+
         teacher.PendingFirstName = null;
         teacher.PendingLastName = null;
         teacher.PendingPhoneNumber = null;
@@ -166,11 +174,12 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         teacher.PendingQualification = null;
         teacher.PendingProfileImage = null;
         teacher.HasProfileChangesPendingReview = false;
-        teacher.Status = TeacherStatus.Approved;
+
         await teacherRepository.SaveChangesAsync();
-        
+
         return ServiceResult.Success();
     }
+
 
     public async Task<ServiceResult> RemoveTeacherRoleAsync(string userId)
     {
