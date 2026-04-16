@@ -10,12 +10,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+using static LerningApp.Common.ApplicationConstants;
+using static LerningApp.Common.ErrorMessages;
+
 namespace LerningApp.Controllers;
 
 [Authorize]
 public class ProfileController(IProfileService profileService,
     IRepository<Teacher, Guid> teacherRepository,
-    UserManager<ApplicationUser> userManager) : BaseController
+    UserManager<ApplicationUser> userManager,
+    IFileService fileService) : BaseController
 {
     public async Task<IActionResult> Index()
     {
@@ -120,23 +124,32 @@ public class ProfileController(IProfileService profileService,
         {
             return RedirectToAction(nameof(Index));
         }
+        string imagePath = string.Empty;
+
+        if (model.Image?.Length > 0)
+        {
+            if (!fileService.IsFileValid(model.Image, AllowedImageExtensions, MaxFileSize))
+            {
+                 return this.View(model);
+            }
+
+            string extension = Path.GetExtension(model.Image.FileName);
+            string uniqueFileName = $"{Guid.NewGuid()}{extension}";
+            imagePath = await fileService.UploadFileAsync(model.Image, DefaultTEacherProfileImageDirectoryPath, uniqueFileName);
+        }
         
         teacher.PendingFirstName = model.FirstName;
         teacher.PendingLastName = model.LastName;
         teacher.PendingPhoneNumber = model.PhoneNumber;
-        teacher.PendingProfileImage = model.ProfileImage;
         teacher.PendingBiography = model.Biography;
         teacher.PendingQualification = model.Qualifications;
         
-        if (teacher.Status == Enums.TeacherStatus.Approved)
+        if (!string.IsNullOrEmpty(imagePath))
         {
-            teacher.HasProfileChangesPendingReview = true;
+            teacher.PendingProfileImage = imagePath;
         }
-        else if (teacher.Status == Enums.TeacherStatus.Draft || teacher.Status == Enums.TeacherStatus.Rejected)
-        {
-            teacher.HasProfileChangesPendingReview = false;
-            teacher.Status = Enums.TeacherStatus.PendingReview;
-        }
+        
+        teacher.HasProfileChangesPendingReview = true;
         
         await teacherRepository.SaveChangesAsync();
         

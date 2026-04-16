@@ -192,6 +192,7 @@
         <form asp-controller="Profile"
               asp-action="TeacherEdit"
               method="post"
+              enctype="multipart/form-data"
               class="teacher-edit-body">
             @Html.AntiForgeryToken()
 
@@ -219,10 +220,10 @@
                     <span asp-validation-for="PhoneNumber" class="text-danger teacher-validation"></span>
                 </div>
 
-                <div class="teacher-edit-field teacher-edit-field-full">
-                    <label asp-for="ProfileImage" class="teacher-edit-label">Profile Image Url</label>
-                    <input asp-for="ProfileImage" class="teacher-edit-input" />
-                    <span asp-validation-for="ProfileImage" class="text-danger teacher-validation"></span>
+                <div class="mb-3">
+                    <label asp-for="Image" class="form-label">Profile Image</label>
+                    <input asp-for="Image" type="file" class="form-control" />
+                    <span asp-validation-for="Image" class="text-danger  teacher-validation"></span>
                 </div>
 
                 <div class="teacher-edit-field teacher-edit-field-full">

@@ -119,7 +119,6 @@ public static class EntityValidationConstants
         public const int PhoneNumberMinLength = 5;
         public const int PhoneNumberMaxLength = 20;
         
-        public const int ProfileImageMinLength = 150;
         public const int ProfileImageMaxLength = 350;
     }
 }
