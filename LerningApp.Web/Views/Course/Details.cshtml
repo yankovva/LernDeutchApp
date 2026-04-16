@@ -90,23 +90,6 @@
                 </section>
             }
 
-            @if (isTeacher)
-            {
-                <section class="actions-card">
-                    <a asp-action="Edit" asp-controller="Course" asp-route-id="@Model.Id" class="btn btn-warning">
-                        Редактирай
-                    </a>
-
-                    <form asp-action="SoftDelete" method="post"
-                          onsubmit="return confirm('Сигурни ли сте, че искате да изтриете този курс?');"
-                          class="d-inline">
-                        @Html.AntiForgeryToken()
-                        <input type="hidden" name="id" value="@Model.Id"/>
-                        <button type="submit" class="btn btn-danger btn-sm">Изтрий</button>
-                    </form>
-                </section>
-            }
-
             <section class="section-card">
                 <h4 class="section-title">Описание</h4>
                 @if (string.IsNullOrWhiteSpace(Model.Description))

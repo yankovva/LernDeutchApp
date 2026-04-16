@@ -19,6 +19,14 @@ public class TeacherService(IRepository<Teacher, Guid> teacherRepository) : ITea
         return result;
     }
 
+    public async Task<bool> HasUserTeacherEntityAsync(string userId)
+    {
+        bool result = await  teacherRepository
+            .GetAllAttached()
+            .AnyAsync(t => t.UserId.ToString()== userId);
+
+        return result;
+    }
 
     public async Task<Guid?> GetTeacherIdAsync(string userId)
     {

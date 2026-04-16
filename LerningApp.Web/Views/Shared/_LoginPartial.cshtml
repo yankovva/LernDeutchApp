@@ -1,10 +1,15 @@
 @using LerningApp.Data.Models
 @using LerningApp.Services.Data.Interfaces
+@using LerningApp.Web.Infrastructure.Extensions
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 
 @inject ITeacherService TeacherService
 @inject UserManager<ApplicationUser> UserManager
+@{
+    string userId = User.GetUserId();
+    bool isTeacher = await TeacherService.HasUserTeacherEntityAsync(userId);
+}
 
 <style>
     .account-nav {
@@ -147,6 +152,18 @@
                 <i class="fa-solid fa-user-gear" style="color: #ff9933;" ></i>
                 My Profile
             </a>
+            
+            @if (isTeacher)
+            {
+                <a class="dropdown-item"
+                   asp-area=""
+                   asp-controller="Profile"
+                   asp-action="TeacherIndex">
+                    <i class="fa-solid fa-user-gear" style="color: #ff9933;"></i>
+                    Teacher Profile
+                </a>
+            }
+            
             <a id="manage"
                asp-area="" asp-controller="UsersCourses" asp-action="Index"
                class="dropdown-item"
@@ -154,6 +171,7 @@
                 <i class="fa-solid fa-graduation-cap" style="color: #ff9933;"></i>
                 My Courses
             </a>
+            
             @if (User.IsInRole("Teacher"))
             {
                 <a class="dropdown-item"
@@ -164,6 +182,7 @@
                     Teacher Panel
                 </a>
             }
+            
 
             @if (User.IsInRole("Admin"))
             {
