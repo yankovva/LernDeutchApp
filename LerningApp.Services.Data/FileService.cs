@@ -23,7 +23,7 @@ public class FileService(IWebHostEnvironment environment) : IFileService
             await file.CopyToAsync(stream);
         }
 
-        return Path.Combine(folderName, uniqueFileName);
+        return $"/{folderName.Replace("\\", "/")}/{uniqueFileName}";
     }
 
 

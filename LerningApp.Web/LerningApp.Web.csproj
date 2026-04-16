@@ -35,6 +35,7 @@
       <Folder Include="wwwroot\audios\ListeningExerciseAudios\" />
       <Folder Include="wwwroot\images\Common\" />
       <Folder Include="wwwroot\images\flags\" />
+      <Folder Include="wwwroot\images\TeacherProfileImages\" />
       <Folder Include="wwwroot\images\VocabularyCardsImages\" />
     </ItemGroup>
 
