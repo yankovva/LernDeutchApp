@@ -2,168 +2,518 @@
     ViewData["Title"] = "Home";
 }
 
-<style>
-    .hero {
-        background: radial-gradient(circle at top left, #ffefdf, #ff9933);
-        border-radius: 26px;
-        padding: 4rem 3rem;
-        overflow: hidden;
-        position: relative;
-    }
-
-    .hero:after {
-        content: "";
-        position: absolute;
-        right: -120px;
-        top: -120px;
-        width: 320px;
-        height: 320px;
-        background: rgba(255,255,255,0.45);
-        border-radius: 50%;
-        filter: blur(2px);
-    }
-
-    .hero h1 {
-        font-weight: 800;
-        letter-spacing: -0.02em;
-    }
-
-    .hero p {
-        font-size: 1.1rem;
-        color: #5c5c5c;
-        max-width: 720px;
-        margin: 0 auto;
-    }
-
-    .pill {
-        display: inline-flex;
-        align-items: center;
-        gap: .5rem;
-        padding: .45rem .8rem;
-        border-radius: 999px;
-        background: rgba(255,255,255,0.75);
-        border: 1px solid rgba(0,0,0,0.06);
-        font-size: .9rem;
-        color: #5c5c5c;
-    }
-
-    .feature-card {
-        border: none;
-        border-radius: 22px;
-        transition: transform .2s ease, box-shadow .2s ease;
-        background: #fff;
-    }
-
-    .feature-card:hover {
-        transform: translateY(-6px);
-        box-shadow: 0 12px 30px rgba(0,0,0,.12);
-    }
-
-    .feature-icon {
-        width: 46px;
-        height: 46px;
-        border-radius: 14px;
-        display: grid;
-        place-items: center;
-        background: rgba(255,212,143,0.45);
-        font-size: 1.35rem;
-    }
-
-    .soft {
-        color: #6c757d;
-    }
-
-    .cta {
-        border-radius: 22px;
-        background: #fff;
-        border: 1px solid rgba(0,0,0,0.08);
-        padding: 1.2rem 1.4rem;
-    }
-</style>
-
-<div class="container">
-
-    <!-- HERO -->
-    <div class="hero text-center mb-5">
-        <div class="d-flex justify-content-center gap-2 flex-wrap mb-3">
-            <span class="pill">🇩🇪 Немски • A1–B2</span>
-            <span class="pill">📚 Курсове + уроци</span>
-            <span class="pill">✨ Учи по твоето темпо</span>
-        </div>
-
-        <h1 class="mb-3">Започни да учиш немски по-лесно</h1>
-        <p class="mb-4">
-            Избери курс по ниво, следвай уроците и учи стъпка по стъпка.
-            Всичко е подредено ясно, за да напредваш спокойно.
+<section class="home-hero">
+    <div class="home-hero__content">
+        <span class="home-badge">DeutschBuddy • German learning made clear</span>
+        <h1>Learn German with structure, clarity, and momentum.</h1>
+        <p class="home-hero__text">
+            Build your skills step by step with focused lessons, practical exercises,
+            and a clean learning path designed to keep you consistent from A1 to B2.
         </p>
 
-        <div class="d-flex justify-content-center gap-3 flex-wrap">
-            <a asp-controller="Course" asp-action="Index"
-               class="btn btn-primary btn-lg px-4">
-                📚 Разгледай курсове
+        <div class="home-hero__actions">
+            <a asp-controller="Course" asp-action="Index" class="home-btn home-btn--primary">
+                Explore courses
             </a>
-
-            <a asp-controller="Lesson" asp-action="Index"
-               class="btn btn-outline-secondary btn-lg px-4">
-                ▶️ Започни с уроците
+            <a asp-controller="Lesson" asp-action="Index" class="home-btn home-btn--secondary">
+                Start lessons
             </a>
         </div>
-    </div>
 
-    <!-- FEATURES -->
-    <div class="row g-4 mb-5">
-        <div class="col-md-4">
-            <div class="card feature-card h-100 p-4">
-                <div class="d-flex align-items-center gap-3 mb-2">
-                    <div class="feature-icon">🧩</div>
-                    <h5 class="mb-0">Уроци на малки стъпки</h5>
-                </div>
-                <p class="soft mb-0">
-                    Кратки, ясни уроци с добре подредено съдържание, за да учиш без стрес.
-                </p>
+        <div class="home-stats">
+            <div class="home-stat">
+                <strong>A1-B2</strong>
+                <span>levels covered</span>
             </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card feature-card h-100 p-4">
-                <div class="d-flex align-items-center gap-3 mb-2">
-                    <div class="feature-icon">🎯</div>
-                    <h5 class="mb-0">Нива A1–B2</h5>
-                </div>
-                <p class="soft mb-0">
-                    Подреди обучението си по ниво и следвай курса, който ти е подходящ.
-                </p>
+            <div class="home-stat">
+                <strong>Smart</strong>
+                <span>lesson structure</span>
             </div>
-        </div>
-
-        <div class="col-md-4">
-            <div class="card feature-card h-100 p-4">
-                <div class="d-flex align-items-center gap-3 mb-2">
-                    <div class="feature-icon">⏱️</div>
-                    <h5 class="mb-0">Учи по твоето темпо</h5>
-                </div>
-                <p class="soft mb-0">
-                    Върви напред когато имаш време — уроците са винаги под ръка.
-                </p>
+            <div class="home-stat">
+                <strong>Daily</strong>
+                <span>practice flow</span>
             </div>
         </div>
     </div>
 
-    <!-- CTA -->
-    <div class="cta d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
-        <div>
-            <h5 class="mb-1">Готова ли си да започнеш?</h5>
-            <div class="soft">Избери курс и започни още днес.</div>
+    <div class="home-hero__visual">
+        <div class="home-visual-card home-visual-card--main">
+            <span class="home-visual-label">Today’s focus</span>
+            <h3>Build vocabulary that actually sticks</h3>
+            <p>Short lessons, repeated exposure, and practical examples for real progress.</p>
         </div>
 
-        <div class="d-flex gap-2">
-            <a asp-controller="Course" asp-action="Index" class="btn btn-primary px-4">
-                Избери курс
-            </a>
-            <a asp-controller="Home" asp-action="About" class="btn btn-outline-secondary px-4">
-                Как работи
-            </a>
+        <div class="home-visual-card home-visual-card--small home-visual-card--top">
+            <span class="home-dot"></span>
+            Grammar essentials
+        </div>
+
+        <div class="home-visual-card home-visual-card--small home-visual-card--bottom">
+            <span class="home-dot"></span>
+            Listening practice
+        </div>
+
+        <div class="home-orb home-orb--one"></div>
+        <div class="home-orb home-orb--two"></div>
+    </div>
+</section>
+
+<section class="home-section">
+    <div class="home-section__heading">
+        <span class="home-section__eyebrow">Why it works</span>
+        <h2>A learning experience that feels simple and motivating</h2>
+        <p>
+            Everything is organized to help learners move forward without confusion,
+            overwhelm, or wasted time.
+        </p>
+    </div>
+
+    <div class="home-feature-grid">
+        <article class="home-feature-card">
+            <div class="home-feature-icon">01</div>
+            <h3>Clear lesson progression</h3>
+            <p>
+                Follow a path that moves naturally from basics to more confident communication.
+            </p>
+        </article>
+
+        <article class="home-feature-card">
+            <div class="home-feature-icon">02</div>
+            <h3>Practice with purpose</h3>
+            <p>
+                Reinforce what you learn through exercises that support memory and understanding.
+            </p>
+        </article>
+
+        <article class="home-feature-card">
+            <div class="home-feature-icon">03</div>
+            <h3>Designed for consistency</h3>
+            <p>
+                The interface stays clean and calm so the focus remains on learning, not on distraction.
+            </p>
+        </article>
+    </div>
+</section>
+
+<section class="home-highlight">
+    <div class="home-highlight__content">
+        <span class="home-section__eyebrow">Learning flow</span>
+        <h2>From first words to confident progress</h2>
+        <p>
+            Whether someone is just starting or already building intermediate skills,
+            the platform helps them stay focused with lessons, course structure,
+            and a rhythm that feels manageable.
+        </p>
+
+        <ul class="home-list">
+            <li>Structured courses for every stage</li>
+            <li>Lessons broken into understandable steps</li>
+            <li>Practice that supports long-term retention</li>
+        </ul>
+    </div>
+
+    <div class="home-highlight__panel">
+        <div class="home-mini-card">
+            <span class="home-mini-card__label">Student experience</span>
+            <strong>Simple. Warm. Encouraging.</strong>
+            <p>
+                A modern space where learners can build confidence without feeling lost.
+            </p>
+        </div>
+        <div class="home-mini-card">
+            <span class="home-mini-card__label">Your platform tone</span>
+            <strong>Friendly and structured</strong>
+            <p>
+                Educational, soft, and visually polished without becoming too busy.
+            </p>
         </div>
     </div>
+</section>
+
+<section class="home-cta">
+    <div>
+        <span class="home-section__eyebrow">Ready to begin?</span>
+        <h2>Choose a course and start learning today.</h2>
+        <p>
+            Explore the available content and take the first step toward steady German progress.
+        </p>
+    </div>
+
+    <div class="home-cta__actions">
+        <a asp-controller="Course" asp-action="Index" class="home-btn home-btn--primary">
+            View courses
+        </a>
+        <a asp-controller="Home" asp-action="About" class="home-btn home-btn--secondary">
+            Learn more
+        </a>
+    </div>
+</section>
+<style>
+    .home-hero {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1.08fr 0.92fr;
+        gap: 28px;
+        align-items: center;
+        padding: 42px;
+        margin-top: 18px;
+        border-radius: 34px;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at top left, rgba(255, 255, 255, 0.9), transparent 34%),
+            linear-gradient(135deg, #fff7ed 0%, #ffe7cc 55%, #ffd6a8 100%);
+        box-shadow: 0 24px 60px rgba(173, 95, 27, 0.14);
+    }
+
+    .home-badge,
+    .home-section__eyebrow {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: rgba(255, 153, 51, 0.14);
+        color: #c76f16;
+        font-size: 0.85rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+    }
+
+    .home-hero h1 {
+        margin: 18px 0 16px;
+        max-width: 680px;
+        color: #1f2937;
+        font-size: clamp(2.4rem, 5vw, 4.4rem);
+        line-height: 1.02;
+        font-weight: 900;
+        letter-spacing: -0.03em;
+    }
+
+    .home-hero__text,
+    .home-section__heading p,
+    .home-highlight__content p,
+    .home-cta p,
+    .home-feature-card p,
+    .home-mini-card p {
+        color: #6b7280;
+        line-height: 1.75;
+        font-size: 1.02rem;
+    }
+
+    .home-hero__actions,
+    .home-cta__actions {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 26px;
+    }
+
+    .home-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 56px;
+        padding: 0 24px;
+        border-radius: 18px;
+        text-decoration: none;
+        font-weight: 800;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .home-btn--primary {
+        background: linear-gradient(135deg, #ff9933 0%, #ffb15d 100%);
+        color: #fff;
+        box-shadow: 0 16px 30px rgba(255, 153, 51, 0.28);
+    }
+
+    .home-btn--primary:hover {
+        transform: translateY(-2px);
+        color: #fff;
+    }
+
+    .home-btn--secondary {
+        border: 1px solid rgba(255, 153, 51, 0.25);
+        background: rgba(255, 255, 255, 0.75);
+        color: #9a5515;
+    }
+
+    .home-btn--secondary:hover {
+        background: #fff4e8;
+        color: #9a5515;
+    }
+
+    .home-stats {
+        display: flex;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-top: 30px;
+    }
+
+    .home-stat {
+        min-width: 120px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.72);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .home-stat strong {
+        display: block;
+        color: #1f2937;
+        font-size: 1.05rem;
+        font-weight: 800;
+    }
+
+    .home-stat span {
+        color: #7b7b86;
+        font-size: 0.92rem;
+    }
+
+    .home-hero__visual {
+        position: relative;
+        min-height: 420px;
+    }
+
+    .home-visual-card {
+        position: absolute;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.9);
+        box-shadow: 0 20px 45px rgba(154, 85, 21, 0.12);
+        backdrop-filter: blur(10px);
+    }
+
+    .home-visual-card--main {
+        inset: 60px 30px 70px 40px;
+        padding: 30px;
+    }
+
+    .home-visual-card--main h3 {
+        margin: 10px 0 12px;
+        color: #1f2937;
+        font-size: 1.7rem;
+        font-weight: 800;
+    }
+
+    .home-visual-card--main p {
+        margin: 0;
+        color: #6b7280;
+        line-height: 1.7;
+    }
+
+    .home-visual-label,
+    .home-mini-card__label {
+        display: inline-block;
+        margin-bottom: 6px;
+        color: #d97706;
+        font-size: 0.8rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+
+    .home-visual-card--small {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 18px;
+        color: #374151;
+        font-weight: 700;
+    }
+
+    .home-visual-card--top {
+        top: 24px;
+        right: 18px;
+    }
+
+    .home-visual-card--bottom {
+        left: 10px;
+        bottom: 18px;
+    }
+
+    .home-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ff9933;
+        box-shadow: 0 0 0 6px rgba(255, 153, 51, 0.14);
+    }
+
+    .home-orb {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.42);
+    }
+
+    .home-orb--one {
+        top: -20px;
+        left: 20px;
+        width: 130px;
+        height: 130px;
+    }
+
+    .home-orb--two {
+        right: -10px;
+        bottom: 30px;
+        width: 110px;
+        height: 110px;
+    }
+
+    .home-section,
+    .home-highlight,
+    .home-cta {
+        margin-top: 34px;
+    }
+
+    .home-section {
+        padding: 10px 4px;
+    }
+
+    .home-section__heading {
+        max-width: 720px;
+        margin-bottom: 24px;
+    }
+
+    .home-section__heading h2,
+    .home-highlight__content h2,
+    .home-cta h2 {
+        margin: 14px 0 12px;
+        color: #1f2937;
+        font-size: clamp(1.9rem, 3vw, 2.8rem);
+        line-height: 1.15;
+        font-weight: 850;
+    }
+
+    .home-feature-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 20px;
+    }
+
+    .home-feature-card {
+        padding: 26px;
+        border-radius: 26px;
+        background: #fff;
+        border: 1px solid #f3e2d0;
+        box-shadow: 0 16px 35px rgba(31, 41, 55, 0.06);
+    }
+
+    .home-feature-icon {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 18px;
+        border-radius: 16px;
+        display: grid;
+        place-items: center;
+        background: rgba(255, 153, 51, 0.12);
+        color: #d97706;
+        font-weight: 800;
+    }
+
+    .home-feature-card h3 {
+        margin-bottom: 10px;
+        color: #1f2937;
+        font-size: 1.2rem;
+        font-weight: 800;
+    }
+
+    .home-highlight {
+        display: grid;
+        grid-template-columns: 1fr 0.88fr;
+        gap: 22px;
+        padding: 32px;
+        border-radius: 30px;
+        background: linear-gradient(135deg, #fffaf5 0%, #fff2e3 100%);
+        border: 1px solid #f3dfc9;
+    }
+
+    .home-list {
+        margin: 22px 0 0;
+        padding-left: 20px;
+        color: #374151;
+    }
+
+    .home-list li {
+        margin-bottom: 10px;
+        line-height: 1.6;
+    }
+
+    .home-highlight__panel {
+        display: grid;
+        gap: 18px;
+    }
+
+    .home-mini-card {
+        padding: 22px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.82);
+        box-shadow: 0 14px 30px rgba(154, 85, 21, 0.08);
+    }
+
+    .home-mini-card strong {
+        display: block;
+        margin-bottom: 10px;
+        color: #1f2937;
+        font-size: 1.15rem;
+    }
+
+    .home-cta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 30px 32px;
+        border-radius: 28px;
+        background: #fff;
+        border: 1px solid #f3e2d0;
+        box-shadow: 0 14px 34px rgba(31, 41, 55, 0.05);
+    }
+
+    @@media (max-width: 991.98px) {
+    .home-hero,
+    .home-highlight,
+    .home-feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .home-hero {
+        padding: 28px;
+    }
+
+    .home-hero__visual {
+        min-height: 340px;
+    }
+
+    .home-cta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    }
+
+    @@media (max-width: 575.98px) {
+    .home-hero,
+    .home-highlight,
+    .home-cta {
+        padding: 22px;
+        border-radius: 24px;
+    }
+
+    .home-hero h1 {
+        font-size: 2.3rem;
+    }
+
+    .home-visual-card--main {
+        inset: 48px 10px 56px 10px;
+        padding: 22px;
+    }
+
+    .home-hero__visual {
+        min-height: 300px;
+    }
+
+    .home-visual-card--top,
+    .home-visual-card--bottom {
+        position: static;
+        margin-top: 12px;
+    }}
     
-</div>
+</style>
