@@ -8,6 +8,8 @@ using LerningApp.Web.ViewModels.Admin.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
+using static LerningApp.Common.Enums;
+
 namespace LerningApp.Services.Data.AdminServices;
 
 public class AdminUserService(UserManager<ApplicationUser> userManager,
@@ -48,13 +50,13 @@ public class AdminUserService(UserManager<ApplicationUser> userManager,
     {
         if (!Guid.TryParse(userId, out Guid parsedUserId))
         {
-            return ServiceResult.Fail("Invalid user id.");
+            return ServiceResult.Fail("Invalid user id.", ServiceErrorType.Conflict);
         }
 
         ApplicationUser? user = await userManager.FindByIdAsync(userId);
         if (user == null)
         {
-           return ServiceResult.Fail("User not found.");
+           return ServiceResult.Fail("User not found.", ServiceErrorType.Conflict);
         }
         
         string? userPhoto = user.ProfileImage;
@@ -74,7 +76,7 @@ public class AdminUserService(UserManager<ApplicationUser> userManager,
                 var removedRole = await userManager.RemoveFromRoleAsync(user, role);
                 if (!removedRole.Succeeded)
                 {
-                    return ServiceResult.Fail($"Failed to remove user role {role}.");
+                    return ServiceResult.Fail($"Failed to remove user role {role}.", ServiceErrorType.General);
                 }
             }
 
@@ -84,7 +86,7 @@ public class AdminUserService(UserManager<ApplicationUser> userManager,
                var removedLogins = await userManager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
                if (!removedLogins.Succeeded)
                {
-                   return ServiceResult.Fail("Failed to delete user logins.");
+                   return ServiceResult.Fail("Failed to delete user logins.", ServiceErrorType.General);
                }
             }
             
@@ -108,7 +110,7 @@ public class AdminUserService(UserManager<ApplicationUser> userManager,
             var updateResult = await userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
             {
-                return ServiceResult.Fail("Failed to anonymize user.");
+                return ServiceResult.Fail("Failed to anonymize user.", ServiceErrorType.General);
             }
 
             await teacherRepository.SaveChangesAsync();
@@ -118,7 +120,7 @@ public class AdminUserService(UserManager<ApplicationUser> userManager,
         var result = await userManager.DeleteAsync(user);
         if (!result.Succeeded)
         {
-            return ServiceResult.Fail("Failed to delete user.");
+            return ServiceResult.Fail("Failed to delete user.", ServiceErrorType.General);
         }
         
         return ServiceResult.Success();

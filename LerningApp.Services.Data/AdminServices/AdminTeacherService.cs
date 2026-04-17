@@ -46,12 +46,12 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         var user = await userManager.FindByIdAsync(id);
         if (user == null)
         {
-            return ServiceResult.Fail("No user found.");
+            return ServiceResult.Fail("No user found.", ServiceErrorType.Conflict );
         }
         bool isTeacherRole = await userManager.IsInRoleAsync(user, TeacherRole);
         if (isTeacherRole && user.Teacher != null)
         {
-            return ServiceResult.Fail("User is a teacher or has already been requested.");
+            return ServiceResult.Fail("User is a teacher or has already been requested." , ServiceErrorType.Conflict);
         }
 
         var newTeacher = new Teacher()
@@ -93,7 +93,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return ServiceResult.Fail("No user found.");
+            return ServiceResult.Fail("No user found.", ServiceErrorType.Conflict);
         }
         
         //First request for teacher 
@@ -104,7 +104,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             bool roleAssigned = await AssignTeacherRole(user, userId);
             if (!roleAssigned)
             {
-                return ServiceResult.Fail("Failed to assign teacher role.");
+                return ServiceResult.Fail("Failed to assign teacher role.", ServiceErrorType.General);
             }
         }
         
@@ -116,7 +116,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         
         if (teacher == null)
         {
-            return ServiceResult.Fail("No teacher found.");
+            return ServiceResult.Fail("No teacher found.", ServiceErrorType.Conflict);
         }
 
         if (!string.IsNullOrWhiteSpace(teacher.PendingProfileImage))
@@ -154,7 +154,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return ServiceResult.Fail("No user found.");
+            return ServiceResult.Fail("No user found.", ServiceErrorType.Conflict);
         }
 
         bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
@@ -165,7 +165,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
 
         if (teacher == null)
         {
-            return ServiceResult.Fail("No teacher request found.");
+            return ServiceResult.Fail("No teacher request found.", ServiceErrorType.Conflict);
         }
 
         if (!isTeacher)
@@ -196,13 +196,13 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return ServiceResult.Fail("No user found.");
+            return ServiceResult.Fail("No user found.",ServiceErrorType.Conflict);
         }
         
         bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
         if (!isTeacher)
         {
-            return ServiceResult.Fail("User not in role teacher.");
+            return ServiceResult.Fail("User not in role teacher.", ServiceErrorType.Conflict);
         }
         Guid parsedUserId = Guid.Parse(userId);
         
@@ -211,13 +211,13 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         
         if (teacher == null)
         {
-            return ServiceResult.Fail("User not a teacher.");
+            return ServiceResult.Fail("User not a teacher.", ServiceErrorType.Conflict);
         }
         
         var roleResult = await userManager.RemoveFromRoleAsync(user, TeacherRole);
         if (!roleResult.Succeeded)
         {
-            return ServiceResult.Fail("Failed to remove teacher role.");
+            return ServiceResult.Fail("Failed to remove teacher role.", ServiceErrorType.General);
         }
         teacher.PendingFirstName = null;
         teacher.PendingLastName = null;
@@ -244,7 +244,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             .FirstOrDefaultAsync(t => t.Id == teacherGuid && t.Status == TeacherStatus.PendingReview);
         if (teacher == null)
         {
-            return ServiceResult.Fail("User does not have a pending teacher request.");
+            return ServiceResult.Fail("User does not have a pending teacher request.", ServiceErrorType.Conflict);
         }
         
         teacherRepository.DeleteByEntity(teacher);
@@ -271,7 +271,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         
         if (teacher == null)
         {
-            return ServiceResultT<AdminTeacherDetailsViewModel>.Fail("User is not Teacher");
+            return ServiceResultT<AdminTeacherDetailsViewModel>.Fail("User is not Teacher", ServiceErrorType.Conflict);
         }
 
         var result = new AdminTeacherDetailsViewModel()
@@ -314,7 +314,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
         var user = await userManager.FindByIdAsync(userId);
         if (user == null)
         {
-            return ServiceResult.Fail("No user found.");
+            return ServiceResult.Fail("No user found.", ServiceErrorType.NotFound);
         }
         Guid id = Guid.TryParse(userId, out Guid userGuid)
             ? userGuid
@@ -323,7 +323,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             .FirstorDefaultAsync(t => t.UserId == userGuid);
         if (userTeacher == null)
         {
-            return ServiceResult.Fail("No teacher found.");
+            return ServiceResult.Fail("No teacher found.", ServiceErrorType.NotFound);
         }
         
         bool isTeacher = await userManager.IsInRoleAsync(user, TeacherRole);
@@ -332,7 +332,7 @@ public class AdminTeacherService(UserManager<ApplicationUser> userManager,
             var roleResult = await userManager.AddToRoleAsync(user, TeacherRole);
             if (!roleResult.Succeeded)
             {
-                return ServiceResult.Fail("Failed to restore teacher role.");
+                return ServiceResult.Fail("Failed to restore teacher role.", ServiceErrorType.General);
             }
         }
 

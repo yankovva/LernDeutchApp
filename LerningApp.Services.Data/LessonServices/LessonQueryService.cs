@@ -12,7 +12,7 @@ using LerningApp.Web.ViewModels.UserLessonProgress;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Lesson;
-
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data.LessonServices;
 
@@ -51,7 +51,7 @@ public class LessonQueryService(IRepository<Lesson, Guid> lessonRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResultT<LessonContentViewModel>.Fail(InvalidLessonIdMessage);
+            return ServiceResultT<LessonContentViewModel>.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
         }
         
         Lesson? lesson = await lessonRepository
@@ -63,7 +63,7 @@ public class LessonQueryService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lesson == null)
         {
-            return ServiceResultT<LessonContentViewModel>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<LessonContentViewModel>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         List<IndexListeningExerciseViewModel> listeningExercisesViewModels = await listeningExerciseRepository
@@ -127,12 +127,12 @@ public class LessonQueryService(IRepository<Lesson, Guid> lessonRepository,
         
         if (userProgressResult.Result == false && !isUserTeacher)
         {
-            return ServiceResultT<LessonContentViewModel>.Fail(userProgressResult.Message ?? "Invalid operation.");
+            return ServiceResultT<LessonContentViewModel>.Fail(userProgressResult.Message ?? "Invalid operation.", ServiceErrorType.Conflict);
         }
         
         if (userProgressResult.Data != null && !userProgressResult.Data.IsUnlocked && !isUserTeacher)
         {
-            return ServiceResultT<LessonContentViewModel>.Fail("Lesson is locked.");
+            return ServiceResultT<LessonContentViewModel>.Fail("Lesson is locked.", ServiceErrorType.AccessDenied);
         }
         
         await userExerciseProgressService.CreateUserExerciseProgress(listeningExercisesViewModels, x => x.Id, userId, lessonId, Enums.ExerciseType.ListeningExercise);

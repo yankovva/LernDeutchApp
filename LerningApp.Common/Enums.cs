@@ -31,4 +31,13 @@ public class Enums
         Hard = 3,
         VeryHard = 4
     }
+    public enum ServiceErrorType
+    {
+        Validation,
+        NotFound,
+        AccessDenied,
+        Conflict,
+        General
+    }
+
 }

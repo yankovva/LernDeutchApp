@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.ApplicationConstants;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data.CourseServices;
 
@@ -20,7 +21,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResult.Fail(InvalidCourseIdMessage);
+            return ServiceResult.Fail(InvalidCourseIdMessage, ServiceErrorType.NotFound);
         }
 
         var course = await courseRepository
@@ -28,7 +29,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
 
         if (course == null)
         {
-            return ServiceResult.Fail(CourseNotFoundMessage);
+            return ServiceResult.Fail(CourseNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -37,7 +38,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
         
         if (!isAdmin && (teacherId == null || course.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         course.IsPublished = false;
@@ -50,7 +51,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResult.Fail(InvalidCourseIdMessage);
+            return ServiceResult.Fail(InvalidCourseIdMessage, ServiceErrorType.NotFound);
         }
 
         var course = await courseRepository
@@ -58,7 +59,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
 
         if (course == null)
         {
-            return ServiceResult.Fail(CourseNotFoundMessage);
+            return ServiceResult.Fail(CourseNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -67,7 +68,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
         
         if (!isAdmin && (teacherId == null || course.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         course.IsPublished = true;
@@ -79,7 +80,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
     {
         if (!Guid.TryParse(id, out var courseId))
         {
-            return ServiceResult.Fail(InvalidCourseIdMessage);
+            return ServiceResult.Fail(InvalidCourseIdMessage, ServiceErrorType.NotFound);
         }
 
         var course = await courseRepository
@@ -90,7 +91,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
 
         if (course == null)
         {
-            return ServiceResult.Fail(CourseNotFoundMessage);
+            return ServiceResult.Fail(CourseNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -99,7 +100,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
         
         if (!isAdmin && (teacherId == null || course.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         course.IsDeleted = true;

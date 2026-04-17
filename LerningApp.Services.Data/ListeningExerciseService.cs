@@ -11,6 +11,7 @@ using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.ApplicationConstants;
 using static LerningApp.Common.EntityErrorMessages.Exercise;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data;
 
@@ -28,14 +29,14 @@ public class ListeningExerciseService(
     {
         if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuid))
         {
-            return ServiceResultT<CreateListeningExerciseViewModel>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<CreateListeningExerciseViewModel>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         Lesson? lesson = await lessonRepository.GetByIdAsync(lessonGuid);
 
         if (lesson == null)
         {
-            return ServiceResultT<CreateListeningExerciseViewModel>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<CreateListeningExerciseViewModel>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -44,7 +45,7 @@ public class ListeningExerciseService(
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<CreateListeningExerciseViewModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<CreateListeningExerciseViewModel>.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
         }
 
         var model = new CreateListeningExerciseViewModel()
@@ -60,14 +61,14 @@ public class ListeningExerciseService(
     {
         if (string.IsNullOrWhiteSpace(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
-            return ServiceResult.Fail(LessonNotFoundMessage);
+            return ServiceResult.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         Lesson? lesson = await lessonRepository.GetByIdAsync(lessonId);
 
         if (lesson == null)
         {
-            return ServiceResult.Fail(LessonNotFoundMessage);
+            return ServiceResult.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -76,12 +77,12 @@ public class ListeningExerciseService(
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
         }
 
         if (model.AudioFile.Length == 0)
         {
-            return ServiceResult.Fail("Audio file is required.", nameof(model.AudioFile));
+            return ServiceResult.Fail("Audio file is required.",ServiceErrorType.Validation, nameof(model.AudioFile));
         }
 
         string audioPath = string.Empty;
@@ -92,7 +93,7 @@ public class ListeningExerciseService(
 
             if (!fileService.IsFileValid(model.AudioFile, allowedExtensions, maxSize))
             {
-                return ServiceResult.Fail("Please upload a valid audio file (.mp3, .wav, .ogg, .m4a) up to 5 MB.",
+                return ServiceResult.Fail("Please upload a valid audio file (.mp3, .wav, .ogg, .m4a) up to 5 MB.", ServiceErrorType.Validation,
                     nameof(model.AudioFile));
             }
 
@@ -118,7 +119,7 @@ public class ListeningExerciseService(
 
         if (!filledQuestions.Any())
         {
-            return ServiceResult.Fail("Add at least one question for the exercise.", nameof(model.Questions));
+            return ServiceResult.Fail("Add at least one question for the exercise.", ServiceErrorType.General, nameof(model.Questions));
         }
 
         foreach (var question in filledQuestions)
@@ -136,7 +137,7 @@ public class ListeningExerciseService(
 
                 if (filledOptions.Count <= 1)
                 {
-                    return ServiceResult.Fail("Add at least two options for the question.", nameof(model.Questions));
+                    return ServiceResult.Fail("Add at least two options for the question.", ServiceErrorType.General,nameof(model.Questions));
                 }
 
                 int selectedCorrectOptionsCount = filledOptions
@@ -144,7 +145,7 @@ public class ListeningExerciseService(
 
                 if (selectedCorrectOptionsCount != 1)
                 {
-                    return ServiceResult.Fail("Choose one correct option for the question.", nameof(model.Questions));
+                    return ServiceResult.Fail("Choose one correct option for the question.", ServiceErrorType.General,nameof(model.Questions));
                 }
 
                 List<ListeningExerciseOption> options = new List<ListeningExerciseOption>();
@@ -170,7 +171,7 @@ public class ListeningExerciseService(
 
         if (questions.Count == 0)
         {
-            return ServiceResult.Fail("Add at least one valid question.", nameof(model.Questions));
+            return ServiceResult.Fail("Add at least one valid question.", ServiceErrorType.General,nameof(model.Questions));
         }
 
         exercise.Questions = questions;
@@ -185,12 +186,12 @@ public class ListeningExerciseService(
         List<ListeningQuestionCheckResultDto> results = new();
         if (!Guid.TryParse(userId, out var userGuidId))
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         if (!Guid.TryParse(dto.LessonId, out var lessonGuidId))
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         var isTeacher = await teacherService.IsUserTeacherAsync(userId.ToString());
@@ -200,12 +201,12 @@ public class ListeningExerciseService(
 
         if (!isUnlocked)
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         if (!Guid.TryParse(dto.ExerciseId, out var exerciseGuidId))
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         var exercise = await listeningExerciseRepository
@@ -216,7 +217,7 @@ public class ListeningExerciseService(
 
         if (exercise == null)
         {
-            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         var answerMap = dto
@@ -231,7 +232,7 @@ public class ListeningExerciseService(
                 .FirstOrDefault(o => o.IsCorrect);
             if (correctOption == null)
             {
-                return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
+                return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
             }
 
             string correctAnswer = correctOption.Answer;
@@ -258,7 +259,7 @@ public class ListeningExerciseService(
             var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
             if (result.Result == false)
             {
-                return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage);
+                return ServiceResultT<List<ListeningQuestionCheckResultDto>>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
             }
         }
         
@@ -269,7 +270,7 @@ public class ListeningExerciseService(
     {
         if (!Guid.TryParse(exerciseId, out var exerciseGuidId))
         {
-            return ServiceResult.Fail(InvalidExerciseIdMessage);
+            return ServiceResult.Fail(InvalidExerciseIdMessage, ServiceErrorType.NotFound);
         }
 
         var exercise = await listeningExerciseRepository
@@ -278,7 +279,7 @@ public class ListeningExerciseService(
 
         if (exercise == null)
         {
-            return ServiceResult.Fail(InvalidExerciseIdMessage);
+            return ServiceResult.Fail(InvalidExerciseIdMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -287,7 +288,7 @@ public class ListeningExerciseService(
         
         if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         exercise.IsDeleted = true;

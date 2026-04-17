@@ -23,7 +23,6 @@ public class ProfileService(UserManager<ApplicationUser> userManager,
             .ThenInclude(uc => uc.Course)
             .ThenInclude(c => c.Level)
             .FirstOrDefaultAsync(u => u.Id == userId);
-
         
         bool isAdmin = await userManager.IsInRoleAsync(currentUser!, AdminRole);
 

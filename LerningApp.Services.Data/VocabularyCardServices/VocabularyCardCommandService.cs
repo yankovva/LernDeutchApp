@@ -13,8 +13,7 @@ using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.File;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.PartOfSpeech;
-using static LerningApp.Common.ApplicationConstants;
-
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data.VocabularyCardServices;
 
@@ -31,13 +30,13 @@ public class VocabularyCardCommandService(
     {
         if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuid))
         {
-            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         Lesson? lesson = await lessonRepository.GetByIdAsync(lessonGuid);
         if (lesson == null)
         {
-            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -46,7 +45,7 @@ public class VocabularyCardCommandService(
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<VocabularyCardCreateInputModel>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         var model = new VocabularyCardCreateInputModel()
@@ -61,13 +60,13 @@ public class VocabularyCardCommandService(
     {
         if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
-            return ServiceResult.Fail(InvalidLessonIdMessage, string.Empty);
+            return ServiceResult.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
         }
 
         var lesson = await lessonRepository.GetByIdAsync(lessonId);
         if (lesson == null)
         {
-            return ServiceResult.Fail(LessonNotFoundMessage, string.Empty);
+            return ServiceResult.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -76,17 +75,17 @@ public class VocabularyCardCommandService(
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         if (string.IsNullOrEmpty(model.PartOfSpeechId) || !Guid.TryParse(model.PartOfSpeechId, out Guid partOfSpeechId))
         {
-            return ServiceResult.Fail(InvalidPartOfSpeechIdMessage, nameof(model.PartOfSpeechId));
+            return ServiceResult.Fail(InvalidPartOfSpeechIdMessage,ServiceErrorType.Validation, nameof(model.PartOfSpeechId));
         }
 
         if (await partOfSpeechRepository.GetByIdAsync(partOfSpeechId) == null)
         {
-            return ServiceResult.Fail(PartOfSpeechNotFoundMessage, nameof(model.PartOfSpeechId));
+            return ServiceResult.Fail(PartOfSpeechNotFoundMessage, ServiceErrorType.Validation, nameof(model.PartOfSpeechId));
         }
 
         string imagePath = string.Empty;
@@ -95,7 +94,7 @@ public class VocabularyCardCommandService(
         {
             if (!fileService.IsFileValid(model.Image, AllowedImageExtensions, MaxFileSize))
             {
-                return ServiceResult.Fail(InvalidFileMessage, nameof(model.Image));
+                return ServiceResult.Fail(InvalidFileMessage, ServiceErrorType.Validation,nameof(model.Image));
             }
 
             string extension = Path.GetExtension(model.Image.FileName);
@@ -145,7 +144,7 @@ public class VocabularyCardCommandService(
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
-            return ServiceResultT<VocabularyCardEditInputModel>.Fail(InvalidCardIdMessage);
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(InvalidCardIdMessage,ServiceErrorType.NotFound);
         }
 
         var card = await vocabularyCardRepository
@@ -157,7 +156,7 @@ public class VocabularyCardCommandService(
 
         if (card == null)
         {
-            return ServiceResultT<VocabularyCardEditInputModel>.Fail(CardNotFoundMessage);
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(CardNotFoundMessage, ServiceErrorType.NotFound);
         }
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         var user = await userManager.FindByIdAsync(userId);
@@ -165,7 +164,7 @@ public class VocabularyCardCommandService(
         
         if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         var de = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "de");
@@ -191,7 +190,7 @@ public class VocabularyCardCommandService(
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
-            return ServiceResult.Fail(InvalidCardIdMessage);
+            return ServiceResult.Fail(InvalidCardIdMessage, ServiceErrorType.NotFound);
         }
 
         var card = await vocabularyCardRepository
@@ -203,7 +202,7 @@ public class VocabularyCardCommandService(
 
         if (card == null)
         {
-            return ServiceResult.Fail(CardNotFoundMessage);
+            return ServiceResult.Fail(CardNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -212,26 +211,26 @@ public class VocabularyCardCommandService(
         
         if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         if (string.IsNullOrEmpty(model.PartOfSpeechId) || !Guid.TryParse(model.PartOfSpeechId, out Guid partOfSpeechId))
         {
-            return ServiceResult.Fail(InvalidPartOfSpeechIdMessage, nameof(model.PartOfSpeechId));
+            return ServiceResult.Fail(InvalidPartOfSpeechIdMessage, ServiceErrorType.Validation,nameof(model.PartOfSpeechId));
         }
 
         var partOfSpeech = await partOfSpeechRepository.GetByIdAsync(partOfSpeechId);
 
         if (partOfSpeech == null)
         {
-            return ServiceResult.Fail(PartOfSpeechNotFoundMessage, nameof(model.PartOfSpeechId));
+            return ServiceResult.Fail(PartOfSpeechNotFoundMessage, ServiceErrorType.Validation,nameof(model.PartOfSpeechId));
         }
 
         if (model.Image?.Length > 0)
         {
             if (!fileService.IsFileValid(model.Image, AllowedImageExtensions, MaxFileSize))
             {
-                return ServiceResult.Fail(InvalidFileMessage, nameof(model.Image));
+                return ServiceResult.Fail(InvalidFileMessage, ServiceErrorType.Validation, nameof(model.Image));
             }
 
             string extension = Path.GetExtension(model.Image.FileName);

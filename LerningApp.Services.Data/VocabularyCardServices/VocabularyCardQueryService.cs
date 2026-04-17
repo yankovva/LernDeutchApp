@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Card;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data.VocabularyCardServices;
 
@@ -23,12 +24,12 @@ public class VocabularyCardQueryService(
 
         if (!result.Result || !result.Data)
         {
-            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(result.Message ?? "Invalid operation.");
+            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(result.Message ?? "Invalid operation.", ServiceErrorType.AccessDenied);
         }
 
         if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuidId))
         {
-            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(InvalidLessonIdMessage);
+            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
         }
 
         var lesson = await lessonRepository
@@ -36,7 +37,7 @@ public class VocabularyCardQueryService(
 
         if (lesson == null)
         {
-            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<VocabularyCardsIndexViewModel>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         var cards = await vocabularyCardRepository
@@ -68,7 +69,7 @@ public class VocabularyCardQueryService(
     {
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid cardGuid))
         {
-            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(InvalidCardIdMessage);
+            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(InvalidCardIdMessage, ServiceErrorType.NotFound);
         }
 
         VocabularyCard? card = await vocabularyCardRepository
@@ -81,14 +82,14 @@ public class VocabularyCardQueryService(
 
         if (card == null)
         {
-            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(CardNotFoundMessage);
+            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(CardNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         var result = await userLessonProgressService
             .IsLessonUnlockedForAUserAsync(card.LessonId.ToString(), userId);
         if (result.Data == false)
         {
-            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(result.Message ?? "Invalid operation.");
+            return ServiceResultT<VocabularyCardDetailsViewModel>.Fail(result.Message ?? "Invalid operation.", ServiceErrorType.AccessDenied);
         }
 
         var de = card.Terms.FirstOrDefault(t => t.IsPrimary && t.Side == "de");

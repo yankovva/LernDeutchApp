@@ -2,9 +2,9 @@ using LerningApp.Common;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
-using LerningApp.Web.ViewModels.Lesson;
-using LerningApp.Web.ViewModels.UserLessonProgress;
+
 using Microsoft.EntityFrameworkCore;
+
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.Enums;
 
@@ -23,7 +23,7 @@ public class UserExerciseProgressService(IRepository<UserExerciseProgress, Guid>
        
         if (userProgress == null)
         {
-            return ServiceResult.Fail(InvalidOperationMessage);
+            return ServiceResult.Fail(InvalidOperationMessage, ServiceErrorType.NotFound);
         }
         
         if (userProgress.IsCompleted)
@@ -46,14 +46,14 @@ public class UserExerciseProgressService(IRepository<UserExerciseProgress, Guid>
         Guid? userGuid = Guid.TryParse(userId, out Guid parsedUserId) ? parsedUserId : null;
         if (userGuid == null)
         {
-            return ServiceResultT<bool>.Fail("Invalid operation.");
+            return ServiceResultT<bool>.Fail("Invalid operation.",ServiceErrorType.General);
         }
         
         Guid? exerciseGuid = Guid.TryParse(exerciseId, out Guid parsedExerciseId) ? parsedExerciseId : null;
         
         if (exerciseGuid == null)
         {
-            return ServiceResultT<bool>.Fail("Invalid operation.");
+            return ServiceResultT<bool>.Fail("Invalid operation.", ServiceErrorType.General);
         }
 
         bool hasProgress = await userExerciseProgressRepository

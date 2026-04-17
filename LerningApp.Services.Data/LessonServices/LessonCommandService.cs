@@ -12,6 +12,8 @@ using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.ApplicationConstants;
+using static LerningApp.Common.Enums;
+
 
 namespace LerningApp.Services.Data.LessonServices;
 
@@ -26,7 +28,7 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null)
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
         }
         
         Guid courseId = Guid.Empty;
@@ -34,7 +36,7 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
         {
             if (!Guid.TryParse(model.CourseId, out  courseId))
             {
-                return ServiceResult.Fail(InvalidCourseIdMessage, nameof(model.CourseId));
+                return ServiceResult.Fail(InvalidCourseIdMessage, ServiceErrorType.Validation,nameof(model.CourseId));
             }
             
             Course? course = await courseRepository
@@ -42,7 +44,7 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
             
             if (course == null)
             {
-                return ServiceResult.Fail(CourseNotFoundMessage, nameof(model.CourseId));
+                return ServiceResult.Fail(CourseNotFoundMessage, ServiceErrorType.Validation,nameof(model.CourseId));
             }
         }
         
@@ -65,7 +67,7 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResultT<LessonEditInputModel>.Fail(InvalidLessonIdMessage);
+            return ServiceResultT<LessonEditInputModel>.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
         }
 
         Lesson? lesson = await lessonRepository
@@ -74,7 +76,7 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lesson == null)
         {
-            return ServiceResultT<LessonEditInputModel>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<LessonEditInputModel>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         var user = await userManager.FindByIdAsync(userId);
@@ -83,7 +85,7 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<LessonEditInputModel>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         var model = new LessonEditInputModel
@@ -104,7 +106,7 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
     {
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResult.Fail(InvalidLessonIdMessage);
+            return ServiceResult.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
         }
 
         Lesson? lessonToChange = await lessonRepository
@@ -113,20 +115,22 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lessonToChange == null)
         {
-            return ServiceResult.Fail(LessonNotFoundMessage);
+            return ServiceResult.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         Guid? courseId = null;
         if (!string.IsNullOrWhiteSpace(model.CourseId))
         {
             if (!Guid.TryParse(model.CourseId, out var parsedCourseId))
-                return ServiceResult.Fail(InvalidCourseIdMessage);
+            {
+                return ServiceResult.Fail(InvalidCourseIdMessage, ServiceErrorType.Validation,nameof(model.CourseId));
+            }
 
             var course = await courseRepository.GetAllAttached()
                 .FirstOrDefaultAsync(c => c.Id == parsedCourseId);
                
             if (course == null)
-                return ServiceResult.Fail(CourseNotFoundMessage);
+                return ServiceResult.Fail(CourseNotFoundMessage, ServiceErrorType.NotFound);
 
             courseId = parsedCourseId;
         }
@@ -137,7 +141,7 @@ public class LessonCommandService(IRepository<Lesson, Guid> lessonRepository,
         
         if (!isAdmin && (teacherId == null || lessonToChange.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         lessonToChange.Name = model.Name;

@@ -12,6 +12,7 @@ using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.ApplicationConstants;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data.LessonServices;
 
@@ -26,7 +27,7 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail(InvalidLessonIdMessage);
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
         }
 
         Lesson? lesson = await lessonRepository
@@ -34,7 +35,7 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
 
         if (lesson == null) 
         {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         var teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -43,7 +44,7 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<AddLessonToCourseViewModel>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         AddLessonToCourseViewModel model = new AddLessonToCourseViewModel()
@@ -67,7 +68,7 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
     {
         if (string.IsNullOrEmpty(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
-            return ServiceResult.Fail(InvalidLessonIdMessage);
+            return ServiceResult.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
         }
 
         Lesson? lesson = await lessonRepository
@@ -75,7 +76,7 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
 
         if (lesson == null)
         {
-            return ServiceResult.Fail(LessonNotFoundMessage);
+            return ServiceResult.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         var teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -84,7 +85,7 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
        
         //TODO: Delete UserLessonProgress records for enrolled users when a lesson is removed from a course (decide: hard delete vs soft delete).
@@ -97,7 +98,7 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
            
         if (string.IsNullOrEmpty(model.SelectedCourseId) || !Guid.TryParse(model.SelectedCourseId, out Guid courseId))
         {
-            return ServiceResult.Fail(InvalidCourseIdMessage, nameof(model.SelectedCourseId));
+            return ServiceResult.Fail(InvalidCourseIdMessage, ServiceErrorType.Validation,nameof(model.SelectedCourseId));
         }
 
         Course? course = await courseRepository
@@ -106,7 +107,7 @@ public class LessonCourseAssignmentService(IRepository<Lesson, Guid> lessonRepos
         
         if (course == null)
         {
-            return ServiceResult.Fail(CourseNotFoundMessage,nameof(model.SelectedCourseId));
+            return ServiceResult.Fail(CourseNotFoundMessage,ServiceErrorType.Validation,nameof(model.SelectedCourseId));
         }
         
         var participantsInCourseIds = await userCourseRepository

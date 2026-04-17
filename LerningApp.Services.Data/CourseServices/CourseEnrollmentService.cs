@@ -6,8 +6,7 @@ using LerningApp.Services.Data.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 using static LerningApp.Common.EntityErrorMessages.Course;
-
-
+using static LerningApp.Common.Enums;
 namespace LerningApp.Services.Data.CourseServices;
 
 public class CourseEnrollmentService(IRepository<Course, Guid> courseRepository,
@@ -18,7 +17,7 @@ public class CourseEnrollmentService(IRepository<Course, Guid> courseRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResult.Fail(InvalidCourseIdMessage);
+            return ServiceResult.Fail(InvalidCourseIdMessage,ServiceErrorType.NotFound);
         }
 
         Course? course = await courseRepository
@@ -28,7 +27,7 @@ public class CourseEnrollmentService(IRepository<Course, Guid> courseRepository,
 
         if (course == null)
         {
-            return ServiceResult.Fail(CourseNotFoundMessage);
+            return ServiceResult.Fail(CourseNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         bool alreadyEnrolled = await userCourseRepository
@@ -37,7 +36,7 @@ public class CourseEnrollmentService(IRepository<Course, Guid> courseRepository,
 
         if (alreadyEnrolled)
         {
-            return ServiceResult.Fail(AlreadyEnrolled);
+            return ServiceResult.Fail(AlreadyEnrolled, ServiceErrorType.Conflict);
         }
 
         UserCourse newUserCourse = new UserCourse

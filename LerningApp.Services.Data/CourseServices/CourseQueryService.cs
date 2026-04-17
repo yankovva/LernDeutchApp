@@ -7,6 +7,7 @@ using LerningApp.Web.ViewModels.UserLessonProgress;
 
 using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.EntityErrorMessages.Course;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data.CourseServices;
 
@@ -45,7 +46,7 @@ public class CourseQueryService( IRepository<Course, Guid> courseRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResultT<CourseDetailsViewModel>.Fail((InvalidCourseIdMessage));
+            return ServiceResultT<CourseDetailsViewModel>.Fail(InvalidCourseIdMessage, ServiceErrorType.NotFound );
         }
 
         Course? course = await courseRepository
@@ -57,7 +58,7 @@ public class CourseQueryService( IRepository<Course, Guid> courseRepository,
 
         if (course == null)
         {
-            return ServiceResultT<CourseDetailsViewModel>.Fail((CourseNotFoundMessage));
+            return ServiceResultT<CourseDetailsViewModel>.Fail(CourseNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         CourseDetailsViewModel model = new CourseDetailsViewModel()

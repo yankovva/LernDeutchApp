@@ -11,7 +11,7 @@ using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Exercise;
 using static LerningApp.Common.ApplicationConstants;
-
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data;
 
@@ -26,14 +26,14 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
     {
         if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuid))
         {
-            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail("Невалиден урок.");
+            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail("Невалиден урок.", ServiceErrorType.NotFound);
         }
         Lesson? lesson = await lessonRepository
             .GetByIdAsync(lessonGuid);
 
         if (lesson == null)
         {
-            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail("Невалиден урок.");
+            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail("Невалиден урок.", ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -42,7 +42,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<CreateMultipleChoiceExerciseViewModel>.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
         }
        
         var model = new CreateMultipleChoiceExerciseViewModel()
@@ -57,7 +57,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
     {
         if (string.IsNullOrWhiteSpace(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
-                return ServiceResult.Fail(InvalidLessonIdMessage);
+                return ServiceResult.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
         }
 
         Lesson? lesson = await lessonRepository
@@ -65,7 +65,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         
         if (lesson == null)
         {
-                return ServiceResult.Fail(LessonNotFoundMessage);
+                return ServiceResult.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
        
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -74,7 +74,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
         }
         
         var filledOptions = model.Options
@@ -83,12 +83,12 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         
         if (filledOptions.Count <= 1)
         {
-            return ServiceResult.Fail("Add at least 2 options");
+            return ServiceResult.Fail("Add at least 2 options", ServiceErrorType.General);
         }
 
         if (filledOptions.Count(o => o.IsCorrect) != 1)
         {
-            return ServiceResult.Fail("Add 1 correct option");
+            return ServiceResult.Fail("Add 1 correct option", ServiceErrorType.General);
         }
         
         var options = new List<MultipleChoiceExerciseOption>();
@@ -124,12 +124,12 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
     {
         if (!Guid.TryParse(dto.ExerciseId, out var exerciseGuidId))
         {
-            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(ExerciseNotFoundMessage);
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         if (!Guid.TryParse(dto.LessonId, out var lessonGuidId))
         {
-            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         var exercise = await exerciseRepository
@@ -139,12 +139,12 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
 
         if (exercise == null)
         {
-            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(ExerciseNotFoundMessage);
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         if (!Guid.TryParse(userId, out Guid userGuidId))
         {
-            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(AccessDeniedMessage);
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         bool isTeacher = await teacherService.IsUserTeacherAsync(userId);
@@ -155,7 +155,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
       
         if (!isUnlocked && !isTeacher)
         {
-            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(AccessDeniedMessage);
+            return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         var correctOption = exercise.Options
@@ -170,10 +170,11 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         {
             if (!isTeacher)
             {
-                var result = await userExerciseProgressService.CompleteExerciseAsync(userGuidId, exercise.Id);
+                var result = await userExerciseProgressService
+                    .CompleteExerciseAsync(userGuidId, exercise.Id);
                 if (result.Result == false)
                 {
-                    return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(InvalidOperationMessage);
+                    return ServiceResultT<MultipleChoiceCheckResultDto>.Fail(InvalidOperationMessage,ServiceErrorType.General);
                 }
             }
             
@@ -187,7 +188,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
     {
         if (!Guid.TryParse(id, out var exerciseGuidId))
         {
-            return ServiceResult.Fail(InvalidExerciseIdMessage);
+            return ServiceResult.Fail(InvalidExerciseIdMessage, ServiceErrorType.NotFound);
         }
 
         var exercise = await exerciseRepository
@@ -196,7 +197,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
 
         if (exercise == null)
         {
-            return ServiceResult.Fail(InvalidExerciseIdMessage);
+            return ServiceResult.Fail(InvalidExerciseIdMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -205,7 +206,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         
         if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         exercise.IsDeleted = true;

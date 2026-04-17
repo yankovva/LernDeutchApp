@@ -135,7 +135,18 @@ public class ProfileController(IProfileService profileService,
 
             string extension = Path.GetExtension(model.Image.FileName);
             string uniqueFileName = $"{Guid.NewGuid()}{extension}";
-            imagePath = await fileService.UploadFileAsync(model.Image, DefaultTеacherProfileImageDirectoryPath, uniqueFileName);
+            try
+            {
+                imagePath = await fileService
+                    .UploadFileAsync(model.Image,
+                        DefaultTеacherProfileImageDirectoryPath,
+                        uniqueFileName);
+            }
+            catch (Exception e)
+            {
+                ModelState.AddModelError(nameof(model.Image), e.Message);
+                return this.View(model);
+            }
         }
         
         teacher.PendingFirstName = model.FirstName;

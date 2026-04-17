@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.EntityErrorMessages.Lesson;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.ApplicationConstants;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data.LessonServices;
 
@@ -21,7 +22,7 @@ public class LessonLifecycleService(IRepository<Lesson, Guid> lessonRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
         {
-            return ServiceResult.Fail(InvalidLessonIdMessage);
+            return ServiceResult.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
         }
 
         Lesson? lesson = await lessonRepository
@@ -30,7 +31,7 @@ public class LessonLifecycleService(IRepository<Lesson, Guid> lessonRepository,
 
         if (lesson == null)
         {
-            return ServiceResult.Fail(LessonNotFoundMessage);
+            return ServiceResult.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -39,7 +40,7 @@ public class LessonLifecycleService(IRepository<Lesson, Guid> lessonRepository,
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         lesson.IsDeleted = true;

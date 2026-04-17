@@ -10,6 +10,8 @@ using static LerningApp.Common.EntityErrorMessages.Level;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.EntityErrorMessages.Course;
 using static LerningApp.Common.ApplicationConstants;
+using static LerningApp.Common.Enums;
+
 
 namespace LerningApp.Services.Data.CourseServices;
 
@@ -23,12 +25,12 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
         if (teacherId == null)
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         if (string.IsNullOrWhiteSpace(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
         {
-            return ServiceResult.Fail(InvalidLevelIdMessage);
+            return ServiceResult.Fail(InvalidLevelIdMessage, ServiceErrorType.Validation,nameof(model.LevelId));
         }
 
         Level? level = await levelRepository
@@ -36,7 +38,7 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
 
         if (level == null)
         {
-            return ServiceResult.Fail(LevelNotFoundMessage);
+            return ServiceResult.Fail(LevelNotFoundMessage, ServiceErrorType.Validation,nameof(model.LevelId));
         }
         
         var course = new Course
@@ -59,7 +61,7 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResultT<CourseEditViewModel>.Fail(InvalidCourseIdMessage);
+            return ServiceResultT<CourseEditViewModel>.Fail(InvalidCourseIdMessage, ServiceErrorType.NotFound);
         }
 
         Course? course = await courseRepository
@@ -67,7 +69,7 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
 
         if (course == null)
         {
-            return ServiceResultT<CourseEditViewModel>.Fail(CourseNotFoundMessage);
+            return ServiceResultT<CourseEditViewModel>.Fail(CourseNotFoundMessage, ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -76,7 +78,7 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
         
         if (!isAdmin && (teacherId == null || course.PublisherId != teacherId))
         {
-            return ServiceResultT<CourseEditViewModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<CourseEditViewModel>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         CourseEditViewModel model = new CourseEditViewModel()
@@ -95,7 +97,7 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
     {
         if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid courseId))
         {
-            return ServiceResult.Fail(InvalidCourseIdMessage, nameof(id));
+            return ServiceResult.Fail(InvalidCourseIdMessage, ServiceErrorType.NotFound,nameof(id));
         }
 
         Course? courseToChange = await courseRepository
@@ -103,7 +105,7 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
 
         if (courseToChange == null)
         {
-            return ServiceResult.Fail(CourseNotFoundMessage, nameof(id));
+            return ServiceResult.Fail(CourseNotFoundMessage,ServiceErrorType.NotFound, nameof(id));
         }
        
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -112,12 +114,12 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
         
         if (!isAdmin && (teacherId == null || courseToChange.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         if (string.IsNullOrEmpty(model.LevelId) || !Guid.TryParse(model.LevelId, out Guid levelId))
         {
-            return ServiceResult.Fail(InvalidLevelIdMessage, nameof(model.LevelId));
+            return ServiceResult.Fail(InvalidLevelIdMessage,ServiceErrorType.Validation, nameof(model.LevelId));
         }
 
         var levelExists = await levelRepository
@@ -125,7 +127,7 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
 
         if (levelExists == null)
         {
-            return ServiceResult.Fail(LevelNotFoundMessage, nameof(model.LevelId));
+            return ServiceResult.Fail(LevelNotFoundMessage,ServiceErrorType.Validation, nameof(model.LevelId));
         }
 
         courseToChange.Name = model.Name;

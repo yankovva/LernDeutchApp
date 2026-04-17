@@ -26,14 +26,14 @@ public class TranslationExerciseService(
     {
         if (string.IsNullOrWhiteSpace(lessonId) || !Guid.TryParse(lessonId, out Guid lessonGuid))
         {
-            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(InvalidLessonIdMessage);
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(InvalidLessonIdMessage,ServiceErrorType.NotFound);
         }
         Lesson? lesson = await lessonRepository
             .GetByIdAsync(lessonGuid);
 
         if (lesson == null)
         {
-            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(LessonNotFoundMessage);
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(LessonNotFoundMessage,ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -42,7 +42,7 @@ public class TranslationExerciseService(
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
         }
 
         var model = new CreateTranslationExerciseViewModel()
@@ -56,14 +56,14 @@ public class TranslationExerciseService(
     {
         if (string.IsNullOrWhiteSpace(model.LessonId) || !Guid.TryParse(model.LessonId, out Guid lessonId))
         {
-            return ServiceResult.Fail(InvalidLessonIdMessage);
+            return ServiceResult.Fail(InvalidLessonIdMessage,ServiceErrorType.NotFound);
         }
 
         Lesson? lesson = await lessonRepository
             .GetByIdAsync(lessonId);
         if (lesson == null)
         {
-            return ServiceResult.Fail(LessonNotFoundMessage);
+            return ServiceResult.Fail(LessonNotFoundMessage,ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -72,7 +72,7 @@ public class TranslationExerciseService(
         
         if (!isAdmin && (teacherId == null || lesson.PublisherId != teacherId))
         {
-            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(AccessDeniedMessage);
+            return ServiceResultT<CreateTranslationExerciseViewModel>.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
         }
         
         TranslationExercise exercise = new TranslationExercise()
@@ -144,7 +144,7 @@ public class TranslationExerciseService(
     {
         if (!Guid.TryParse(exerciseId, out var exerciseGuidId))
         {
-            return ServiceResult.Fail(InvalidExerciseIdMessage);
+            return ServiceResult.Fail(InvalidExerciseIdMessage,ServiceErrorType.NotFound);
         }
 
         var exercise = await exerciseRepository
@@ -153,7 +153,7 @@ public class TranslationExerciseService(
 
         if (exercise == null)
         {
-            return ServiceResult.Fail(InvalidExerciseIdMessage);
+            return ServiceResult.Fail(InvalidExerciseIdMessage,ServiceErrorType.NotFound);
         }
         
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -162,7 +162,7 @@ public class TranslationExerciseService(
         
         if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
         }
         
         exercise.IsDeleted = true;

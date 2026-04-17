@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using static LerningApp.Common.EntityErrorMessages.Card;
 using static LerningApp.Common.EntityErrorMessages.Common;
 using static LerningApp.Common.ApplicationConstants;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data.VocabularyCardServices;
 
@@ -22,7 +23,7 @@ public class VocabularyCardLifecycleService(
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
-            return ServiceResult.Fail(InvalidCardIdMessage);
+            return ServiceResult.Fail(InvalidCardIdMessage, ServiceErrorType.NotFound);
         }
 
         var card = await vocabularyCardRepository
@@ -32,7 +33,7 @@ public class VocabularyCardLifecycleService(
 
         if (card == null)
         {
-            return ServiceResult.Fail(CardNotFoundMessage);
+            return ServiceResult.Fail(CardNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -41,7 +42,7 @@ public class VocabularyCardLifecycleService(
         
         if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
         if (card.ImagePath != null)
@@ -59,7 +60,7 @@ public class VocabularyCardLifecycleService(
     {
         if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid cardId))
         {
-            return ServiceResult.Fail(InvalidCardIdMessage);
+            return ServiceResult.Fail(InvalidCardIdMessage, ServiceErrorType.NotFound);
         }
 
         VocabularyCard? card = await vocabularyCardRepository
@@ -70,7 +71,7 @@ public class VocabularyCardLifecycleService(
 
         if (card == null)
         {
-            return ServiceResult.Fail(CardNotFoundMessage);
+            return ServiceResult.Fail(CardNotFoundMessage, ServiceErrorType.NotFound);
         }
 
         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
@@ -79,7 +80,7 @@ public class VocabularyCardLifecycleService(
         
         if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
         {
-            return ServiceResult.Fail(AccessDeniedMessage);
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
         card.IsDeleted = true;

@@ -3,10 +3,10 @@ using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.UserLessonProgress;
+
 using Microsoft.EntityFrameworkCore;
 
-using static LerningApp.Common.EntityErrorMessages.Common;
-using static LerningApp.Common.EntityErrorMessages.Course;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Services.Data;
 
@@ -28,7 +28,7 @@ public class UserLessonProgressService(IRepository<Lesson,Guid> lessonRepository
 
         if (lesson == null)
         {
-            return ServiceResultT<IndexUserLessonProgressViewModel>.Fail("Invalid operation.");
+            return ServiceResultT<IndexUserLessonProgressViewModel>.Fail("Invalid operation.", ServiceErrorType.NotFound);
         }
         
         if (userGuidId != null)
@@ -39,7 +39,7 @@ public class UserLessonProgressService(IRepository<Lesson,Guid> lessonRepository
           
             if (hasUserProgress == null)
             {
-                return ServiceResultT<IndexUserLessonProgressViewModel>.Fail("Invalid operation.");
+                return ServiceResultT<IndexUserLessonProgressViewModel>.Fail("Invalid operation.", ServiceErrorType.NotFound);
             }
             
             var model = new IndexUserLessonProgressViewModel()
@@ -93,13 +93,13 @@ public class UserLessonProgressService(IRepository<Lesson,Guid> lessonRepository
         Guid? userGuid = Guid.TryParse(userId, out Guid parsedUserId) ? parsedUserId : null;
         if (userGuid == null)
         {
-            return ServiceResultT<bool>.Fail("Invalid operation.");
+            return ServiceResultT<bool>.Fail("Invalid operation.", ServiceErrorType.General);
         }
         
         Guid? lessonGuid = Guid.TryParse(lessonId, out Guid parsedLessonId) ? parsedLessonId : null;
         if (lessonGuid == null)
         {
-            return ServiceResultT<bool>.Fail("Invalid operation.");
+            return ServiceResultT<bool>.Fail("Invalid operation.",ServiceErrorType.General);
         }
         
         bool hasProgress = await userProgressRepository
