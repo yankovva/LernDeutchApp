@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using static LerningApp.Common.EntityErrorMessages.Common;
-
+using static LerningApp.Common.Enums;
 namespace LerningApp.Controllers;
 
 [Authorize]
@@ -71,18 +71,20 @@ public class LessonController(ILessonService lessonService,
         var result = await lessonService.AddLessonToCourseAsync(model, userId);
         if (result.Result == false)
         {
-            if (result.Field != null)
-                ModelState.AddModelError(string.Empty, result.Message);
+            if (result.ErrorType == ServiceErrorType.Validation)
+                ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
             else
                 TempData["ErrorMessage"] = result.Message;
             
             return this.View(model);
         }
+        
         // TODO: consider enum for result action
         if (string.IsNullOrWhiteSpace(model.SelectedCourseId))
             TempData["SuccessMessage"] = "Урокът беше премахнат от курса.";
         else
             TempData["SuccessMessage"] = "Урокът беше добавен към курса.";
+        
         return RedirectToAction(nameof(this.Index));
     }
 
@@ -119,9 +121,12 @@ public class LessonController(ILessonService lessonService,
         var result = await  lessonService.AddLessonAsync(model, userId);
         if (result.Result == false)
         {
-            ModelState.AddModelError(string.Empty, result.Message);
+            if (result.ErrorType == ServiceErrorType.Validation)
+                ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
+            else
+                TempData["ErrorMessage"] = result.Message;
             model.Courses = await courseService.GetCourseOptionsAsync();
-            return View(model);
+            return this.View(model);
         }
         
         TempData["SuccessMessage"] = $"Успешно създадохте {model.Name}.";
@@ -159,12 +164,14 @@ public class LessonController(ILessonService lessonService,
         var result = await lessonService.PostLessonEditInputModelAsync(model, id, userId);
         if (result.Result == false)
         {
-            ModelState.AddModelError(string.Empty, result.Message);
+            if (result.ErrorType == ServiceErrorType.Validation)
+                ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
+            else
+                TempData["ErrorMessage"] = result.Message;
             model.Courses = await courseService.GetCourseOptionsAsync();
-            return View(model);
+            return this.View(model);
         }
        
-        
         TempData["SuccessMessage"] = $"Успешно редактирахте {model.Name}.";
         return RedirectToAction(nameof(Details), new { id });
     }

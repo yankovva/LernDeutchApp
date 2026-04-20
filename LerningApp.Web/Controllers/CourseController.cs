@@ -5,6 +5,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 using static LerningApp.Common.EntityErrorMessages.Common;
+using static LerningApp.Common.Enums;
+
 namespace LerningApp.Controllers;
 
 public class CourseController(ICourseService courseService,
@@ -80,15 +82,11 @@ public class CourseController(ICourseService courseService,
         
         if (result.Result == false)
         {
-            if (string.IsNullOrWhiteSpace(result.Field))
-            {
-                TempData["ErrorMessage"] = result.Message;
-            }
+            if (result.ErrorType == ServiceErrorType.Validation)
+                ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
             else
-            {
-                ModelState.AddModelError(result.Field ?? "", result.Message!);
-            }
-
+                TempData["ErrorMessage"] = result.Message;
+            
             model.Levels = await levelService.GetAllLevelOptionsAsync();
             return this.View(model);
         }
@@ -135,16 +133,12 @@ public class CourseController(ICourseService courseService,
         var result = await courseService.PostEditCourseAsync(model, id, userId);
         if (result.Result == false)
         {
-            if (string.IsNullOrWhiteSpace(result.Field))
-            {
-                TempData["ErrorMessage"] = result.Message;
-            }
+            if (result.ErrorType == ServiceErrorType.Validation)
+                ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
             else
-            {
-                ModelState.AddModelError(result.Field ?? "", result.Message!);
-            }
-
-            model.Levels =  await levelService.GetAllLevelOptionsAsync();
+                TempData["ErrorMessage"] = result.Message;
+            
+            model.Levels = await levelService.GetAllLevelOptionsAsync();
             return this.View(model);
         }
 
@@ -160,7 +154,6 @@ public class CourseController(ICourseService courseService,
     public async Task<IActionResult> Deactivate(string id)
     {
         string userId = User.GetUserId()!;
-        
         var result = await courseService.DeactivateCourseAsync(id,userId);
         if (result.Result == false)
         {

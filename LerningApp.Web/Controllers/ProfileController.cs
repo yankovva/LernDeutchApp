@@ -64,7 +64,7 @@ public class ProfileController(IProfileService profileService) : BaseController
        if (result.Result == false)
        {
            if (result.ErrorType == ServiceErrorType.Validation)
-               ModelState.AddModelError(string.Empty, result.Message);
+               ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
            else
                TempData["ErrorMessage"] = result.Message;
             

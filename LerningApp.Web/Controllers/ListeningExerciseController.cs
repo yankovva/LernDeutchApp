@@ -1,11 +1,11 @@
-using LerningApp.Data;
-using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.ListeningExercise;
-using static LerningApp.Common.EntityErrorMessages.Exercise;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+    
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Controllers;
 
@@ -40,12 +40,15 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
         string userId = User.GetUserId()!;
         
         var result = await exerciseService.CreatePostListeningExercise(model, userId);
-        
         if (result.Result == false)
         {
-            TempData["ErrorMessage"] = result.Message;
-            return  RedirectToAction("Index", "Home");
+            if (result.ErrorType == ServiceErrorType.Validation)
+                ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
+            else
+                TempData["ErrorMessage"] = result.Message;
+            return this.View(model);
         }
+
         return RedirectToAction("Details", "Lesson", new { id = model.LessonId });
     }
 }

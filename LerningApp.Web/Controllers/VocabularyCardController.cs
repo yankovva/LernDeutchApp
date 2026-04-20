@@ -1,8 +1,11 @@
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.VocabularyCard;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Controllers;
 
@@ -70,9 +73,13 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         var result = await vocabularyCardService.CreateVocabularyCardAsync(model, userId);
         if (result.Result == false)
         {
-            TempData["ErrorMessage"] = result.Message;
+            if (result.ErrorType == ServiceErrorType.Validation)
+                ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
+            else
+                TempData["ErrorMessage"] = result.Message;
             model.PartOfSpeechOptions = await partOfSpeechService.GetAllPartOfSpeechOptionsAsync();
-            return View(model);
+
+            return this.View(model);
         }
         
         TempData["SuccessMessage"] = "Успешно създадохте нова карта";
@@ -85,6 +92,7 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
     {
         var userId = User.GetUserId();
         var result = await vocabularyCardService.GetCardEditByIdAsync(id, userId);
+        
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
@@ -104,9 +112,14 @@ public class VocabularyCardController(IVocabularyCardService vocabularyCardServi
         var result = await vocabularyCardService.PostCardEditByIdAsync(model,id, userId);
         if (result.Result == false)
         {
-            TempData["ErrorMessage"] = result.Message;
-            return this.RedirectToAction("Index", "Home");
+            if (result.ErrorType == ServiceErrorType.Validation)
+                ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
+            else
+                TempData["ErrorMessage"] = result.Message;
+
+            return this.View(model);
         }
+
         return RedirectToAction(nameof(Index), new { lessonId = model.LessonId });
     }
     //Done
