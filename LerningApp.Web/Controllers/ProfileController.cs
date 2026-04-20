@@ -1,4 +1,3 @@
-using LerningApp.Common;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
@@ -8,18 +7,13 @@ using LerningApp.Web.ViewModels.Teacher;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
-using static LerningApp.Common.ApplicationConstants;
-using static LerningApp.Common.ErrorMessages;
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Controllers;
 
 [Authorize]
-public class ProfileController(IProfileService profileService,
-    IRepository<Teacher, Guid> teacherRepository,
-    UserManager<ApplicationUser> userManager,
-    IFileService fileService) : BaseController
+public class ProfileController(IProfileService profileService) : BaseController
 {
     public async Task<IActionResult> Index()
     {
@@ -33,64 +27,28 @@ public class ProfileController(IProfileService profileService,
     public async Task<IActionResult> TeacherIndex()
     {
         Guid userId = Guid.Parse(User.GetUserId()!);
-        var teacher = await teacherRepository
-            .GetAllAttached()
-            .Include(t => t.User)
-            .FirstOrDefaultAsync(t => t.UserId == userId);
-        
-        if (teacher == null)
+        var result = await profileService
+            .GetTeacherProfileIndexViewModelAsync(userId);
+        if (result.Result == false && result.ErrorType != ServiceErrorType.Validation)
         {
-            return RedirectToAction("Index", "Home");
+            TempData["ErrorMessage"] = result.Message;
         }
         
-        var model = new ProfileIndexViewModel
-        {
-            TeacherId = teacher.Id.ToString(),
-            UserId = teacher.UserId.ToString(),
-            FirstName = teacher.User.FirstName,
-            LastName = teacher.User.LastName,
-            UserName = teacher.User.UserName,
-            Email = teacher.User.Email,
-            PhoneNumber = teacher.User.PhoneNumber,
-            ProfileImage = teacher.User.ProfileImage,
-            Status = teacher.Status.ToString(),
-            TeacherSince = teacher.TeacherSince.HasValue
-                ? teacher.TeacherSince.Value.ToString("MM/dd/yyyy")
-                : string.Empty,    
-            Biography = teacher.Biography,
-            Qualifications = teacher.Qualification
-        };
-        return View(model);
+        return View(result.Data);
     }
 
     [HttpGet]
     public async Task<IActionResult> TeacherEdit()
     {
         Guid userId = Guid.Parse(User.GetUserId()!);
-
-        var teacher = await teacherRepository
-            .GetAllAttached()
-            .Include(t => t.User)
-            .FirstOrDefaultAsync(t => t.UserId == userId);
-
-        if (teacher == null)
-        {
-            return RedirectToAction("Index");
-        }
+        var result = await profileService
+            .GetTeacherProfileEditViewModelAsync(userId);
         
-        var model = new ProfileEditViewModel
+        if (result.Result == false && result.ErrorType != ServiceErrorType.Validation)
         {
-            TeacherId = teacher.Id.ToString(),
-            UserId = teacher.UserId.ToString(),
-            FirstName = teacher.User.FirstName,
-            LastName = teacher.User.LastName,
-            PhoneNumber = teacher.User.PhoneNumber,
-            ProfileImage = teacher.User.ProfileImage,
-            Biography = teacher.Biography,
-            Qualifications = teacher.Qualification
-        };
-            
-        return View(model);
+            TempData["ErrorMessage"] = result.Message;
+        }
+        return View(result.Data);
     }
     [HttpPost]
     [ValidateAntiForgeryToken]
@@ -101,69 +59,18 @@ public class ProfileController(IProfileService profileService,
             return this.View(model);
         }
         
-        if (!Guid.TryParse(model.TeacherId, out Guid teacherId))
-        {
-            return RedirectToAction(nameof(Index));
-        }
-
         Guid userId = Guid.Parse(User.GetUserId()!);
-        var user = await userManager.Users
-            .Include(u => u.Teacher)
-            .SingleOrDefaultAsync(u => u.Id == userId);
-
-        if (user == null || user.Teacher == null || user.Teacher.Id != teacherId)
-        {
-            return RedirectToAction(nameof(Index));
-        }
-
-        var teacher = await teacherRepository
-            .GetAllAttached()
-            .FirstOrDefaultAsync(t => t.UserId == userId);
-
-        if (teacher == null)
-        {
-            return RedirectToAction(nameof(Index));
-        }
-        string imagePath = string.Empty;
-
-        if (model.Image?.Length > 0)
-        {
-            if (!fileService.IsFileValid(model.Image, AllowedImageExtensions, MaxFileSize))
-            {
-                 return this.View(model);
-            }
-
-            string extension = Path.GetExtension(model.Image.FileName);
-            string uniqueFileName = $"{Guid.NewGuid()}{extension}";
-            try
-            {
-                imagePath = await fileService
-                    .UploadFileAsync(model.Image,
-                        DefaultTеacherProfileImageDirectoryPath,
-                        uniqueFileName);
-            }
-            catch (Exception e)
-            {
-                ModelState.AddModelError(nameof(model.Image), e.Message);
-                return this.View(model);
-            }
-        }
-        
-        teacher.PendingFirstName = model.FirstName;
-        teacher.PendingLastName = model.LastName;
-        teacher.PendingPhoneNumber = model.PhoneNumber;
-        teacher.PendingBiography = model.Biography;
-        teacher.PendingQualification = model.Qualifications;
-        
-        if (!string.IsNullOrEmpty(imagePath))
-        {
-            teacher.PendingProfileImage = imagePath;
-        }
-        
-        teacher.HasProfileChangesPendingReview = true;
-        
-        await teacherRepository.SaveChangesAsync();
-        
+       var result = await profileService.PostTeacherProfileEditAsync(userId, model);
+       if (result.Result == false)
+       {
+           if (result.ErrorType == ServiceErrorType.Validation)
+               ModelState.AddModelError(string.Empty, result.Message);
+           else
+               TempData["ErrorMessage"] = result.Message;
+            
+           return this.View(model);
+       }
+     
         TempData["SuccessMessage"] = "Your profile changes have been submitted for review.";
         return RedirectToAction(nameof(TeacherIndex));
     }
