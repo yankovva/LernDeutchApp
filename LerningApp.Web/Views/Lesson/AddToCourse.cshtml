@@ -119,6 +119,7 @@
                 credentials: 'include'
             });
             if (!res.ok) {
+                toastr.error('Invalid operation.');
                 console.log('Failed to load indexes');
                 return;
             }

@@ -154,7 +154,7 @@ public class ProfileService(UserManager<ApplicationUser> userManager,
         {
             if (!fileService.IsFileValid(model.Image, AllowedImageExtensions, MaxFileSize))
             {
-                 return ServiceResult.Fail(InvalidFileMessage, ServiceErrorType.Validation);
+                 return ServiceResult.Fail(InvalidFileMessage, ServiceErrorType.Validation, nameof(model.Image));
             }
 
             string extension = Path.GetExtension(model.Image.FileName);
@@ -166,9 +166,9 @@ public class ProfileService(UserManager<ApplicationUser> userManager,
                         DefaultTеacherProfileImageDirectoryPath,
                         uniqueFileName);
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                return ServiceResult.Fail(e.Message, ServiceErrorType.Validation);
+                return ServiceResult.Fail(InvalidFileMessage, ServiceErrorType.Validation,nameof(model.Image));
             }
         }
         

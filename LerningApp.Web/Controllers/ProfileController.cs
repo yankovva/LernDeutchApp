@@ -29,9 +29,10 @@ public class ProfileController(IProfileService profileService) : BaseController
         Guid userId = Guid.Parse(User.GetUserId()!);
         var result = await profileService
             .GetTeacherProfileIndexViewModelAsync(userId);
-        if (result.Result == false && result.ErrorType != ServiceErrorType.Validation)
+        if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Index", "Home");
         }
         
         return View(result.Data);
@@ -44,9 +45,10 @@ public class ProfileController(IProfileService profileService) : BaseController
         var result = await profileService
             .GetTeacherProfileEditViewModelAsync(userId);
         
-        if (result.Result == false && result.ErrorType != ServiceErrorType.Validation)
+        if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Index", "Home");
         }
         return View(result.Data);
     }
