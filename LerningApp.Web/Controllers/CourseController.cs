@@ -216,10 +216,28 @@ public class CourseController(ICourseService courseService,
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return RedirectToAction("Details", new { id = id });
+            return RedirectToAction(nameof(Index));
         }
         
-        TempData["SuccessMessage"] = $"Успешно изтрихте курса";
+        TempData["SuccessMessage"] = "Successfully deleted.";
         return RedirectToAction(nameof(Index));
+    }
+    
+    [Authorize]
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin, Teacher")]
+    public async Task<IActionResult> Publish(string id)
+    {
+        string userId = User.GetUserId()!;
+       var result = await courseService.PublishCourseAsync(id, userId);
+       if (result.Result == false)
+       {
+           TempData["ErrorMessage"] = result.Message;
+           return RedirectToAction(nameof(Index));
+       }
+       
+       TempData["SuccessMessage"] = "Successfully published.";
+       return RedirectToAction(nameof(Index));
     }
 }

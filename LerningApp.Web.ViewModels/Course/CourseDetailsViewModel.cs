@@ -1,3 +1,5 @@
+using static LerningApp.Common.Enums;
+
 namespace LerningApp.Web.ViewModels.Course;
 
 public class CourseDetailsViewModel
@@ -11,8 +13,8 @@ public class CourseDetailsViewModel
     public string LevelName { get; set; } = null!;
     
     public double ProgressPercentage { get; set; }
-    public bool IsActive { get; set; }
     
+    public CourseStatus Status{ get; set; }
     public decimal Price { get; set; }
     
     public bool IsEnrolled { get; set; }

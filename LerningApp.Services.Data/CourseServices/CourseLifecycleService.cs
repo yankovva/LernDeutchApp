@@ -118,4 +118,54 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
         await courseRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
+
+    public async Task<ServiceResult> PublishCourseAsync(string id, string userId)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid courseId))
+        {
+            return ServiceResult.Fail(InvalidCourseIdMessage, ServiceErrorType.NotFound);
+        }
+
+        var course = await courseRepository
+            .GetAllAttached()
+            .Include(c => c.LessonsForCourse)
+            .FirstOrDefaultAsync(c => c.Id == courseId);
+
+        if (course == null)
+        {
+            return ServiceResult.Fail(CourseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || course.PublisherId != teacherId))
+        {
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
+        }
+
+        // A course can be published when having at least 3 lessons
+        if (course.LessonsForCourse.Count(l => !l.IsDeleted) < 3)
+        {
+            return ServiceResult.Fail(CoursePublishLessonCountMessage, ServiceErrorType.General);
+        }
+
+        if (string.IsNullOrEmpty(course.Name) ||
+            string.IsNullOrEmpty(course.Description) ||
+            course.Price <= 0)
+        {
+            return ServiceResult.Fail(InvalidOperationMessage, ServiceErrorType.General);
+        }
+        
+        if (course.Status == CourseStatus.Deleted)
+        {
+            return ServiceResult.Fail(InvalidOperationMessage, ServiceErrorType.General);
+        }
+
+        course.Status = CourseStatus.Published;
+        await courseRepository.SaveChangesAsync();
+
+        return ServiceResult.Success();
+    }
 }

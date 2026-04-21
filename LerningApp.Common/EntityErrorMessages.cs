@@ -24,7 +24,8 @@ public static class EntityErrorMessages
       public const string CourseLevelValidationMessage = "Please enter a valid course level";
       public const string CourseNameValidationMessage = "Please enter a valid course name";
       public const string CourseDescriptionValidationMessage = "Please enter a valid course description";
-      
+      public const string CoursePublishLessonCountMessage = "Please add at least 3 lessons to this course before publisching.";
+
       //Error Messages
       public const string InvalidCourseIdMessage = "Invalid course ID.";
       public const string CourseNotFoundMessage = "Course not found.";

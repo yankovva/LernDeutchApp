@@ -42,7 +42,7 @@
 
                     @if (isTeacher)
                     {
-                        if (Model.IsActive)
+                        if (Model.Status == Enums.CourseStatus.Published)
                         {
                             <form asp-action="Deactivate"
                                   asp-route-id="@Model.Id"
@@ -53,7 +53,7 @@
                                 <button type="submit" class="btn btn-outline-danger">Деактивирай</button>
                             </form>
                         }
-                        else
+                        else if(Model.Status == Enums.CourseStatus.Inactive)
                         {
                             <form asp-action="Restore"
                                   asp-route-id="@Model.Id"
@@ -62,6 +62,16 @@
                                   class="d-inline">
                                 @Html.AntiForgeryToken()
                                 <button type="submit" class="btn btn-outline-success">Възстанови</button>
+                            </form>
+                        }else if (Model.Status == Enums.CourseStatus.Draft)
+                        {
+                            <form asp-action="Publish"
+                                  asp-route-id="@Model.Id"
+                                  method="post"
+                                  onsubmit="return confirm('Сигурни ли сте, че искате да публикувате този курс?');"
+                                  class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-outline-success">Publish</button>
                             </form>
                         }
                     }

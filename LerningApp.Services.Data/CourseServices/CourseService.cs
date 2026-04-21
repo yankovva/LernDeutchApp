@@ -59,4 +59,8 @@ public class CourseService(
     {
         return await queryService.GetAssignableCourseOptionsAsync();
     }
+    public async Task<ServiceResult> PublishCourseAsync(string id, string userId)
+    {
+        return await lifecycleService.PublishCourseAsync(id, userId);
+    }
 }
