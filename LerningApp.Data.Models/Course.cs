@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
+
+using static LerningApp.Common.Enums;
 
 namespace LerningApp.Data.Models;
 
@@ -18,10 +17,7 @@ public class Course
     public string Description { get; set; } = null!;
     
     [Comment("The status of the Course")]
-    public bool IsPublished { get; set; }
-    
-    [Comment("Shows if the Course is deleted")]
-    public bool IsDeleted { get; set; }
+    public CourseStatus Status { get; set; }
     
     [Comment("The Creation Date of the Course")]
     public DateTime CreatedAt { get; set; }

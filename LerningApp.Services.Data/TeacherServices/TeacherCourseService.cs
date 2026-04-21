@@ -1,3 +1,4 @@
+using LerningApp.Common;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces.TeacherInterfaces;
@@ -20,7 +21,7 @@ public class TeacherCourseService(IRepository<Course, Guid> courserepository) : 
                 Name = c.Name,
                 LevelName = c.Level.Name,
                 Price = c.Price,
-                IsPublished = c.IsPublished,
+                IsPublished = c.Status == Enums.CourseStatus.Published,
                 EnrolledStudentsCount = c.CourseParticipants.Count
             }).ToListAsync();
 

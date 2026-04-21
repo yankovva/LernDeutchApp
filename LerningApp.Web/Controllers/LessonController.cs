@@ -101,7 +101,7 @@ public class LessonController(ILessonService lessonService,
         }
         AddLessonInputModel model = new AddLessonInputModel
         {
-            Courses = await courseService.GetCourseOptionsAsync()
+            Courses = await courseService.GetAssignableCourseOptionsAsync()
         };
         return this.View(model);
     }
@@ -113,7 +113,7 @@ public class LessonController(ILessonService lessonService,
     {
         if (!ModelState.IsValid)
         {
-            model.Courses = await courseService.GetCourseOptionsAsync();
+            model.Courses = await courseService.GetAssignableCourseOptionsAsync();
             return View(model);
         }
         
@@ -125,7 +125,7 @@ public class LessonController(ILessonService lessonService,
                 ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
             else
                 TempData["ErrorMessage"] = result.Message;
-            model.Courses = await courseService.GetCourseOptionsAsync();
+            model.Courses = await courseService.GetAssignableCourseOptionsAsync();
             return this.View(model);
         }
         
@@ -145,7 +145,7 @@ public class LessonController(ILessonService lessonService,
            return RedirectToAction("Index", "Home");
        }
 
-       result.Data!.Courses = await courseService.GetCourseOptionsAsync();
+       result.Data!.Courses = await courseService.GetAssignableCourseOptionsAsync();
 
        return View(result.Data);
     }
@@ -157,7 +157,7 @@ public class LessonController(ILessonService lessonService,
     {
         if (!ModelState.IsValid)
         {
-            model.Courses = await courseService.GetCourseOptionsAsync();
+            model.Courses = await courseService.GetAssignableCourseOptionsAsync();
             return View(model);
         }
         string userId = User.GetUserId()!;
@@ -168,7 +168,7 @@ public class LessonController(ILessonService lessonService,
                 ModelState.AddModelError(result.Field ?? string.Empty, result.Message!);
             else
                 TempData["ErrorMessage"] = result.Message;
-            model.Courses = await courseService.GetCourseOptionsAsync();
+            model.Courses = await courseService.GetAssignableCourseOptionsAsync();
             return this.View(model);
         }
        

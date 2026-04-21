@@ -1,3 +1,4 @@
+using LerningApp.Common;
 using LerningApp.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -23,9 +24,6 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(c => c.Price)
             .HasPrecision(18, 2)
             .IsRequired();
-        
-        builder
-            .HasQueryFilter(l => l.IsPublished == true && l.IsDeleted == false);
         
         builder
             .HasOne(e => e.Level)

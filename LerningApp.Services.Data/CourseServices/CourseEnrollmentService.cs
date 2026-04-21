@@ -23,7 +23,7 @@ public class CourseEnrollmentService(IRepository<Course, Guid> courseRepository,
         Course? course = await courseRepository
             .GetAllAttached()
             .Include(c => c.LessonsForCourse)
-            .FirstOrDefaultAsync(c => c.Id == courseId && c.IsDeleted == false && c.IsPublished == true);
+            .FirstOrDefaultAsync(c => c.Id == courseId && c.Status == CourseStatus.Published);
 
         if (course == null)
         {

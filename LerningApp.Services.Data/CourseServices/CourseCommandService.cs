@@ -47,7 +47,7 @@ public class CourseCommandService( IRepository<Course, Guid> courseRepository,
             Name = model.Name,
             Description = model.Description,
             LevelId = levelId,
-            IsPublished = true,
+            Status = CourseStatus.Draft,
             CreatedAt = DateTime.UtcNow,
             PublisherId = teacherId.Value,
             Price = model.Price

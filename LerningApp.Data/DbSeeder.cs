@@ -78,7 +78,7 @@ public class DbSeeder
             Id = Guid.NewGuid(),
             Name = "German Basics (A1)",
             Description = "First steps in German",
-            IsPublished = true,
+            Status = CourseStatus.Published,
             CreatedAt = DateTime.UtcNow,
             Level = a1,
             PublisherId = teacher.Id,

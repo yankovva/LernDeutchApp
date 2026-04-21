@@ -25,13 +25,14 @@ public class CourseQueryService( IRepository<Course, Guid> courseRepository,
             .GetAllAttached()
             .AsNoTracking()
             .OrderBy(c => c.CreatedAt)
+            .Where(c => c.Status == CourseStatus.Published)
             .Select(c => new CourseIndexViewModel
             {
                 Id = c.Id.ToString(),
                 Name = c.Name,
                 LessonsCount = c.LessonsForCourse.Count,
                 CourseLevel = c.Level.Name,
-                IsActive = c.IsPublished,
+                IsActive = c.Status == CourseStatus.Published,
                 EnrolledCount = c.CourseParticipants.Count,
                 Price = c.Price,
                 IsEnrolled = userId != null && c.CourseParticipants
@@ -53,8 +54,9 @@ public class CourseQueryService( IRepository<Course, Guid> courseRepository,
             .GetAllAttached()
             .Include(course => course.Level)
             .Include(course => course.LessonsForCourse)
-            .ThenInclude(lesson => lesson.VocabularyCards).Include(course => course.CourseParticipants)
-            .FirstOrDefaultAsync(c => c.Id == courseId);
+            .ThenInclude(lesson => lesson.VocabularyCards)
+            .Include(course => course.CourseParticipants)
+            .FirstOrDefaultAsync(c => c.Id == courseId && c.Status == CourseStatus.Published);
 
         if (course == null)
         {
@@ -70,7 +72,7 @@ public class CourseQueryService( IRepository<Course, Guid> courseRepository,
             LevelName = course.Level.Name,
             TotalWordsInCourse = course.LessonsForCourse.Select(l => l.VocabularyCards.Count).Sum(),
             PublisherId = course.PublisherId.ToString(),
-            IsActive = course.IsPublished,
+            IsActive = course.Status == CourseStatus.Published,
             CourseLessons = course.LessonsForCourse
                 .OrderBy(l =>l.OrderIndex)
                 .Select(cl => new CourseLessonsViewModel()
@@ -121,10 +123,12 @@ public class CourseQueryService( IRepository<Course, Guid> courseRepository,
         return ServiceResultT<CourseDetailsViewModel>.Success(model);
     }
      
-    public async Task<List<CourseOptionsViewModel>> GetCourseOptionsAsync()
+    public async Task<List<CourseOptionsViewModel>> GetAssignableCourseOptionsAsync()
     {
         var courses = await courseRepository
             .GetAllAttached()
+            .Where(c => c.Status == CourseStatus.Draft ||
+                        c.Status == CourseStatus.Published)
             .AsNoTracking()
             .OrderBy(c => c.Name)
             .Select(c => new CourseOptionsViewModel

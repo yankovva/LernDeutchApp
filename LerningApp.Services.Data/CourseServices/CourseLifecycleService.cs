@@ -41,7 +41,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
             return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
-        course.IsPublished = false;
+        course.Status = CourseStatus.Inactive;
         await courseRepository.SaveChangesAsync();
 
         return ServiceResult.Success();
@@ -71,7 +71,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
             return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
 
-        course.IsPublished = true;
+        course.Status = CourseStatus.Published;
         await courseRepository.SaveChangesAsync();
 
         return ServiceResult.Success();
@@ -103,7 +103,7 @@ public class CourseLifecycleService( IRepository<Course, Guid> courseRepository,
             return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
         
-        course.IsDeleted = true;
+        course.Status = CourseStatus.Deleted;
 
         foreach (var lesson in course.LessonsForCourse)
         {

@@ -14,5 +14,5 @@ public interface ICourseService
     Task<ServiceResult> RestoreCourseAsync(string id, string userId);
     Task<ServiceResult> EnrollInCourseAsync(string id, Guid userId);
     Task<ServiceResult> SoftDeleteCourseAsync(string id, string userId);
-    Task<List<CourseOptionsViewModel>> GetCourseOptionsAsync();
+    Task<List<CourseOptionsViewModel>> GetAssignableCourseOptionsAsync();
 }

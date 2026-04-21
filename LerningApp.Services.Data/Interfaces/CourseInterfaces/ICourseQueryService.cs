@@ -9,5 +9,5 @@ public interface ICourseQueryService
     
     Task<ServiceResultT<CourseDetailsViewModel>> GetCourseDetailsByIdAsync(string id, string? userId);
     
-    Task<List<CourseOptionsViewModel>> GetCourseOptionsAsync();
+    Task<List<CourseOptionsViewModel>> GetAssignableCourseOptionsAsync();
 }

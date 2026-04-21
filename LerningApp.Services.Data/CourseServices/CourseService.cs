@@ -55,8 +55,8 @@ public class CourseService(
     {
        return await lifecycleService.SoftDeleteCourseAsync(id, userId);
     }
-    public async Task<List<CourseOptionsViewModel>> GetCourseOptionsAsync()
+    public async Task<List<CourseOptionsViewModel>> GetAssignableCourseOptionsAsync()
     {
-        return await queryService.GetCourseOptionsAsync();
+        return await queryService.GetAssignableCourseOptionsAsync();
     }
 }
