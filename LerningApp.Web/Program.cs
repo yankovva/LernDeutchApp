@@ -1,20 +1,11 @@
-using LerningApp.Common;
 using LerningApp.Data;
-using LerningApp.Data.Models;
-using LerningApp.Data.Repository;
-using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data;
 using LerningApp.Services.Data.Interfaces;
+using LerningApp.Web.Infrastructure;
 using LerningApp.Web.Infrastructure.Extensions;
 
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.StaticFiles;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Blazor;
-using ApplicationUser = LerningApp.Data.Models.ApplicationUser;
-using LerningAppContext = LerningApp.Data.LerningAppContext;
-using NoOpEmailSender = LerningApp.Web.Infrastructure.NoOpEmailSender;
 
 var builder = WebApplication.CreateBuilder(args);
 //Add services to the container
@@ -29,7 +20,8 @@ builder.Services.AddRazorPages();
 builder.Services.RegisterRepositories();
 builder.Services.RegisterUserDefinedServices(typeof(CourseService).Assembly);
 
-builder.Services.AddTransient<IEmailSender, NoOpEmailSender>();
+builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddTransient<IContactEmailSender, ContactEmailSender>();
 
 var app = builder.Build();
 

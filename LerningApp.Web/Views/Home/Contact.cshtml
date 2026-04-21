@@ -1,3 +1,5 @@
+@model LerningApp.Web.ViewModels.Contact.ContactFormViewModel;
+
 @{
     ViewData["Title"] = "Contact";
 }
@@ -79,22 +81,27 @@
                 <div class="field-row">
                     <div class="field">
                         <label for="name">Name</label>
-                        <input id="name" name="Name" class="form-control" required />
+                        <input asp-for="Name" id="name" name="Name" class="form-control" placeholder="John Smith" required />
+                        <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
                     <div class="field">
                         <label for="email">Email</label>
-                        <input id="email" name="Email" type="email" class="form-control" required />
+                        <input  asp-for="Email" id="email" name="Email" type="email" class="form-control" placeholder="example@gmail.com" required />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+
                     </div>
                 </div>
 
                 <div class="field">
                     <label for="subject">Subject</label>
-                    <input id="subject" name="Subject" class="form-control" required />
+                    <input asp-for="Subject" id="subject" name="Subject" class="form-control"  required />
+                    <span asp-validation-for="Subject" class="text-danger"></span>
                 </div>
 
                 <div class="field">
                     <label for="message">Message</label>
-                    <textarea id="message" name="Message" rows="6" class="form-control" required></textarea>
+                    <textarea asp-for="Message" id="message" name="Message" rows="6" class="form-control" required></textarea>
+                    <span asp-validation-for="Message" class="text-danger"></span>
                 </div>
 
                 <button type="submit" class="btn-send">Send Message</button>
