@@ -1,0 +1,125 @@
+﻿@page
+@model ConfirmEmailModel
+
+@{
+    ViewData["Title"] = "Email confirmed";
+}
+
+<section class="auth-result-shell">
+    <div class="auth-result-card">
+        <div class="auth-result-icon">✓</div>
+
+        <p class="auth-result-eyebrow">Email confirmed</p>
+
+        <h1>Your account is ready</h1>
+
+        <p class="auth-result-text">
+            Thank you for confirming your email. You can now log in and continue
+            your German learning journey with DeutschBuddy.
+        </p>
+
+        @if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+        {
+            <div class="auth-result-message">
+                @Model.StatusMessage
+            </div>
+        }
+
+        <a asp-page="./Login" class="auth-result-button">
+            Go to login
+        </a>
+    </div>
+</section>
+
+<style>
+    .auth-result-shell {
+        min-height: 62vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 36px 16px;
+    }
+
+    .auth-result-card {
+        width: 100%;
+        max-width: 560px;
+        text-align: center;
+        padding: 42px 34px;
+        border-radius: 30px;
+        background:
+            radial-gradient(circle at top left, rgba(255, 153, 51, 0.18), transparent 34%),
+            #ffffff;
+        border: 1px solid #f4dec5;
+        box-shadow: 0 24px 55px rgba(149, 81, 17, 0.12);
+    }
+
+    .auth-result-icon {
+        width: 74px;
+        height: 74px;
+        margin: 0 auto 18px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ff7a1a 0%, #ff9933 100%);
+        color: #fff;
+        font-size: 2.1rem;
+        font-weight: 900;
+        box-shadow: 0 16px 30px rgba(255, 122, 26, 0.28);
+    }
+
+    .auth-result-eyebrow {
+        margin: 0 0 8px;
+        color: #d86100;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .auth-result-card h1 {
+        margin: 0 0 12px;
+        color: #1f2937;
+        font-size: clamp(2rem, 4vw, 2.8rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+    }
+
+    .auth-result-text {
+        margin: 0 auto 20px;
+        max-width: 430px;
+        color: #6b7280;
+        line-height: 1.7;
+        font-size: 1.02rem;
+    }
+
+    .auth-result-message {
+        margin: 18px auto 24px;
+        padding: 12px 14px;
+        border-radius: 16px;
+        background: #fff7ed;
+        color: #9a5515;
+        border: 1px solid #ffd7ad;
+        font-weight: 700;
+    }
+
+    .auth-result-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 54px;
+        padding: 0 24px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #ff7a1a 0%, #ff9933 100%);
+        color: #fff;
+        text-decoration: none;
+        font-weight: 800;
+        box-shadow: 0 16px 30px rgba(255, 122, 26, 0.25);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .auth-result-button:hover {
+        transform: translateY(-2px);
+        color: #fff;
+        box-shadow: 0 18px 34px rgba(255, 122, 26, 0.32);
+    }
+</style>

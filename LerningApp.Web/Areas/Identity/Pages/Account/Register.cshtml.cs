@@ -2,25 +2,19 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 #nullable disable
 
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
-using System.Threading;
-using System.Threading.Tasks;
 using LerningApp.Common;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authorization;
 using LerningApp.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
-using Microsoft.Extensions.Logging;
 
+using static LerningApp.Common.EmailTemplates;
 namespace LerningApp.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
@@ -143,8 +137,8 @@ namespace LerningApp.Areas.Identity.Pages.Account
                         values: new { area = "Identity", userId = userId, code = code, returnUrl = returnUrl },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailAsync(Input.Email, "Confirm your DeutschBuddy email",
+                        EmailConfirmation(HtmlEncoder.Default.Encode(callbackUrl)));
 
                     if (_userManager.Options.SignIn.RequireConfirmedAccount)
                     {
