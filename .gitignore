@@ -4,6 +4,8 @@
 
 # Visual Studio
 .vs/
+*.user
+*.suo
 
 # JetBrains Rider
 .idea/
@@ -12,6 +14,21 @@
 # Rider / ReSharper user settings
 *.DotSettings.user
 
+# OS files
+.DS_Store
+Thumbs.db
+
 # Logs
 *.log
 
+# ASP.NET Core local configuration
+**/appsettings.Development.json
+**/appsettings.Development.*.json
+
+# User-uploaded/generated media
+LerningApp.Web/wwwroot/audios/ListeningExerciseAudios/*
+LerningApp.Web/wwwroot/images/TeacherProfileImages/*
+LerningApp.Web/wwwroot/images/VocabularyCardsImages/*
+
+# Keep default placeholder assets in source control
+!LerningApp.Web/wwwroot/images/VocabularyCardsImages/defaultcardimage.png
