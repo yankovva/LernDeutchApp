@@ -1,6 +1,7 @@
 using LerningApp.Common;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.Course;
+using LerningApp.Web.ViewModels.Teacher;
 
 namespace LerningApp.Services.Data;
 
@@ -59,6 +60,17 @@ public class CourseService(
     {
         return await queryService.GetAssignableCourseOptionsAsync();
     }
+
+    public Task<ServiceResultT<CourseManageViewModel>> GetCourseManageByIdAsync(string id)
+    {
+        return queryService.GetCourseManageByIdAsync(id);
+    }
+
+    public Task<IEnumerable<CourseTeacherIndexViewModel>> GetAllCorsesAsync()
+    {
+        return queryService.GetAllCorsesAsync();
+    }
+
     public async Task<ServiceResult> PublishCourseAsync(string id, string userId)
     {
         return await lifecycleService.PublishCourseAsync(id, userId);

@@ -6,6 +6,7 @@ using LerningApp.Services.Data.Interfaces.LessonInterfaces;
 using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.ListeningExercise;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
+using LerningApp.Web.ViewModels.Teacher;
 using LerningApp.Web.ViewModels.TranslationExercise;
 using LerningApp.Web.ViewModels.UserLessonProgress;
 
@@ -206,5 +207,24 @@ public class LessonQueryService(IRepository<Lesson, Guid> lessonRepository,
         }
 
         return availableIndexes;
+    }
+
+    public async Task<IEnumerable<LessonTeacherIndexViewModel>> GetAllLessonsAsync()
+    {
+        var lessons = await lessonRepository
+            .GetAllAttached()
+            .Include(c => c.Course)
+            .Select(l => new LessonTeacherIndexViewModel
+            {
+                Id = l.Id.ToString(),
+                Name = l.Name,
+                CourseName  = l.Course != null ? l.Course.Name : "Not added to course.",
+                IsDeleted = l.IsDeleted,
+                ExercisesCount = l.ListeningExercises.Count
+                                 + l.TranslationExercises.Count
+                                 + l.MultipleChoiceExercises.Count
+            }).ToListAsync();
+        
+        return lessons;
     }
 }

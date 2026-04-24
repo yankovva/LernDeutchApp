@@ -1,5 +1,6 @@
 using LerningApp.Common;
 using LerningApp.Web.ViewModels.Lesson;
+using LerningApp.Web.ViewModels.Teacher;
 
 namespace LerningApp.Services.Data.Interfaces;
 
@@ -14,4 +15,5 @@ public interface ILessonService
     Task<ServiceResult> PostLessonEditInputModelAsync(LessonEditInputModel model, string id, string userId);
     Task<ServiceResult> SoftDeleteLessonAsync(string id,string userId);
     Task<List<int>> GetAvailableOrderIndexes(string courseId);
+    Task<IEnumerable<LessonTeacherIndexViewModel>> GetAllLessonsAsync();
 }

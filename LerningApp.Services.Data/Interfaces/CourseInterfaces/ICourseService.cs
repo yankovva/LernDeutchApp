@@ -1,5 +1,6 @@
 using LerningApp.Common;
 using LerningApp.Web.ViewModels.Course;
+using LerningApp.Web.ViewModels.Teacher;
 
 namespace LerningApp.Services.Data.Interfaces;
 
@@ -16,4 +17,6 @@ public interface ICourseService
     Task<ServiceResult> SoftDeleteCourseAsync(string id, string userId);
     Task<ServiceResult> PublishCourseAsync(string id, string userId);
     Task<List<CourseOptionsViewModel>> GetAssignableCourseOptionsAsync();
+    Task<ServiceResultT<CourseManageViewModel>> GetCourseManageByIdAsync(string id);
+    Task<IEnumerable<CourseTeacherIndexViewModel>> GetAllCorsesAsync();
 }
