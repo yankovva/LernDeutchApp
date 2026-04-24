@@ -7,6 +7,7 @@ using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.ListeningExercise;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using LerningApp.Web.ViewModels.Teacher;
+using LerningApp.Web.ViewModels.Teacher.Lesson;
 using LerningApp.Web.ViewModels.TranslationExercise;
 using LerningApp.Web.ViewModels.UserLessonProgress;
 
@@ -226,5 +227,97 @@ public class LessonQueryService(IRepository<Lesson, Guid> lessonRepository,
             }).ToListAsync();
         
         return lessons;
+    }
+
+    public async Task<ServiceResultT<LessonManageViewModel>> GetLessonManageByIdAsync(string id)
+    {
+        if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out Guid lessonId))
+        {
+            return ServiceResultT<LessonManageViewModel>.Fail(InvalidLessonIdMessage, ServiceErrorType.NotFound);
+        }
+        
+        Lesson? lesson = await lessonRepository
+            .GetAllAttached()
+            .AsNoTracking()
+            .Include(l => l.Course)
+            .Include(l => l.UsersLessonProgresses)
+            .Include(lesson => lesson.VocabularyCards)
+            .ThenInclude(c => c.Terms)
+            .Include(l => l.TranslationExercises)
+            .Include(l => l.MultipleChoiceExercises)
+            .Include(l => l.ListeningExercises)
+            .ThenInclude(ex => ex.Questions)
+            .FirstOrDefaultAsync(l => l.Id == lessonId);
+
+        if (lesson == null)
+        {
+            return ServiceResultT<LessonManageViewModel>.Fail(LessonNotFoundMessage, ServiceErrorType.NotFound);
+        }
+        
+        int completedUserLessonCount = lesson.UsersLessonProgresses
+            .Count(x => x.IsCompleted);
+        
+        int totalExerciseCount = lesson.ListeningExercises.Count 
+                                 + lesson.TranslationExercises.Count 
+                                 + lesson.MultipleChoiceExercises.Count;
+
+        var words = lesson.VocabularyCards
+            .Select(vc => new LessonManageWordViewModel
+            {
+                Id = vc.Id.ToString(),
+                German = vc.Terms
+                    .Where(t => t.Side == "de" && t.IsPrimary)
+                    .Select(t => t.Word!)
+                    .FirstOrDefault() ?? "No word found.",
+                English = vc.Terms
+                    .Where(t => t.Side == "en" && t.IsPrimary)
+                    .Select(t => t.Word)
+                    .FirstOrDefault() ?? "No word found.",
+            }).ToList();
+
+        var multipleChoiceExercises = lesson.MultipleChoiceExercises
+            .Select(ex => new LessonManageMultipleChoiceViewModel
+            {
+                Id = ex.Id.ToString(),
+                Question = ex.Question,
+            }).ToList();
+
+        var listeningExercises = lesson.ListeningExercises
+            .Select(ex => new LessonManageListeningViewModel
+            {
+                Id = ex.Id.ToString(),
+                QuestionsCount = ex.Questions.Count
+            }).ToList();
+        
+        var translationExercises = lesson.TranslationExercises
+            .Select(ex => new LessonManageTranslationViewModel
+            {
+                Id = ex.Id.ToString(),
+                GermanSentence = ex.GermanSentence,
+            }).ToList();
+
+        var model = new LessonManageViewModel
+        {
+            Id = lesson.Id.ToString(),
+            Name = lesson.Name,
+            Target = lesson.Target,
+            Content = lesson.Content,
+            CourseName = lesson.Course?.Name,
+            CreatedAt = lesson.CreatedAt.ToString("dd/MM/yyyy"),
+            OrderIndex = lesson.OrderIndex,
+            IsDeleted = lesson.IsDeleted,
+            TotalWordsCount = lesson.VocabularyCards.Count,
+            MultipleChoiceCount = lesson.MultipleChoiceExercises.Count,
+            ListeningExercisesCount = lesson.ListeningExercises.Count,
+            TranslationExercisesCount = lesson.TranslationExercises.Count,
+            CompletedUsersCount = completedUserLessonCount,
+            TotalExercisesCount = totalExerciseCount,
+            Words = words,
+            MultipleChoiceExercises = multipleChoiceExercises,
+            ListeningExercises = listeningExercises,
+            TranslationExercises = translationExercises
+        };
+        
+        return ServiceResultT<LessonManageViewModel>.Success(model);
     }
 }

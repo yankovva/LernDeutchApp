@@ -1,0 +1,813 @@
+@model LerningApp.Web.ViewModels.Teacher.Lesson.LessonManageViewModel
+
+@{
+    ViewData["Title"] = "Manage Lesson";
+}
+
+<section class="lesson-manage-page">
+    <div class="lesson-manage-hero">
+        <div class="lesson-manage-hero__content">
+            <span class="lesson-eyebrow">Lesson workspace</span>
+            <h1>@Model.Name</h1>
+            <p class="lesson-hero-text">
+                Organize lesson content, improve exercises, refine vocabulary, and keep the learning flow sharp.
+            </p>
+
+            <div class="lesson-hero-meta">
+                <span class="meta-pill">
+                    <span class="meta-label">Course</span>
+                    <strong>@(string.IsNullOrWhiteSpace(Model.CourseName) ? "No course assigned" : Model.CourseName)</strong>
+                </span>
+
+                <span class="meta-pill">
+                    <span class="meta-label">Order</span>
+                    <strong>@Model.OrderIndex</strong>
+                </span>
+
+                <span class="meta-pill">
+                    <span class="meta-label">Created</span>
+                    <strong>@Model.CreatedAt</strong>
+                </span>
+            </div>
+        </div>
+
+        <div class="lesson-hero-actions">
+            <a asp-area="Teacher"
+               asp-controller="Lesson"
+               asp-action="Edit"
+               asp-route-id="@Model.Id"
+               class="manage-btn manage-btn-outline">
+                Edit lesson
+            </a>
+
+            <a asp-area="Teacher"
+               asp-controller="Lesson"
+               asp-action="AddToCourse"
+               asp-route-id="@Model.Id"
+               class="manage-btn manage-btn-primary">
+                Add to course
+            </a>
+
+            <form asp-area="Teacher"
+                  asp-controller="Lesson"
+                  asp-action="SoftDelete"
+                  asp-route-id="@Model.Id"
+                  method="post"
+                  onsubmit="return confirm('Are you sure you want to delete this lesson?');">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="manage-btn manage-btn-danger">
+                    Delete lesson
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="lesson-manage-layout">
+        <main class="lesson-manage-main">
+            <section class="manage-card">
+                <div class="manage-card-head">
+                    <div>
+                        <span class="section-kicker">Overview</span>
+                        <h2>Lesson information</h2>
+                    </div>
+                </div>
+
+                <div class="lesson-info-grid">
+                    <div class="info-box">
+                        <dt>Name</dt>
+                        <dd>@Model.Name</dd>
+                    </div>
+
+                    <div class="info-box">
+                        <dt>Course</dt>
+                        <dd>@(string.IsNullOrWhiteSpace(Model.CourseName) ? "Not assigned" : Model.CourseName)</dd>
+                    </div>
+
+                    <div class="info-box">
+                        <dt>Order index</dt>
+                        <dd>@Model.OrderIndex</dd>
+                    </div>
+
+                    <div class="info-box">
+                        <dt>Status</dt>
+                        <dd>@(Model.IsDeleted ? "Deleted" : "Active")</dd>
+                    </div>
+                </div>
+
+                <div class="lesson-text-block">
+                    <h3>Target</h3>
+                    @if (string.IsNullOrWhiteSpace(Model.Target))
+                    {
+                        <p class="empty-copy">No target has been added yet.</p>
+                    }
+                    else
+                    {
+                        <p>@Model.Target</p>
+                    }
+                </div>
+
+                <div class="lesson-text-block">
+                    <h3>Content</h3>
+                    @if (string.IsNullOrWhiteSpace(Model.Content))
+                    {
+                        <p class="empty-copy">No lesson content has been added yet.</p>
+                    }
+                    else
+                    {
+                        <p>@Model.Content</p>
+                    }
+                </div>
+            </section>
+
+            <section class="manage-card">
+                <div class="manage-card-head">
+                    <div>
+                        <span class="section-kicker">Builder</span>
+                        <h2>Quick actions</h2>
+                    </div>
+                </div>
+
+                <div class="builder-grid">
+                    <a asp-area=""
+                       asp-controller="VocabularyCard"
+                       asp-action="Create"
+                       asp-route-lessonId="@Model.Id"
+                       class="builder-card">
+                        <span class="builder-icon">Aa</span>
+                        <strong>Add words</strong>
+                        <p>Create and expand the vocabulary set for this lesson.</p>
+                    </a>
+
+                    <a asp-area=""
+                       asp-controller="MultipleChoiceExercise"
+                       asp-action="Create"
+                       asp-route-lessonId="@Model.Id"
+                       class="builder-card">
+                        <span class="builder-icon">AB</span>
+                        <strong>Add multiple choice</strong>
+                        <p>Create quick-check tasks with answer options.</p>
+                    </a>
+
+                    <a asp-area=""
+                       asp-controller="ListeningExercise"
+                       asp-action="Create"
+                       asp-route-lessonId="@Model.Id"
+                       class="builder-card">
+                        <span class="builder-icon">♪</span>
+                        <strong>Add listening</strong>
+                        <p>Build listening exercises with audio and questions.</p>
+                    </a>
+
+                    <a asp-area=""
+                       asp-controller="TranslationExercise"
+                       asp-action="Create"
+                       asp-route-lessonId="@Model.Id"
+                       class="builder-card">
+                        <span class="builder-icon">DE</span>
+                        <strong>Add translation</strong>
+                        <p>Create translation practice for active recall.</p>
+                    </a>
+                </div>
+            </section>
+
+            <section class="manage-card">
+                <div class="manage-card-head">
+                    <div>
+                        <span class="section-kicker">Vocabulary</span>
+                        <h2>Words in this lesson</h2>
+                    </div>
+                </div>
+
+                @if (Model.Words == null || !Model.Words.Any())
+                {
+                    <div class="empty-state">
+                        <strong>No words added yet.</strong>
+                        <p>Start building the vocabulary foundation for this lesson.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="word-list">
+                        @foreach (var word in Model.Words)
+                        {
+                            <article class="word-row">
+                                <div class="word-main">
+                                    <strong>@word.German</strong>
+                                    <span>@word.English</span>
+                                </div>
+
+                                <a asp-area=""
+                                   asp-controller="VocabularyCard"
+                                   asp-action="Edit"
+                                   asp-route-id="@word.Id"
+                                   class="icon-action-btn"
+                                   title="Edit word">
+                                    ✎
+                                </a>
+                            </article>
+                        }
+                    </div>
+                }
+            </section>
+
+            <section class="manage-card">
+                <div class="manage-card-head">
+                    <div>
+                        <span class="section-kicker">Exercises</span>
+                        <h2>Lesson exercises</h2>
+                    </div>
+                </div>
+
+                <div class="exercise-groups">
+                    <div class="exercise-group">
+                        <div class="exercise-group-head">
+                            <h3>Multiple choice</h3>
+                            <span>@Model.MultipleChoiceCount</span>
+                        </div>
+
+                        @if (Model.MultipleChoiceExercises == null || !Model.MultipleChoiceExercises.Any())
+                        {
+                            <p class="empty-copy">No multiple choice exercises yet.</p>
+                        }
+                        else
+                        {
+                            <div class="exercise-list">
+                                @foreach (var ex in Model.MultipleChoiceExercises)
+                                {
+                                    <article class="exercise-row">
+                                        <div class="exercise-main">
+                                            <strong>@ex.Question</strong>
+                                        </div>
+
+                                        <a asp-area=""
+                                           asp-controller="MultipleChoiceExercise"
+                                           asp-action="Edit"
+                                           asp-route-id="@ex.Id"
+                                           class="icon-action-btn"
+                                           title="Edit exercise">
+                                            ✎
+                                        </a>
+                                    </article>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="exercise-group">
+                        <div class="exercise-group-head">
+                            <h3>Listening</h3>
+                            <span>@Model.ListeningExercisesCount</span>
+                        </div>
+
+                        @if (Model.ListeningExercises == null || !Model.ListeningExercises.Any())
+                        {
+                            <p class="empty-copy">No listening exercises yet.</p>
+                        }
+                        else
+                        {
+                            <div class="exercise-list">
+                                @foreach (var ex in Model.ListeningExercises)
+                                {
+                                    <article class="exercise-row">
+                                        <div class="exercise-main">
+                                            <strong>Listening exercise</strong>
+                                            <p>@ex.QuestionsCount question(s)</p>
+                                        </div>
+
+                                        <a asp-area=""
+                                           asp-controller="ListeningExercise"
+                                           asp-action="Edit"
+                                           asp-route-id="@ex.Id"
+                                           class="icon-action-btn"
+                                           title="Edit exercise">
+                                            ✎
+                                        </a>
+                                    </article>
+                                }
+                            </div>
+                        }
+                    </div>
+
+                    <div class="exercise-group">
+                        <div class="exercise-group-head">
+                            <h3>Translation</h3>
+                            <span>@Model.TranslationExercisesCount</span>
+                        </div>
+
+                        @if (Model.TranslationExercises == null || !Model.TranslationExercises.Any())
+                        {
+                            <p class="empty-copy">No translation exercises yet.</p>
+                        }
+                        else
+                        {
+                            <div class="exercise-list">
+                                @foreach (var ex in Model.TranslationExercises)
+                                {
+                                    <article class="exercise-row">
+                                        <div class="exercise-main">
+                                            <strong>@ex.GermanSentence</strong>
+                                        </div>
+
+                                        <a asp-area=""
+                                           asp-controller="TranslationExercise"
+                                           asp-action="Edit"
+                                           asp-route-id="@ex.Id"
+                                           class="icon-action-btn"
+                                           title="Edit exercise">
+                                            ✎
+                                        </a>
+                                    </article>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <aside class="lesson-manage-sidebar">
+            <section class="sidebar-panel">
+                <span class="section-kicker">Summary</span>
+                <h2>Lesson stats</h2>
+
+                <div class="stat-list">
+                    <div class="stat-row">
+                        <span>Total words</span>
+                        <strong>@Model.TotalWordsCount</strong>
+                    </div>
+
+                    <div class="stat-row">
+                        <span>Total exercises</span>
+                        <strong>@Model.TotalExercisesCount</strong>
+                    </div>
+
+                    <div class="stat-row">
+                        <span>Completed users</span>
+                        <strong>@Model.CompletedUsersCount</strong>
+                    </div>
+
+                    <div class="stat-row">
+                        <span>Multiple choice</span>
+                        <strong>@Model.MultipleChoiceCount</strong>
+                    </div>
+
+                    <div class="stat-row">
+                        <span>Listening</span>
+                        <strong>@Model.ListeningExercisesCount</strong>
+                    </div>
+
+                    <div class="stat-row">
+                        <span>Translation</span>
+                        <strong>@Model.TranslationExercisesCount</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="sidebar-panel">
+                <span class="section-kicker">Navigation</span>
+                <h2>Back</h2>
+
+                <a asp-area="Teacher"
+                   asp-controller="Lesson"
+                   asp-action="Index"
+                   class="manage-btn manage-btn-ghost manage-btn-block">
+                    Back to lessons
+                </a>
+            </section>
+        </aside>
+    </div>
+</section>
+
+<style>
+    .lesson-manage-page {
+        padding: 24px 0 44px;
+        color: #1f2937;
+    }
+
+    .lesson-manage-hero {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: flex-start;
+        padding: 34px;
+        margin-bottom: 24px;
+        border-radius: 30px;
+        background:
+            radial-gradient(circle at 90% 14%, rgba(255, 153, 51, 0.24), transparent 26%),
+            linear-gradient(135deg, #fff7ed 0%, #ffffff 52%, #fff2e3 100%);
+        border: 1px solid rgba(255, 153, 51, 0.18);
+        box-shadow: 0 20px 50px rgba(148, 82, 18, 0.10);
+    }
+
+    .lesson-eyebrow,
+    .section-kicker {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 6px 11px;
+        border-radius: 999px;
+        background: rgba(255, 153, 51, 0.14);
+        color: #b45309;
+        font-size: 0.76rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+    }
+
+    .lesson-manage-hero h1 {
+        margin: 10px 0 12px;
+        font-size: clamp(2rem, 4vw, 4rem);
+        line-height: 0.95;
+        letter-spacing: -0.06em;
+        color: #111827;
+    }
+
+    .lesson-hero-text {
+        max-width: 700px;
+        margin: 0 0 18px;
+        color: #6b7280;
+        font-size: 1.04rem;
+    }
+
+    .lesson-hero-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .meta-pill {
+        display: inline-flex;
+        flex-direction: column;
+        gap: 4px;
+        padding: 12px 14px;
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.84);
+        border: 1px solid #fed7aa;
+        min-width: 120px;
+    }
+
+    .meta-label {
+        font-size: 0.72rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: #b45309;
+    }
+
+    .lesson-hero-actions {
+        width: 260px;
+        display: grid;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .lesson-manage-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .lesson-manage-main,
+    .lesson-manage-sidebar {
+        display: grid;
+        gap: 20px;
+    }
+
+    .manage-card,
+    .sidebar-panel {
+        border-radius: 26px;
+        border: 1px solid #f0dcc5;
+        background: rgba(255, 255, 255, 0.94);
+        box-shadow: 0 16px 40px rgba(148, 82, 18, 0.07);
+    }
+
+    .manage-card {
+        padding: 26px;
+    }
+
+    .sidebar-panel {
+        padding: 22px;
+    }
+
+    .manage-card-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 22px;
+    }
+
+    .manage-card h2,
+    .sidebar-panel h2 {
+        margin: 10px 0 0;
+        color: #111827;
+        font-size: 1.35rem;
+        font-weight: 850;
+        letter-spacing: -0.03em;
+    }
+
+    .lesson-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin-bottom: 20px;
+    }
+
+    .info-box {
+        padding: 16px;
+        border-radius: 18px;
+        background: #fff8f1;
+        border: 1px solid #fde0bf;
+    }
+
+    .info-box dt {
+        margin-bottom: 4px;
+        color: #9a3412;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .info-box dd {
+        margin: 0;
+        color: #111827;
+        font-weight: 750;
+    }
+
+    .lesson-text-block {
+        padding-top: 18px;
+        border-top: 1px solid #f3e3d2;
+    }
+
+    .lesson-text-block + .lesson-text-block {
+        margin-top: 18px;
+    }
+
+    .lesson-text-block h3 {
+        margin-bottom: 8px;
+        color: #111827;
+        font-size: 1.05rem;
+        font-weight: 850;
+    }
+
+    .lesson-text-block p,
+    .empty-copy {
+        color: #6b7280;
+        line-height: 1.7;
+    }
+
+    .builder-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .builder-card {
+        display: block;
+        padding: 18px;
+        border-radius: 22px;
+        text-decoration: none;
+        border: 1px solid #fed7aa;
+        background: linear-gradient(180deg, #fffaf5 0%, #fff4ea 100%);
+        color: #1f2937;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    }
+
+    .builder-card:hover {
+        transform: translateY(-2px);
+        text-decoration: none;
+        box-shadow: 0 18px 30px rgba(255, 153, 51, 0.12);
+        border-color: #fb923c;
+    }
+
+    .builder-icon {
+        display: inline-grid;
+        place-items: center;
+        width: 42px;
+        height: 42px;
+        margin-bottom: 12px;
+        border-radius: 14px;
+        background: #ffedd5;
+        color: #c2410c;
+        font-weight: 900;
+    }
+
+    .builder-card strong {
+        display: block;
+        margin-bottom: 6px;
+        font-size: 1rem;
+    }
+
+    .builder-card p {
+        margin: 0;
+        color: #6b7280;
+        line-height: 1.6;
+    }
+
+    .word-list,
+    .exercise-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .word-row,
+    .exercise-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        border-radius: 18px;
+        background: #fffaf5;
+        border: 1px solid #f5dac0;
+    }
+
+    .word-main,
+    .exercise-main {
+        min-width: 0;
+    }
+
+    .word-main strong,
+    .exercise-main strong {
+        display: block;
+        color: #111827;
+        word-break: break-word;
+    }
+
+    .word-main span,
+    .exercise-main p {
+        margin: 4px 0 0;
+        color: #6b7280;
+        font-size: 0.94rem;
+    }
+
+    .exercise-groups {
+        display: grid;
+        gap: 16px;
+    }
+
+    .exercise-group {
+        padding: 18px;
+        border-radius: 22px;
+        background: #fffaf5;
+        border: 1px solid #f5dac0;
+    }
+
+    .exercise-group-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 14px;
+    }
+
+    .exercise-group-head h3 {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 850;
+        color: #111827;
+    }
+
+    .exercise-group-head span {
+        min-width: 34px;
+        height: 34px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 999px;
+        background: #ffedd5;
+        color: #c2410c;
+        font-weight: 900;
+    }
+
+    .stat-list {
+        margin-top: 18px;
+        display: grid;
+        gap: 8px;
+    }
+
+    .stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f3e3d2;
+        color: #4b5563;
+    }
+
+    .stat-row:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+    }
+
+    .stat-row strong {
+        color: #111827;
+        font-size: 1rem;
+        font-weight: 850;
+    }
+
+    .manage-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 42px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-weight: 850;
+        text-decoration: none;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .manage-btn:hover {
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+    .manage-btn-block {
+        width: 100%;
+    }
+
+    .manage-btn-primary {
+        background: #ff9933;
+        color: #111827;
+        box-shadow: 0 12px 24px rgba(255, 153, 51, 0.25);
+    }
+
+    .manage-btn-outline {
+        background: #ffffff;
+        color: #b45309;
+        border-color: #fdba74;
+    }
+
+    .manage-btn-danger {
+        background: #ef4444;
+        color: #ffffff;
+    }
+
+    .manage-btn-ghost {
+        background: #fff7ed;
+        color: #9a3412;
+        border-color: #fed7aa;
+    }
+
+    .icon-action-btn {
+        flex: 0 0 auto;
+        width: 36px;
+        height: 36px;
+        display: inline-grid;
+        place-items: center;
+        border-radius: 999px;
+        border: 1px solid #fed7aa;
+        background: #ffffff;
+        color: #c2410c;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: 900;
+        transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .icon-action-btn:hover {
+        background: #ffedd5;
+        border-color: #fb923c;
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+    .empty-state {
+        padding: 22px;
+        border-radius: 20px;
+        background: #fff7ed;
+        border: 1px dashed #fdba74;
+        color: #92400e;
+    }
+
+    .empty-state p {
+        margin: 6px 0 0;
+    }
+
+    @@media (max-width: 992px) {
+        .lesson-manage-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .lesson-manage-hero {
+            flex-direction: column;
+        }
+
+        .lesson-hero-actions {
+            width: 100%;
+        }
+    }
+
+    @@media (max-width: 720px) {
+        .lesson-info-grid,
+        .builder-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .manage-card-head {
+            flex-direction: column;
+        }
+    }
+</style>

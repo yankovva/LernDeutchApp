@@ -2,7 +2,8 @@ using LerningApp.Common;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.Lesson;
-
+using LerningApp.Web.ViewModels.Teacher;
+using LerningApp.Web.ViewModels.Teacher.Lesson;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
@@ -40,7 +41,6 @@ public class LessonController(ILessonService lessonService,
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    [Authorize(Roles = "Admin, Teacher")]
     public async Task<IActionResult> AddToCourse(AddLessonToCourseViewModel model)
     {
         if (!this.ModelState.IsValid)
@@ -60,7 +60,6 @@ public class LessonController(ILessonService lessonService,
             return this.View(model);
         }
         
-        // TODO: consider enum for result action
         if (string.IsNullOrWhiteSpace(model.SelectedCourseId))
             TempData["SuccessMessage"] = "Урокът беше премахнат от курса.";
         else
@@ -160,5 +159,19 @@ public class LessonController(ILessonService lessonService,
         
         TempData["SuccessMessage"] = $"Успешно изтрихте урока";
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Manage(string id)
+    {
+        var result = await lessonService
+            .GetLessonManageByIdAsync(id);
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Index", "Home");
+        }
+        
+        return View(result.Data);
     }
 }

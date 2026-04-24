@@ -3,6 +3,7 @@ using LerningApp.Services.Data.Interfaces;
 using LerningApp.Services.Data.Interfaces.LessonInterfaces;
 using LerningApp.Web.ViewModels.Lesson;
 using LerningApp.Web.ViewModels.Teacher;
+using LerningApp.Web.ViewModels.Teacher.Lesson;
 
 namespace LerningApp.Services.Data;
 
@@ -57,8 +58,13 @@ public class LessonService(ILessonCommandService commandService,
        return await queryService.GetAvailableOrderIndexes(courseId);
     }
 
-    public Task<IEnumerable<LessonTeacherIndexViewModel>> GetAllLessonsAsync()
+    public async Task<IEnumerable<LessonTeacherIndexViewModel>> GetAllLessonsAsync()
     {
-       return  queryService.GetAllLessonsAsync();
+       return await queryService.GetAllLessonsAsync();
+    }
+
+    public async Task<ServiceResultT<LessonManageViewModel>> GetLessonManageByIdAsync(string id)
+    {
+       return await queryService.GetLessonManageByIdAsync(id);
     }
 }
