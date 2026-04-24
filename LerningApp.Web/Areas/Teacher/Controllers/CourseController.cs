@@ -18,4 +18,12 @@ public class CourseController(ITeacherCourseService teacherCourseService) : Cont
         var courses = await teacherCourseService.GetAllCorsesAsync();
         return View(courses);
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Manage(string id)
+    {
+        var model = await teacherCourseService
+            .GetCourseManageByIdAsync(id);
+        return View(model.Data);
+    }
 }

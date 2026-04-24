@@ -1,0 +1,651 @@
+@using LerningApp.Common
+@using static LerningApp.Common.Enums
+@model LerningApp.Web.ViewModels.Teacher.CourseManageViewModel
+
+@{
+    ViewData["Title"] = "Manage Course";
+
+    string statusClass = Model.Status switch
+    {
+        CourseStatus.Published => "status-published",
+        CourseStatus.Draft => "status-draft",
+        CourseStatus.Inactive => "status-inactive",
+        CourseStatus.Deleted => "status-deleted",
+        _ => "status-draft"
+    };
+}
+
+<section class="course-manage-page">
+    <div class="course-manage-hero">
+        <div>
+            <span class="teacher-eyebrow">Course workspace</span>
+            <h1>@Model.Name</h1>
+            <p>
+                Manage course content, visibility, and lifecycle from one teacher workspace.
+            </p>
+        </div>
+
+        <span class="course-status @statusClass">
+            @Model.Status
+        </span>
+    </div>
+
+    <div class="course-manage-layout">
+        <main class="course-manage-main">
+            <section class="manage-card">
+                <div class="manage-card-head">
+                    <div>
+                        <span class="section-kicker">Overview</span>
+                        <h2>Course information</h2>
+                    </div>
+
+                    <a asp-area=""
+                       asp-controller="Course"
+                       asp-action="Edit"
+                       asp-route-id="@Model.Id"
+                       class="manage-btn manage-btn-outline">
+                        Edit course
+                    </a>
+                </div>
+
+                <dl class="course-info-grid">
+                    <div>
+                        <dt>Name</dt>
+                        <dd>@Model.Name</dd>
+                    </div>
+
+                    <div>
+                        <dt>Level</dt>
+                        <dd>@(Model.LevelName ?? "Not selected")</dd>
+                    </div>
+
+                    <div>
+                        <dt>Price</dt>
+                        <dd>@Model.Price.ToString("F2") €</dd>
+                    </div>
+
+                    <div>
+                        <dt>Created at</dt>
+                        <dd>@Model.CreatedAt</dd>
+                    </div>
+                </dl>
+
+                <div class="course-text-block">
+                    <h3>Goal</h3>
+                    @if (string.IsNullOrWhiteSpace(Model.Goal))
+                    {
+                        <p class="muted">No course goal has been added yet.</p>
+                    }
+                    else
+                    {
+                        <p>@Model.Goal</p>
+                    }
+                </div>
+
+                <div class="course-text-block">
+                    <h3>Description</h3>
+                    @if (string.IsNullOrWhiteSpace(Model.Description))
+                    {
+                        <p class="muted">No course description has been added yet.</p>
+                    }
+                    else
+                    {
+                        <p>@Model.Description</p>
+                    }
+                </div>
+            </section>
+
+            <section class="manage-card">
+                <div class="manage-card-head">
+                    <div>
+                        <span class="section-kicker">Lessons</span>
+                        <h2>Course lessons</h2>
+                    </div>
+
+                    <a asp-area=""
+                       asp-controller="Lesson"
+                       asp-action="Create"
+                       class="manage-btn manage-btn-primary">
+                        Add lesson
+                    </a>
+                </div>
+
+                @if (Model.Lessons == null || !Model.Lessons.Any())
+                {
+                    <div class="empty-state">
+                        <strong>No lessons yet.</strong>
+                        <p>Add at least 3 lessons before publishing this course.</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="lesson-manage-list">
+                        @foreach (var lesson in Model.Lessons)
+                        {
+                            <article class="lesson-manage-row">
+                                <div>
+                                    <span class="lesson-order">Lesson @lesson.OrderIndex</span>
+                                    <h3>@lesson.Name</h3>
+                                    <p>@(lesson.Target ?? "No target added.")</p>
+                                </div>
+
+                                <div class="lesson-actions">
+                                    <a asp-area=""
+                                       asp-controller="Lesson"
+                                       asp-action="Details"
+                                       asp-route-id="@lesson.Id"
+                                       class="manage-link">
+                                        View
+                                    </a>
+
+                                    <a asp-area=""
+                                       asp-controller="Lesson"
+                                       asp-action="Edit"
+                                       asp-route-id="@lesson.Id"
+                                       class="manage-link">
+                                        Edit
+                                    </a>
+
+                                    <a asp-area=""
+                                       asp-controller="Lesson"
+                                       asp-action="AddToCourse"
+                                       asp-route-id="@lesson.Id"
+                                       class="manage-link">
+                                        Course
+                                    </a>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                }
+            </section>
+        </main>
+
+        <aside class="course-manage-sidebar">
+            <section class="sidebar-card sidebar-card-highlight">
+                <span class="section-kicker">Summary</span>
+                <h2>Course stats</h2>
+
+                <div class="stats-grid">
+                    <div>
+                        <strong>@Model.LessonsCount</strong>
+                        <span>Lessons</span>
+                    </div>
+
+                    <div>
+                        <strong>@Model.TotalWordsCount</strong>
+                        <span>Words</span>
+                    </div>
+
+                    <div>
+                        <strong>@Model.TotalExercisesCount</strong>
+                        <span>Exercises</span>
+                    </div>
+
+                    <div>
+                        <strong>@Model.EnrolledStudentsCount</strong>
+                        <span>Students</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="sidebar-card">
+                <span class="section-kicker">Lifecycle</span>
+                <h2>Actions</h2>
+
+                <div class="course-action-stack">
+                    @if (Model.Status == CourseStatus.Draft || Model.Status == CourseStatus.Inactive)
+                    {
+                        <form asp-area=""
+                              asp-controller="Course"
+                              asp-action="Publish"
+                              asp-route-id="@Model.Id"
+                              method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="manage-btn manage-btn-primary manage-btn-block">
+                                Publish course
+                            </button>
+                        </form>
+                    }
+
+                    @if (Model.Status == CourseStatus.Published)
+                    {
+                        <form asp-area=""
+                              asp-controller="Course"
+                              asp-action="Deactivate"
+                              asp-route-id="@Model.Id"
+                              method="post"
+                              onsubmit="return confirm('Are you sure you want to make this course inactive?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="manage-btn manage-btn-warning manage-btn-block">
+                                Make inactive
+                            </button>
+                        </form>
+                    }
+
+                    @if (Model.Status == CourseStatus.Inactive)
+                    {
+                        <form asp-area=""
+                              asp-controller="Course"
+                              asp-action="Restore"
+                              asp-route-id="@Model.Id"
+                              method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="manage-btn manage-btn-outline manage-btn-block">
+                                Restore course
+                            </button>
+                        </form>
+                    }
+
+                    @if (Model.Status != CourseStatus.Deleted)
+                    {
+                        <form asp-area=""
+                              asp-controller="Course"
+                              asp-action="SoftDelete"
+                              asp-route-id="@Model.Id"
+                              method="post"
+                              onsubmit="return confirm('Are you sure you want to delete this course?');">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="manage-btn manage-btn-danger manage-btn-block">
+                                Delete course
+                            </button>
+                        </form>
+                    }
+
+                    <a asp-area="Teacher"
+                       asp-controller="Course"
+                       asp-action="Index"
+                       class="manage-btn manage-btn-ghost manage-btn-block">
+                        Back to courses
+                    </a>
+                </div>
+            </section>
+
+            <section class="sidebar-card">
+                <span class="section-kicker">Publishing rule</span>
+                <p class="helper-text">
+                    A course should have at least 3 lessons and complete basic information before it is published.
+                </p>
+            </section>
+        </aside>
+    </div>
+</section>
+
+<style>
+    .course-manage-page {
+        padding: 22px 0 42px;
+        color: #1f2937;
+    }
+
+    .course-manage-hero {
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        align-items: flex-start;
+        padding: 34px;
+        margin-bottom: 24px;
+        border-radius: 30px;
+        background:
+            radial-gradient(circle at 88% 18%, rgba(255, 153, 51, 0.35), transparent 28%),
+            linear-gradient(135deg, #fff7ed 0%, #ffffff 48%, #fff1df 100%);
+        border: 1px solid rgba(255, 153, 51, 0.22);
+        box-shadow: 0 24px 60px rgba(148, 82, 18, 0.12);
+    }
+
+    .course-manage-hero h1 {
+        margin: 8px 0 10px;
+        max-width: 760px;
+        font-size: clamp(2rem, 4vw, 4.2rem);
+        line-height: 0.95;
+        letter-spacing: -0.06em;
+        color: #111827;
+    }
+
+    .course-manage-hero p {
+        max-width: 650px;
+        margin: 0;
+        color: #6b7280;
+        font-size: 1.05rem;
+    }
+
+    .teacher-eyebrow,
+    .section-kicker {
+        display: inline-flex;
+        align-items: center;
+        width: fit-content;
+        padding: 6px 11px;
+        border-radius: 999px;
+        background: rgba(255, 153, 51, 0.14);
+        color: #b45309;
+        font-size: 0.76rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+    }
+
+    .course-status {
+        flex: 0 0 auto;
+        padding: 10px 14px;
+        border-radius: 999px;
+        font-weight: 800;
+        border: 1px solid transparent;
+    }
+
+    .status-published {
+        background: #dcfce7;
+        color: #166534;
+        border-color: #bbf7d0;
+    }
+
+    .status-draft {
+        background: #fef3c7;
+        color: #92400e;
+        border-color: #fde68a;
+    }
+
+    .status-inactive {
+        background: #e5e7eb;
+        color: #374151;
+        border-color: #d1d5db;
+    }
+
+    .status-deleted {
+        background: #fee2e2;
+        color: #991b1b;
+        border-color: #fecaca;
+    }
+
+    .course-manage-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .course-manage-main,
+    .course-manage-sidebar {
+        display: grid;
+        gap: 20px;
+    }
+
+    .manage-card,
+    .sidebar-card {
+        border-radius: 26px;
+        border: 1px solid #f0dcc5;
+        background: rgba(255, 255, 255, 0.88);
+        box-shadow: 0 18px 45px rgba(148, 82, 18, 0.08);
+    }
+
+    .manage-card {
+        padding: 26px;
+    }
+
+    .sidebar-card {
+        padding: 22px;
+    }
+
+    .sidebar-card-highlight {
+        background:
+            radial-gradient(circle at top right, rgba(255, 153, 51, 0.2), transparent 35%),
+            #ffffff;
+    }
+
+    .manage-card-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: flex-start;
+        margin-bottom: 22px;
+    }
+
+    .manage-card h2,
+    .sidebar-card h2 {
+        margin: 10px 0 0;
+        color: #111827;
+        font-size: 1.35rem;
+        font-weight: 850;
+        letter-spacing: -0.03em;
+    }
+
+    .course-info-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        margin: 0 0 22px;
+    }
+
+    .course-info-grid div {
+        padding: 16px;
+        border-radius: 18px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+    }
+
+    .course-info-grid dt {
+        margin-bottom: 4px;
+        color: #9a3412;
+        font-size: 0.75rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .course-info-grid dd {
+        margin: 0;
+        color: #111827;
+        font-weight: 750;
+    }
+
+    .course-text-block {
+        padding-top: 18px;
+        border-top: 1px solid #f3e3d2;
+    }
+
+    .course-text-block + .course-text-block {
+        margin-top: 18px;
+    }
+
+    .course-text-block h3 {
+        margin-bottom: 8px;
+        color: #111827;
+        font-size: 1.05rem;
+        font-weight: 850;
+    }
+
+    .course-text-block p,
+    .helper-text {
+        color: #6b7280;
+        line-height: 1.7;
+    }
+
+    .muted {
+        color: #9ca3af;
+        font-style: italic;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    .stats-grid div {
+        padding: 16px;
+        border-radius: 20px;
+        background: #fff7ed;
+        border: 1px solid #fed7aa;
+    }
+
+    .stats-grid strong {
+        display: block;
+        color: #111827;
+        font-size: 1.8rem;
+        line-height: 1;
+    }
+
+    .stats-grid span {
+        display: block;
+        margin-top: 6px;
+        color: #9a3412;
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .course-action-stack {
+        display: grid;
+        gap: 10px;
+        margin-top: 18px;
+    }
+
+    .manage-btn {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 42px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid transparent;
+        font-weight: 850;
+        text-decoration: none;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .manage-btn:hover {
+        transform: translateY(-1px);
+        text-decoration: none;
+    }
+
+    .manage-btn-block {
+        width: 100%;
+    }
+
+    .manage-btn-primary {
+        background: #ff9933;
+        color: #111827;
+        box-shadow: 0 12px 24px rgba(255, 153, 51, 0.25);
+    }
+
+    .manage-btn-outline {
+        background: #ffffff;
+        color: #b45309;
+        border-color: #fdba74;
+    }
+
+    .manage-btn-warning {
+        background: #f59e0b;
+        color: #111827;
+    }
+
+    .manage-btn-danger {
+        background: #ef4444;
+        color: #ffffff;
+    }
+
+    .manage-btn-ghost {
+        background: #fff7ed;
+        color: #9a3412;
+        border-color: #fed7aa;
+    }
+
+    .empty-state {
+        padding: 22px;
+        border-radius: 20px;
+        background: #fff7ed;
+        border: 1px dashed #fdba74;
+        color: #92400e;
+    }
+
+    .empty-state p {
+        margin: 6px 0 0;
+    }
+
+    .lesson-manage-list {
+        display: grid;
+        gap: 12px;
+    }
+
+    .lesson-manage-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 18px;
+        border-radius: 22px;
+        background: #fffaf5;
+        border: 1px solid #f5dac0;
+    }
+
+    .lesson-order {
+        color: #ea580c;
+        font-size: 0.75rem;
+        font-weight: 850;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+    }
+
+    .lesson-manage-row h3 {
+        margin: 4px 0;
+        color: #111827;
+        font-size: 1.1rem;
+        font-weight: 850;
+    }
+
+    .lesson-manage-row p {
+        margin: 0;
+        color: #6b7280;
+    }
+
+    .lesson-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-content: center;
+        justify-content: flex-end;
+    }
+
+    .manage-link {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: #ffffff;
+        border: 1px solid #fed7aa;
+        color: #b45309;
+        font-size: 0.85rem;
+        font-weight: 800;
+        text-decoration: none;
+    }
+
+    .manage-link:hover {
+        background: #ffedd5;
+        color: #9a3412;
+    }
+
+    @@media (max-width: 992px) {
+        .course-manage-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .course-manage-hero {
+            flex-direction: column;
+        }
+    }
+
+    @@media (max-width: 640px) {
+        .course-info-grid,
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .manage-card-head,
+        .lesson-manage-row {
+            flex-direction: column;
+        }
+
+        .lesson-actions {
+            justify-content: flex-start;
+        }
+    }
+</style>
