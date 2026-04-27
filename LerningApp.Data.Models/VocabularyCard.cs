@@ -23,6 +23,12 @@ public class VocabularyCard
     [Comment("Image of the VocabularyCard")]
     public string? ImagePath { get; set; }
     
+    [Comment("The Publisher of the Card")]
+    public Guid PublisherId { get; set; }
+    
+    [Comment("Publisher Reference")]
+    public Teacher Publisher { get; set; } = null!;
+    
     [Comment("VocabularyTerm in this VocabularyCard")]
      public virtual ICollection<VocabularyTerm> Terms { get; set; }
         = new HashSet<VocabularyTerm>();

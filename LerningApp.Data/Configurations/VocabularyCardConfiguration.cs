@@ -26,6 +26,12 @@ public class VocabularyCardConfiguration: IEntityTypeConfiguration<VocabularyCar
             .HasForeignKey(x => x.PartOfSpeechId)
             .OnDelete(DeleteBehavior.Restrict);
         
+        builder
+            .HasOne(c => c.Publisher)
+            .WithMany(u => u.CreatedVocabularyCards)
+            .HasForeignKey(c => c.PublisherId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
         builder.HasIndex(x => x.LessonId);
         builder.HasIndex(x => x.PartOfSpeechId);
     }

@@ -129,6 +129,7 @@ public class DbSeeder
         {
             Id = Guid.NewGuid(),
             Lesson = lesson1,
+            PublisherId = teacher.Id,
             PartOfSpeech = noun,
             Terms = new List<VocabularyTerm>
             {
@@ -169,6 +170,7 @@ public class DbSeeder
         {
             Id = Guid.NewGuid(),
             Lesson = lesson1,
+            PublisherId = teacher.Id,
             PartOfSpeech = noun,
             Terms = new List<VocabularyTerm>
             {
@@ -202,6 +204,7 @@ public class DbSeeder
         {
             Id = Guid.NewGuid(),
             Lesson = lesson1,
+            PublisherId = teacher.Id,
             PartOfSpeech = noun,
             Terms = new List<VocabularyTerm>
             {
