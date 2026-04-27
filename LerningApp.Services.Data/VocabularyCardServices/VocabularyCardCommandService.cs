@@ -130,6 +130,7 @@ public class VocabularyCardCommandService(
         {
             LessonId = lessonId,
             PartOfSpeechId = partOfSpeechId,
+            PublisherId = teacherId!.Value,
             Terms = terms,
             ImagePath = string.IsNullOrEmpty(imagePath) ? null : imagePath
         };
@@ -162,7 +163,7 @@ public class VocabularyCardCommandService(
         var user = await userManager.FindByIdAsync(userId);
         bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
         
-        if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
+        if (!isAdmin && (teacherId == null || card.PublisherId != teacherId))
         {
             return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
@@ -209,7 +210,7 @@ public class VocabularyCardCommandService(
         var user = await userManager.FindByIdAsync(userId);
         bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
         
-        if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
+        if (!isAdmin && (teacherId == null || card.PublisherId != teacherId))
         {
             return ServiceResultT<VocabularyCardEditInputModel>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }

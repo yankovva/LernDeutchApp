@@ -40,7 +40,7 @@ public class VocabularyCardLifecycleService(
         var user = await userManager.FindByIdAsync(userId);
         bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
         
-        if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
+        if (!isAdmin && (teacherId == null || card.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
@@ -78,7 +78,7 @@ public class VocabularyCardLifecycleService(
         var user = await userManager.FindByIdAsync(userId);
         bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
         
-        if (!isAdmin && (teacherId == null || card.Lesson.PublisherId != teacherId))
+        if (!isAdmin && (teacherId == null || card.PublisherId != teacherId))
         {
             return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
         }
