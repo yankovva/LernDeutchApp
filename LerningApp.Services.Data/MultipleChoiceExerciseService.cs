@@ -18,6 +18,7 @@ namespace LerningApp.Services.Data;
 public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepository,
     IRepository<MultipleChoiceExercise, Guid> exerciseRepository,
     IRepository<UserLessonProgress, Guid> userLessonProgressRepository,
+    IRepository<MultipleChoiceExerciseOption, Guid> optionRepository,
     ITeacherService teacherService,
     IUserExerciseProgressService userExerciseProgressService,
     UserManager<ApplicationUser> userManager) : IMultipleChoiceExerciseService
@@ -260,5 +261,78 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
 
         
         return ServiceResultT<EditMultipleExerciseViewModel>.Success(model);
+    }
+
+    public async Task<ServiceResult> PostEditMultipleChoice(EditMultipleExerciseViewModel model, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(model.Id) || !Guid.TryParse(model.Id, out Guid exerciseId))
+        {
+            return ServiceResult.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+
+        MultipleChoiceExercise? exercise = await exerciseRepository
+            .GetAllAttached()
+            .Include(e => e.Options)
+            .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        
+        if (exercise == null)
+        {
+            return ServiceResult.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+       
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
+        {
+            return ServiceResult.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
+        }
+        
+        exercise.Question = model.Question;
+        exercise.DifficultyLevel = model.DifficultyLevel;
+        
+        var modelOptins = model.Options
+            .Where(o => !string.IsNullOrWhiteSpace(o.AnswerText))
+            .ToList();
+        
+        if (modelOptins.Count <= 1)
+        {
+            return ServiceResult.Fail("Add at least 2 options", ServiceErrorType.General);
+        }
+
+        if (modelOptins.Count(o => o.IsCorrect) != 1)
+        {
+            return ServiceResult.Fail("Add 1 correct option", ServiceErrorType.General);
+        }
+        
+        foreach (var oldOption in exercise.Options.ToList())
+        {
+             optionRepository.DeleteByEntity(oldOption);
+        }
+        await optionRepository.SaveChangesAsync();
+
+        var newOptions = new List<MultipleChoiceExerciseOption>();
+        
+        foreach (var option in model.Options)
+        {
+            if (!string.IsNullOrWhiteSpace(option.AnswerText))
+            {
+                var newOPtion = new MultipleChoiceExerciseOption
+                {
+                    Id = Guid.NewGuid(),
+                    MultipleChoiceExerciseId = exerciseId,
+                    IsCorrect = option.IsCorrect,
+                    Answer = option.AnswerText,
+                    OrderIndex = option.OrderIndex
+                };
+                newOptions.Add(newOPtion);
+            }
+        }
+        optionRepository.AddRange(newOptions);
+        exercise.Options = newOptions;
+        await exerciseRepository.SaveChangesAsync();
+       
+        return ServiceResult.Success();
     }
 }

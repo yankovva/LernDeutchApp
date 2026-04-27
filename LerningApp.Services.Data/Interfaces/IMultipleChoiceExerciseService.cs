@@ -12,4 +12,5 @@ public interface IMultipleChoiceExerciseService
      Task<ServiceResultT<MultipleChoiceCheckResultDto>> CheckMultipleChoice(CheckMultipleChoiceExerciseInputDto dto, string userId);
      Task<ServiceResult> SoftDeleteExerciseAsync(string id, string userId);
      Task<ServiceResultT<EditMultipleExerciseViewModel>> GetEditMultipleChoice(string id, string userId);
+     Task<ServiceResult> PostEditMultipleChoice(EditMultipleExerciseViewModel model, string userId);
 }

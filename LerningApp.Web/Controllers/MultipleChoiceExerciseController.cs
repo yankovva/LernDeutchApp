@@ -1,3 +1,4 @@
+using LerningApp.Data.Models;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
@@ -60,5 +61,20 @@ public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exe
             return RedirectToAction("Index", "Home");
         }
         return View(result.Data);
+    }
+    [HttpPost]
+    [Authorize(Roles = "Admin, Teacher")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(EditMultipleExerciseViewModel model)
+    {
+        string userId = User.GetUserId()!;
+        var result = await exerciseService.PostEditMultipleChoice(model, userId);
+        
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Index", "Home");
+        }
+        return RedirectToAction("Manage", "Lesson", new { area = "Teacher", id = model.LessonId });
     }
 }
