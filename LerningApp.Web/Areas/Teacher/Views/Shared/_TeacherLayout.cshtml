@@ -10,6 +10,10 @@
     <title>@pageTitle - Teacher Panel</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"
+          integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg=="
+          crossorigin="anonymous"
+          referrerpolicy="no-referrer" />
     <style>
         :root {
             --teacher-bg: #f3f6fb;
@@ -37,72 +41,100 @@
 
         .teacher-shell {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 96px 1fr;
             min-height: 100vh;
         }
 
         .teacher-sidebar {
             background: linear-gradient(180deg, var(--teacher-sidebar), var(--teacher-sidebar-alt));
             color: white;
-            padding: 1.75rem 1.15rem;
+            padding: 1.4rem 0.9rem;
             display: flex;
             flex-direction: column;
             border-right: 1px solid rgba(255,255,255,0.08);
         }
 
         .teacher-brand {
-            font-size: 1.35rem;
+            font-size: 1.6rem;
             font-weight: 800;
             letter-spacing: 0.03em;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
+            text-align: center;
         }
 
         .teacher-brand span {
-            display: block;
-            margin-top: 0.35rem;
-            font-size: 0.82rem;
-            color: rgba(255,255,255,0.6);
-            font-weight: 400;
+            display: none;
         }
 
         .teacher-nav-title {
-            font-size: 0.74rem;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            color: rgba(255,255,255,0.45);
-            margin-bottom: 0.75rem;
-            padding-left: 0.3rem;
+            display: none;
         }
 
         .teacher-nav {
             display: flex;
             flex-direction: column;
-            gap: 0.6rem;
+            gap: 0.75rem;
+            align-items: center;
         }
 
         .teacher-nav a {
-            display: block;
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             text-decoration: none;
             color: rgba(255,255,255,0.92);
-            padding: 0.9rem 1rem;
-            border-radius: 14px;
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
             background: rgba(255,255,255,0.04);
             border: 1px solid rgba(255,255,255,0.06);
             font-weight: 600;
-            transition: background 0.18s ease, transform 0.18s ease;
+            transition: background 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
         }
 
         .teacher-nav a:hover {
             background: rgba(255,255,255,0.11);
             color: white;
-            transform: translateX(2px);
+            transform: translateY(-1px);
+            border-color: rgba(255,255,255,0.16);
+        }
+
+        .teacher-nav-icon {
+            font-size: 1.35rem;
+            line-height: 1;
+        }
+
+        .teacher-nav-label {
+            position: absolute;
+            left: calc(100% + 12px);
+            top: 50%;
+            transform: translateY(-50%);
+            white-space: nowrap;
+            padding: 0.55rem 0.8rem;
+            border-radius: 12px;
+            background: #ffffff;
+            color: var(--teacher-text);
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.18);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.16s ease, transform 0.16s ease;
+            z-index: 20;
+        }
+
+        .teacher-nav a:hover .teacher-nav-label {
+            opacity: 1;
+            transform: translateY(-50%) translateX(2px);
         }
 
         .teacher-sidebar-footer {
             margin-top: auto;
-            padding-top: 1.5rem;
-            font-size: 0.88rem;
-            color: rgba(255,255,255,0.6);
+            padding-top: 1rem;
+            text-align: center;
+            font-size: 1.25rem;
+            color: rgba(255,255,255,0.55);
         }
 
         .teacher-main {
@@ -189,6 +221,17 @@
             .teacher-sidebar {
                 border-right: none;
                 border-bottom: 1px solid rgba(255,255,255,0.08);
+                flex-direction: row;
+                align-items: center;
+                justify-content: space-between;
+                gap: 1rem;
+                padding: 1rem;
+            }
+
+            .teacher-nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: flex-start;
             }
 
             .teacher-topbar {
@@ -207,24 +250,37 @@
 <div class="teacher-shell">
     <aside class="teacher-sidebar">
         <div class="teacher-brand">
-            Teacher Panel
-            <span>Teaching Workspace</span>
+            <i class="fa-solid fa-graduation-cap " style="color: rgb(237, 237, 237);"></i>
         </div>
 
-        <div class="teacher-nav-title">Navigation</div>
         <nav class="teacher-nav">
-            <a asp-area="Teacher" asp-controller="Home" asp-action="Index">Dashboard</a>
+            <a asp-area="Teacher" asp-controller="Home" asp-action="Index" title="Dashboard">
+                <i class="fa-solid fa-house-user" style="color: rgb(237, 237, 237);"></i>
+                <span class="teacher-nav-label">Dashboard</span>
+            </a>
             @if (User.IsInRole("Teacher"))
             {
-                <a asp-area="" asp-controller="Profile" asp-action="TeacherIndex">Teacher Profile</a>
+                <a asp-area="" asp-controller="Profile" asp-action="TeacherIndex" title="Teacher Profile">
+                    <i class="fa-regular fa-user "  style="color: rgb(237, 237, 237);"></i>
+                    <span class="teacher-nav-label">Teacher Profile</span>
+                </a>
             }
-            <a asp-area="Teacher" asp-controller="Course" asp-action="Index">Courses</a>
-            <a asp-area="Teacher" asp-controller="Lesson" asp-action="Index">Lessons</a>
-            <a asp-area="" asp-controller="Home" asp-action="Index">Main Site</a>
+            <a asp-area="Teacher" asp-controller="Course" asp-action="Index" title="Courses">
+                <i class="fa-solid fa-book" style="color: rgb(237, 237, 237);"></i>
+                <span class="teacher-nav-label">Courses</span>
+            </a>
+            <a asp-area="Teacher" asp-controller="Lesson" asp-action="Index" title="Lessons">
+                <i class="fa-solid fa-file-pen "  style="color: rgb(237, 237, 237);"></i>
+                <span class="teacher-nav-label">Lessons</span>
+            </a>
+            <a asp-area="" asp-controller="Home" asp-action="Index" title="Main Site">
+                <i class="fa-solid fa-earth-americas"  style="color: rgb(237, 237, 237);"></i>
+                <span class="teacher-nav-label">Main Site</span>
+            </a>
         </nav>
 
         <div class="teacher-sidebar-footer">
-            Dedicated workspace for teacher profile management and educational content.
+            ✦
         </div>
     </aside>
 
