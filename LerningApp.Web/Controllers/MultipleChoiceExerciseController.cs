@@ -1,24 +1,17 @@
-using LerningApp.Data.Models;
-using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.Infrastructure.Extensions;
 using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
 
 namespace LerningApp.Controllers;
 
 [Authorize]
-public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exerciseService,
-    ITeacherService teacherService,
-    IRepository<UserLessonProgress, Guid> userLessonProgressRepository) : Controller
+public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exerciseService) : Controller
 {
     //Done
     [HttpGet]
     [Authorize(Roles = "Admin, Teacher")]
-
     public async Task<IActionResult> Create(string lessonId)
     { 
        string userId = User.GetUserId()!;
@@ -52,5 +45,20 @@ public class MultipleChoiceExerciseController(IMultipleChoiceExerciseService exe
        
         TempData["SuccessMessage"] = "Успешно създадохте упражнението";
         return RedirectToAction(nameof(Create), new { lessonId = model.LessonId });
+    }
+
+    [HttpGet]
+    [Authorize(Roles = "Admin, Teacher")]
+    public async Task<IActionResult> Edit(string id)
+    {
+        string userId = User.GetUserId()!;
+        var result = await exerciseService.GetEditMultipleChoice(id, userId);
+        
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Index", "Home");
+        }
+        return View(result.Data);
     }
 }

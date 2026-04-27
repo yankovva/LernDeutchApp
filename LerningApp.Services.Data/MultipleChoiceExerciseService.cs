@@ -214,4 +214,51 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         await exerciseRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
+    
+    public async Task<ServiceResultT<EditMultipleExerciseViewModel>> GetEditMultipleChoice (string id, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid exerciseId))
+        {
+            return ServiceResultT<EditMultipleExerciseViewModel>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+
+        MultipleChoiceExercise? exercise = await exerciseRepository
+            .GetAllAttached()
+            .Include(e => e.Lesson)
+            .Include(e => e.Options)
+            .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        
+        if (exercise == null)
+        {
+            return ServiceResultT<EditMultipleExerciseViewModel>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+       
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
+        {
+            return ServiceResultT<EditMultipleExerciseViewModel>.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
+        }
+
+        var model = new EditMultipleExerciseViewModel()
+        {
+            Id = exercise.Id.ToString(),
+            LessonId = exercise.LessonId.ToString(),
+            Question = exercise.Question,
+            DifficultyLevel = exercise.DifficultyLevel,
+            Options = exercise.Options
+                .OrderBy(op => op.OrderIndex)
+                .Select(op => new EditMultipleChoiceOptionsViewModel()
+                {
+                    IsCorrect = op.IsCorrect,
+                    AnswerText = op.Answer,
+                    OrderIndex = op.OrderIndex,
+                }).ToList()
+        };
+
+        
+        return ServiceResultT<EditMultipleExerciseViewModel>.Success(model);
+    }
 }
