@@ -52,7 +52,7 @@
 
         <hr class="my-4" />
 
-        <form asp-action="AddToCourse" method="post">
+        <form asp-action="AddToCourse" asp-controller="Lesson" asp-area="Teacher" method="post">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="LessonId" />
             <input type="hidden" asp-for="LessonName" />

@@ -102,7 +102,7 @@
                         <h2>Course lessons</h2>
                     </div>
 
-                    <a asp-area=""
+                    <a asp-area="Teacher"
                        asp-controller="Lesson"
                        asp-action="Create"
                        class="manage-btn manage-btn-primary">
@@ -138,7 +138,7 @@
                                         View
                                     </a>
 
-                                    <a asp-area=""
+                                    <a asp-area="Teacher"
                                        asp-controller="Lesson"
                                        asp-action="Edit"
                                        asp-route-id="@lesson.Id"
@@ -146,7 +146,7 @@
                                         Edit
                                     </a>
 
-                                    <a asp-area=""
+                                    <a asp-area="Teacher"
                                        asp-controller="Lesson"
                                        asp-action="AddToCourse"
                                        asp-route-id="@lesson.Id"
@@ -196,7 +196,7 @@
                 <div class="course-action-stack">
                     @if (Model.Status == CourseStatus.Draft || Model.Status == CourseStatus.Inactive)
                     {
-                        <form asp-area=""
+                        <form asp-area="Teacher"
                               asp-controller="Course"
                               asp-action="Publish"
                               asp-route-id="@Model.Id"
@@ -210,7 +210,7 @@
 
                     @if (Model.Status == CourseStatus.Published)
                     {
-                        <form asp-area=""
+                        <form asp-area="Teacher"
                               asp-controller="Course"
                               asp-action="Deactivate"
                               asp-route-id="@Model.Id"
@@ -225,7 +225,7 @@
 
                     @if (Model.Status == CourseStatus.Inactive)
                     {
-                        <form asp-area=""
+                        <form asp-area="Teacher"
                               asp-controller="Course"
                               asp-action="Restore"
                               asp-route-id="@Model.Id"
@@ -239,7 +239,7 @@
 
                     @if (Model.Status != CourseStatus.Deleted)
                     {
-                        <form asp-area=""
+                        <form asp-area="Teacher"
                               asp-controller="Course"
                               asp-action="SoftDelete"
                               asp-route-id="@Model.Id"

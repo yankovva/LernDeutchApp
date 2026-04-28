@@ -20,7 +20,7 @@
     <div class="col-lg-8">
         <div class="card shadow-sm">
             <div class="card-body p-4">
-                <form asp-action="Edit" method="post">
+                <form asp-area="Teacher" asp-action="Edit" asp-controller="Course" method="post">
                     @Html.AntiForgeryToken()
                     <input type="hidden" asp-for="Id" />
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -61,7 +61,7 @@
 
                     <div class="d-flex gap-2 mt-4">
                         <button type="submit" class="btn btn-primary">💾 Запази</button>
-                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Отказ</a>
+                        <a asp-action="Details" asp-controller="Course" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Отказ</a>
                     </div>
                 </form>
             </div>
