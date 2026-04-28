@@ -1,9 +1,11 @@
 using LerningApp.Common;
 using LerningApp.Contracts.ListeningExerciseDtos;
+using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.ListeningExercise;
+using LerningApp.Web.ViewModels.MultipleChoiceExercise;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -106,9 +108,9 @@ public class ListeningExerciseService(
         ListeningExercise exercise = new()
         {
             LessonId = lessonId,
-            DifficultyLevel = Enums.ExerciseDifficultyLevel.Hard,
+            DifficultyLevel = model.DifficultyLevel,
             PublisherId = teacherId.Value,
-            AudioPath = $"/{audioPath}",
+            AudioPath = audioPath,
         };
 
         List<ListeningQuestion> questions = new List<ListeningQuestion>();
@@ -294,6 +296,202 @@ public class ListeningExerciseService(
         exercise.IsDeleted = true;
 
         await listeningExerciseRepository.SaveChangesAsync();
+        return ServiceResult.Success();
+    }
+
+    public async Task<ServiceResultT<EditListeningExerciseViewModel>> GetEditListeningExercise(string id, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid exerciseId))
+        {
+            return ServiceResultT<EditListeningExerciseViewModel>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+
+        ListeningExercise? exercise = await listeningExerciseRepository
+            .GetAllAttached()
+            .Include(e => e.Lesson)
+            .Include(e => e.Questions)
+            .ThenInclude(q => q.Options)
+            .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        
+        if (exercise == null)
+        {
+            return ServiceResultT<EditListeningExerciseViewModel>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+       
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
+        {
+            return ServiceResultT<EditListeningExerciseViewModel>.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
+        }
+        
+        var model = new EditListeningExerciseViewModel()
+        {
+            Id = exercise.Id.ToString(),
+            LessonId = exercise.LessonId.ToString(),
+            DifficultyLevel = exercise.DifficultyLevel,
+            AudioPath = exercise.AudioPath,
+            Questions = exercise.Questions
+                .Select(q => new EditListeningQuestionInputModel()
+                {
+                    QuestionText = q.Question,
+                    Options = q.Options
+                        .Select(o => new EditListeningQuestionOptionInputModel()
+                        {
+                            IsCorrect = o.IsCorrect,
+                            AnswerText = o.Answer,
+                            OrderIndex = o.OrderIndex,
+                        }).ToList()
+                    
+                }).ToList()
+        };
+        
+        return ServiceResultT<EditListeningExerciseViewModel>.Success(model);
+    }
+
+    public async Task<ServiceResult> PostEditListeningExercise(EditListeningExerciseViewModel model, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(model.Id) || !Guid.TryParse(model.Id, out Guid exerciseId))
+        {
+            return ServiceResult.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+
+        ListeningExercise? exercise = await listeningExerciseRepository
+            .GetAllAttached()
+            .Include(e => e.Lesson)
+            .Include(e => e.Questions)
+            .ThenInclude(q => q.Options)
+            .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        
+        if (exercise == null)
+        {
+            return ServiceResult.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+       
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = user != null && await userManager.IsInRoleAsync(user, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
+        {
+            return ServiceResult.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
+        }
+        
+        string? oldAudioPathToDelete = null;
+        
+        string newAudioPath = string.Empty;
+
+        if (model.AudioFile != null && model.AudioFile.Length > 0)
+        {
+            string[] allowedExtensions = [".mp3", ".wav", ".ogg", ".m4a"];
+            long maxSize = MaxFileSize;
+
+            if (!fileService.IsFileValid(model.AudioFile, allowedExtensions, maxSize))
+            {
+                return ServiceResult.Fail(
+                    "Please upload a valid audio file (.mp3, .wav, .ogg, .m4a) up to 5 MB.",
+                    ServiceErrorType.Validation,
+                    nameof(model.AudioFile));
+            }
+
+            string extension = Path.GetExtension(model.AudioFile.FileName);
+            string uniqueFileName = $"{Guid.NewGuid()}{extension}";
+
+            newAudioPath = await fileService.UploadFileAsync(
+                model.AudioFile,
+                DefaultaListeningExerciseAudiosPath,
+                uniqueFileName);
+
+            oldAudioPathToDelete = exercise.AudioPath;
+            exercise.AudioPath = newAudioPath;
+        }
+
+        var dbQuestions = exercise.Questions
+            .OrderBy(q => q.Id)
+            .ToList();
+
+        var modelQuestions = model.Questions
+            .Where(q => !string.IsNullOrWhiteSpace(q.QuestionText))
+            .OrderBy(q => q.QuestionText)
+            .ToList();
+
+        if (modelQuestions.Count == 0)
+        {
+            return ServiceResult.Fail(
+                "Add at least one valid question.",
+                ServiceErrorType.General,
+                nameof(model.Questions));
+        }
+
+        if (dbQuestions.Count != modelQuestions.Count)
+        {
+            return ServiceResult.Fail(
+                "Editing the number of questions is not supported.",
+                ServiceErrorType.General,
+                nameof(model.Questions));
+        }
+
+        exercise.DifficultyLevel = model.DifficultyLevel;
+
+        for (int i = 0; i < dbQuestions.Count; i++)
+        {
+            var dbQuestion = dbQuestions[i];
+            var modelQuestion = modelQuestions[i];
+
+            var filledOptions = modelQuestion.Options
+                .Where(op => !string.IsNullOrWhiteSpace(op.AnswerText))
+                .OrderBy(op => op.OrderIndex)
+                .ToList();
+
+            if (filledOptions.Count <= 1)
+            {
+                return ServiceResult.Fail(
+                    "Add at least two options for the question.",
+                    ServiceErrorType.General,
+                    nameof(model.Questions));
+            }
+
+            int selectedCorrectOptionsCount = filledOptions.Count(op => op.IsCorrect);
+            if (selectedCorrectOptionsCount != 1)
+            {
+                return ServiceResult.Fail(
+                    "Choose one correct option for the question.",
+                    ServiceErrorType.General,
+                    nameof(model.Questions));
+            }
+
+            var dbOptions = dbQuestion.Options
+                .OrderBy(op => op.OrderIndex)
+                .ToList();
+
+            if (dbOptions.Count != filledOptions.Count)
+            {
+                return ServiceResult.Fail(
+                    "Editing the number of options is not supported.",
+                    ServiceErrorType.General,
+                    nameof(model.Questions));
+            }
+
+            dbQuestion.Question = modelQuestion.QuestionText!;
+            dbQuestion.PublisherId = teacherId!.Value;
+
+            for (int j = 0; j < dbOptions.Count; j++)
+            {
+                dbOptions[j].Answer = filledOptions[j].AnswerText!;
+                dbOptions[j].IsCorrect = filledOptions[j].IsCorrect;
+                dbOptions[j].OrderIndex = filledOptions[j].OrderIndex;
+            }
+        }
+
+        await listeningExerciseRepository.SaveChangesAsync();
+
+        if (!string.IsNullOrWhiteSpace(oldAudioPathToDelete))
+        {
+            fileService.DeleteFile(oldAudioPathToDelete);
+        }
+
         return ServiceResult.Success();
     }
 }

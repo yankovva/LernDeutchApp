@@ -47,6 +47,13 @@
     <ItemGroup>
       <_ContentIncludedByDefault Remove="Areas\Teacher\Views\Profile\Edit.cshtml" />
       <_ContentIncludedByDefault Remove="Areas\Teacher\Views\Profile\Index.cshtml" />
+      <_ContentIncludedByDefault Remove="Views\TranslationExercise\Create.cshtml" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AdditionalFiles Include="Areas\Teacher\Views\ListeningExercise\Create.cshtml" />
+      <AdditionalFiles Include="Areas\Teacher\Views\MultipleChoiceExercise\Create.cshtml" />
+      <AdditionalFiles Include="Areas\Teacher\Views\TranslationExercise\Create.cshtml" />
     </ItemGroup>
 
 </Project>
