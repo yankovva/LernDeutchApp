@@ -170,4 +170,78 @@ public class TranslationExerciseService(
         await exerciseRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
+
+    public async Task<ServiceResultT<EditTranslationExerciseViewModel>> GetEditTranslation(string id, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid exerciseId))
+        {
+            return ServiceResultT<EditTranslationExerciseViewModel>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+
+        TranslationExercise? exercise = await exerciseRepository
+            .GetAllAttached()
+            .Include(e => e.Lesson)
+            .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        
+        if (exercise == null)
+        {
+            return ServiceResultT<EditTranslationExerciseViewModel>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+       
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
+        {
+            return ServiceResultT<EditTranslationExerciseViewModel>.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
+        }
+
+        var model = new EditTranslationExerciseViewModel()
+        {
+            Id = exercise.Id.ToString(),
+            LessonId = exercise.LessonId.ToString(),
+            DifficultyLevel = exercise.DifficultyLevel,
+            GermanCorrectTranslation = exercise.GermanSentence,
+            SentenceBg = exercise.BulgarianSentence,
+            SentenceEn = exercise.EnglishSentence,
+        };
+        
+        return ServiceResultT<EditTranslationExerciseViewModel>.Success(model);
+    }
+
+    public async Task<ServiceResult> PostEditranslation(EditTranslationExerciseViewModel model, string userId)
+    {
+         if (string.IsNullOrWhiteSpace(model.Id) || !Guid.TryParse(model.Id, out Guid exerciseId))
+         {
+             return ServiceResult.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+         }
+
+         TranslationExercise? exercise = await exerciseRepository
+             .GetAllAttached()
+             .FirstOrDefaultAsync(e => e.Id == exerciseId);
+        
+         if (exercise == null)
+         {
+             return ServiceResult.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+         }
+       
+         Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+         var user = await userManager.FindByIdAsync(userId);
+         bool isAdmin = await userManager.IsInRoleAsync(user!, AdminRole);
+        
+         if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
+         {
+             return ServiceResult.Fail(AccessDeniedMessage,ServiceErrorType.AccessDenied);
+         }
+        
+         exercise.BulgarianSentence = model.SentenceBg;
+         exercise.EnglishSentence = model.SentenceEn;
+         exercise.GermanSentence = model.GermanCorrectTranslation;
+         exercise.DifficultyLevel = model.DifficultyLevel;
+        
+         await exerciseRepository.SaveChangesAsync();
+       
+         return ServiceResult.Success();
+    }
 }
