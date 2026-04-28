@@ -33,23 +33,4 @@ public class ListeningExerciseApiController(IListeningExerciseService listeningE
         
         return Ok(results);
     }
-    [HttpPost("soft-delete")]
-    [Authorize(Roles = "Admin,Teacher")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> SoftDelete([FromBody] SoftDeleteExerciseInputDto dto)
-    {
-        var userId = User.GetUserId()!;
-        var serviceResult = await listeningExerciseService
-            .SoftDeleteExerciseAsync(dto.ExerciseId, userId);
-        
-        if (serviceResult.Result == false)
-        {
-            return BadRequest("Invalid operation.");
-        }
-        
-        return Ok("Successfully deleted exercise.");
-    }
 }

@@ -480,25 +480,11 @@
             @foreach (var ex in Model.MultipleChoiceExercises)
             {
                 <div class="exercise-shell">
-                    @if (User.Identity?.IsAuthenticated == true &&
-                         await teacherService.IsUserTeacherAsync(User.GetUserId()!))
-                    {
-                        <div class="multiple-exercise-admin">
-                            <form asp-action="SoftDelete" asp-controller="MultipleChoiceExerciseApi" method="post"
-                                  class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@ex.Id"/>
-                                <input type="hidden" name="lessonId" value="@Model.Id"/>
-                                <button type="button" class="btn btn-danger btn-sm">Изтрий</button>
-                            </form>
-                        </div>
-                    }
                     @{
                         var answers = ex.Options;
                     }
 
-                    <form asp-action="CheckMultipleChoice" method="post"
-                          asp-controller="MultipleChoiceExercise" class="exercise-box exercise-box-multiple-choice">
+                    <form class="exercise-box exercise-box-multiple-choice">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="exerciseId" value="@ex.Id" />
                         <input type="hidden" name="lessonId" value="@Model.Id" />
@@ -515,6 +501,7 @@
                                 <label class="form-check-label">@answers[i].Answer</label>
                             </div>
                         }
+
                         <button type="button" class="btn btn-sm btn-primary mt-2 check-btn">Провери</button>
                     </form>
                 </div>
@@ -530,19 +517,6 @@
             @foreach (var ex in Model.ListeningExercises)
             {
                 <div class="exercise-shell">
-                    @if (User.Identity?.IsAuthenticated == true &&
-                         await teacherService.IsUserTeacherAsync(User.GetUserId()!))
-                    {
-                        <div class="listening-exercise-admin">
-                            <form asp-action="SoftDelete" asp-controller="ListeningExerciseApi" method="post"
-                                  class="d-inline">
-                                @Html.AntiForgeryToken()
-                                <input type="hidden" name="id" value="@ex.Id"/>
-                                <input type="hidden" name="lessonId" value="@Model.Id"/>
-                                <button type="button" class="btn btn-danger btn-sm">Изтрий</button>
-                            </form>
-                        </div>
-                    }
                 
                     <div class="listening-exercise-box">
                         <div class="audio-frame">
@@ -569,8 +543,7 @@
                                 }
                             </div>
                         }
-                        <form asp-action="CheckListeningExercise" method="post"
-                              asp-controller="ListeningExercise"  class="exercise-box exercise-box-listening">
+                        <form class="exercise-box exercise-box-listening">
                             @Html.AntiForgeryToken()
                             <input type="hidden" name="exerciseId" value="@ex.Id" />
                             <input type="hidden" name="lessonId" value="@Model.Id" />
@@ -591,22 +564,8 @@
             @foreach (var ex in Model.TranslationExercises)
             {
                 <div class="exercise-shell">
-                @if (User.Identity?.IsAuthenticated == true &&
-                     await teacherService.IsUserTeacherAsync(User.GetUserId()!))
-                {
-                    <div class="translation-exercise-admin">
-                        <form asp-action="SoftDelete" asp-controller="TranslationExerciseApi" method="post"
-                              class="d-inline">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@ex.Id"/>
-                            <input type="hidden" name="lessonId" value="@Model.Id"/>
-                            <button type="button" class="btn btn-danger btn-sm">Изтрий</button>
-                        </form>
-                    </div>
-                }
                
-                    <form asp-action="CheckTranslationExercise" method="post"
-                          asp-controller="TranslationExerciseApi" data-correct="@ex.GermanSentence" class="exercise-box exercise-box-translation">
+                    <form data-correct="@ex.GermanSentence" class="exercise-box exercise-box-translation">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="exerciseId" value="@ex.Id" />
                         <input type="hidden" name="lessonId" value="@Model.Id" />

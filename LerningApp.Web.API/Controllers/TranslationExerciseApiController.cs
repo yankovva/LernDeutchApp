@@ -37,24 +37,4 @@ public class TranslationExerciseApiController(ITranslationExerciseService exerci
        
         return Ok(result);
     }
-    
-    [HttpPost("soft-delete")]
-    [Authorize(Roles = "Admin,Teacher")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> SoftDelete([FromBody] SoftDeleteExerciseInputDto dto)
-    {
-        var userId = User.GetUserId()!;
-        var serviceResult = await exerciseService
-            .SoftDeleteAsync(dto.ExerciseId, userId);
-        
-        if (serviceResult.Result == false)
-        {
-            return BadRequest("Invalid operation.");
-        }
-        
-        return Ok("Successfully deleted exercise.");
-    }
 }
