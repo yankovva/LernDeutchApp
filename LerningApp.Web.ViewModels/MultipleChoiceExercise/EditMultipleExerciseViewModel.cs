@@ -6,8 +6,9 @@ using static LerningApp.Common.Enums;
 using static LerningApp.Common.EntityValidationConstants.MultipleChoiceExercise;
 public class EditMultipleExerciseViewModel
 {
+    [Required]
     public string Id { get; set; } = null!;
-    
+    [Required]
     public string LessonId { get; set; } = null!;
     [Required]
     [MaxLength(QuestionMaxLength)]

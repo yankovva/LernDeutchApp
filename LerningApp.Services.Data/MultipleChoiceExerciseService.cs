@@ -258,7 +258,6 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
                     OrderIndex = op.OrderIndex,
                 }).ToList()
         };
-
         
         return ServiceResultT<EditMultipleExerciseViewModel>.Success(model);
     }
@@ -310,6 +309,7 @@ public class MultipleChoiceExerciseService(IRepository<Lesson, Guid> lessonRepos
         {
              optionRepository.DeleteByEntity(oldOption);
         }
+        
         await optionRepository.SaveChangesAsync();
 
         var newOptions = new List<MultipleChoiceExerciseOption>();
