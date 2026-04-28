@@ -305,9 +305,14 @@
     </main>
 </div>
 
+<partial name="_NotificationsPartial" />
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
+
+<partial name="~/Views/Shared/_NotificationsPartial.cshtml" />
+
 </body>
 </html>
