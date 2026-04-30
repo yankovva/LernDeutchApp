@@ -20,6 +20,8 @@ namespace LerningApp.Services.Data;
 public class ListeningExerciseService(
     IRepository<Lesson, Guid> lessonRepository,
     IRepository<ListeningExercise, Guid> listeningExerciseRepository,
+    IRepository<ListeningQuestion,Guid> questionRepository,
+    IRepository<ListeningExerciseOption, Guid> optionRepository,
     IRepository<UserLessonProgress, Guid> userLessonProgressRepository,
     IUserExerciseProgressService userExerciseProgressService,
     ITeacherService teacherService,
@@ -337,10 +339,13 @@ public class ListeningExerciseService(
                 .Select(q => new EditListeningQuestionInputModel()
                 {
                     QuestionText = q.Question,
+                    Id = q.Id.ToString(),
+                    ExerciseId = exercise.Id.ToString(),
                     Options = q.Options
                         .Select(o => new EditListeningQuestionOptionInputModel()
                         {
                             IsCorrect = o.IsCorrect,
+                            Id = o.Id.ToString(),
                             AnswerText = o.Answer,
                             OrderIndex = o.OrderIndex,
                         }).ToList()
@@ -407,91 +412,149 @@ public class ListeningExerciseService(
             oldAudioPathToDelete = exercise.AudioPath;
             exercise.AudioPath = newAudioPath;
         }
-
-        var dbQuestions = exercise.Questions
-            .OrderBy(q => q.Id)
-            .ToList();
-
-        var modelQuestions = model.Questions
-            .Where(q => !string.IsNullOrWhiteSpace(q.QuestionText))
-            .OrderBy(q => q.QuestionText)
-            .ToList();
-
-        if (modelQuestions.Count == 0)
-        {
-            return ServiceResult.Fail(
-                "Add at least one valid question.",
-                ServiceErrorType.General,
-                nameof(model.Questions));
-        }
-
-        if (dbQuestions.Count != modelQuestions.Count)
-        {
-            return ServiceResult.Fail(
-                "Editing the number of questions is not supported.",
-                ServiceErrorType.General,
-                nameof(model.Questions));
-        }
-
+        
         exercise.DifficultyLevel = model.DifficultyLevel;
-
-        for (int i = 0; i < dbQuestions.Count; i++)
-        {
-            var dbQuestion = dbQuestions[i];
-            var modelQuestion = modelQuestions[i];
-
-            var filledOptions = modelQuestion.Options
-                .Where(op => !string.IsNullOrWhiteSpace(op.AnswerText))
-                .OrderBy(op => op.OrderIndex)
-                .ToList();
-
-            if (filledOptions.Count <= 1)
-            {
-                return ServiceResult.Fail(
-                    "Add at least two options for the question.",
-                    ServiceErrorType.General,
-                    nameof(model.Questions));
-            }
-
-            int selectedCorrectOptionsCount = filledOptions.Count(op => op.IsCorrect);
-            if (selectedCorrectOptionsCount != 1)
-            {
-                return ServiceResult.Fail(
-                    "Choose one correct option for the question.",
-                    ServiceErrorType.General,
-                    nameof(model.Questions));
-            }
-
-            var dbOptions = dbQuestion.Options
-                .OrderBy(op => op.OrderIndex)
-                .ToList();
-
-            if (dbOptions.Count != filledOptions.Count)
-            {
-                return ServiceResult.Fail(
-                    "Editing the number of options is not supported.",
-                    ServiceErrorType.General,
-                    nameof(model.Questions));
-            }
-
-            dbQuestion.Question = modelQuestion.QuestionText!;
-            dbQuestion.PublisherId = teacherId!.Value;
-
-            for (int j = 0; j < dbOptions.Count; j++)
-            {
-                dbOptions[j].Answer = filledOptions[j].AnswerText!;
-                dbOptions[j].IsCorrect = filledOptions[j].IsCorrect;
-                dbOptions[j].OrderIndex = filledOptions[j].OrderIndex;
-            }
-        }
-
         await listeningExerciseRepository.SaveChangesAsync();
 
         if (!string.IsNullOrWhiteSpace(oldAudioPathToDelete))
         {
             fileService.DeleteFile(oldAudioPathToDelete);
         }
+        
+        return ServiceResult.Success();
+    }
 
+    public async Task<ServiceResultT<EditListeningQuestionInputModel>> GetEditListeningQuestion(string id, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid questionId))
+        {
+            return ServiceResultT<EditListeningQuestionInputModel>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+
+        ListeningQuestion? question = await questionRepository
+            .GetAllAttached()
+            .Include(q => q.Options)
+            .Include(q => q.ListeningExercise)
+            .FirstOrDefaultAsync(q => q.Id == questionId);
+        
+        if (question == null)
+        {
+            return ServiceResultT<EditListeningQuestionInputModel>.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+       
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = user != null && await userManager.IsInRoleAsync(user, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || question.PublisherId != teacherId))
+        {
+            return ServiceResultT<EditListeningQuestionInputModel>.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
+        }
+
+        var model = new EditListeningQuestionInputModel()
+        {
+            Id = question.Id.ToString(),
+            ExerciseId = question.ListeningExerciseId.ToString(),
+            QuestionText = question.Question,
+            Options = question.Options
+                .Select(op => new EditListeningQuestionOptionInputModel()
+                {
+                    IsCorrect = op.IsCorrect,
+                    AnswerText = op.Answer,
+                    OrderIndex = op.OrderIndex,
+                    Id = op.Id.ToString(),
+                }).ToList()
+        };
+
+        model.CorrectOptionIndex = model.Options.FindIndex(op => op.IsCorrect);
+
+        return ServiceResultT<EditListeningQuestionInputModel>.Success(model);
+    }
+
+    public async Task<ServiceResult> PostEditListeningQuestion(EditListeningQuestionInputModel model, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(model.Id) || !Guid.TryParse(model.Id, out Guid questionId))
+        {
+            return ServiceResult.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+
+        ListeningQuestion? question = await questionRepository
+            .GetAllAttached()
+            .Include(q => q.Options)
+            .Include(q => q.ListeningExercise)
+            .FirstOrDefaultAsync(q => q.Id == questionId);
+        
+        if (question == null)
+        {
+            return ServiceResult.Fail(ExerciseNotFoundMessage, ServiceErrorType.NotFound);
+        }
+       
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = user != null && await userManager.IsInRoleAsync(user, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || question.PublisherId != teacherId))
+        {
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
+        }
+
+        for (int i = 0; i < model.Options.Count; i++)
+        {
+            model.Options[i].IsCorrect = i == model.CorrectOptionIndex;
+        }
+
+        var modelOptions = model.Options
+            .OrderBy(op => op.OrderIndex)
+            .Where(op => !string.IsNullOrWhiteSpace(op.AnswerText))
+            .ToList();
+
+        if (modelOptions.Any(mo => string.IsNullOrWhiteSpace(mo.AnswerText)))
+        {
+            return ServiceResult.Fail(
+                "There can not be an empty option.",
+                ServiceErrorType.Validation,
+                nameof(model.Options));
+        }
+
+        if (modelOptions.Count != question.Options.Count)
+        {
+                return ServiceResult.Fail(
+                    "Editing the number of questions is not supported here.",
+                    ServiceErrorType.General,
+                    nameof(model.Options));
+        }
+        
+        if (modelOptions.Count <= 1)
+        {
+            return ServiceResult.Fail(
+                "Add at least two options for the question.",
+                ServiceErrorType.General,
+                nameof(model.Options));
+        }
+
+        int selectedCorrectOptionsCount = modelOptions
+            .Count(op => op.IsCorrect);
+        
+        if (selectedCorrectOptionsCount != 1)
+        {
+            return ServiceResult.Fail(
+                "Choose one correct option for the question.",
+                ServiceErrorType.General,
+                nameof(model.Options));
+        }
+
+        var dbOptions = question.Options
+            .OrderBy(op => op.OrderIndex)
+            .ToList();
+        
+        for (int j = 0; j < question.Options.Count; j++)
+        {
+            dbOptions[j].Answer = model.Options[j].AnswerText!;
+            dbOptions[j].IsCorrect = model.Options[j].IsCorrect;
+        }
+        
+        question.Question = model.QuestionText;
+        await questionRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
 }
