@@ -96,4 +96,35 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
         TempData["SuccessMessage"] = "Successfully deleted exercise.";
         return RedirectToAction("Manage", "Lesson", new { area = "Teacher", id = lessonId });
     }
+    [HttpGet]
+    public async Task<IActionResult> EditQuestion(string id)
+    {
+        string userId = User.GetUserId()!;
+        var result = await exerciseService.GetEditListeningQuestion(id, userId);
+        
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Index", "Home");
+        }
+        return PartialView("~/Areas/Teacher/Views/_EditListeningQuestionPartial.cshtml", result.Data);
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> EditQuestion(EditListeningQuestionInputModel model)
+    {
+        if (!ModelState.IsValid)
+        {
+            return PartialView("~/Areas/Teacher/Views/_EditListeningQuestionPartial.cshtml", model);
+        }
+        string userId = User.GetUserId()!;
+        var result = await exerciseService.PostEditListeningQuestion(model, userId);
+        
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return PartialView("~/Areas/Teacher/Views/_EditListeningQuestionPartial.cshtml", model);
+        }
+        return RedirectToAction("Edit", "ListeningExercise", new { area = "Teacher", id = model.ExerciseId });
+    }
 }
