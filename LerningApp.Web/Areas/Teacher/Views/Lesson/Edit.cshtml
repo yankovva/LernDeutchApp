@@ -7,12 +7,12 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h1 class="mb-1">✏️ Редактирай урок</h1>
-        <div class="text-muted">Промени съдържанието, реда и курса (по избор).</div>
+        <h1 class="mb-1">✏️ Edit Lesson</h1>
+        <div class="text-muted">Change the content, name or the course of a lesson.</div>
     </div>
 
     <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">
-        ← Назад
+        ← Back
     </a>
 </div>
 
@@ -27,7 +27,7 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
                     <div class="mb-3">
-                        <label asp-for="Name" class="form-label">Име на урока</label>
+                        <label asp-for="Name" class="form-label">Name of the Lesson</label>
                         <input asp-for="Name" class="form-control" />
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
@@ -35,9 +35,9 @@
                     <div class="row g-3">
 
                         <div class="col-md-8">
-                            <label asp-for="CourseId" class="form-label">Курс (по избор)</label>
+                            <label asp-for="CourseId" class="form-label">Course (optional)</label>
                             <select asp-for="CourseId" id="course-select" class="form-select">
-                                <option value="">— Без курс —</option>
+                                <option value="">— No Course —</option>
                                 @foreach (var c in Model.Courses)
                                 {
                                     <option class="selected-course" value="@c.Id">@c.Name</option>
@@ -49,17 +49,17 @@
                     <div class="mb-3">
                         <label asp-for="Target" class="form-label">Цел на урока</label>
                         <textarea asp-for="Target" class="form-control" rows="3"
-                                  placeholder="Пример: Да можеш да описваш дома си."></textarea>
+                                  placeholder="Exp: Describe your home."></textarea>
                         <span asp-validation-for="Target" class="text-danger"></span>
                     </div>
                     <div class="mb-3 mt-3">
-                        <label asp-for="Content" class="form-label">Съдържание</label>
+                        <label asp-for="Content" class="form-label">Content</label>
                         <textarea asp-for="Content" class="form-control" rows="12"></textarea>
                         <span asp-validation-for="Content" class="text-danger"></span>
                     </div>
                     <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary">💾 Запази</button>
-                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Отказ</a>
+                        <button type="submit" class="btn btn-primary">💾 Save</button>
+                        <a asp-action="Details" asp-route-id="@Model.Id" class="btn btn-outline-secondary">Cancel</a>
                     </div>
                 </form>
             </div>

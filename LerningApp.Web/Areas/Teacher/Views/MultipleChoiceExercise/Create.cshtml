@@ -14,11 +14,11 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="text-muted">Създай multiple‑choice упражнение.</div>
+    <div class="text-muted">Create multiple‑choice exercise.</div>
     <a asp-controller="Lesson"
        asp-action="Details"
        asp-route-id="@Model.LessonId"
-       class="btn btn-outline-secondary">← Назад</a>
+       class="btn btn-outline-secondary">← Back</a>
 </div>
 
 <div class="row justify-content-center">
@@ -31,13 +31,13 @@
                     <input asp-for="LessonId" type="hidden" />
 
                     <div class="mb-3">
-                        <label asp-for="Question" class="form-label">Въпрос</label>
-                        <input asp-for="Question" class="form-control" placeholder="Пример: Какво означава Haus?" />
+                        <label asp-for="Question" class="form-label">Question</label>
+                        <input asp-for="Question" class="form-control" placeholder="Exp: Was bedeutet das Haus?" />
                         <span asp-validation-for="Question" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
-                        <label asp-for="DifficultyLevel" class="form-label">Трудност</label>
+                        <label asp-for="DifficultyLevel" class="form-label"> Difficulty Level</label>
                         <select asp-for="DifficultyLevel" class="form-select">
                             @foreach( var option in difficultyOptions)
                             {
@@ -68,11 +68,11 @@
                     }
 
                     <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary">💾 Създай</button>
+                        <button type="submit" class="btn btn-primary">💾 Create</button>
                         <a asp-controller="Lesson"
                            asp-action="Details"
                            asp-route-id="@Model.LessonId"
-                           class="btn btn-outline-secondary">Отказ</a>
+                           class="btn btn-outline-secondary">Cancel</a>
                     </div>
                 </form>
             </div>

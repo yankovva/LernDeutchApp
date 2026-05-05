@@ -34,11 +34,11 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <div>
-        <h1 class="mb-1">🎯 Избор на курс за урок</h1>
-        <div class="text-muted">Урокът може да бъде добавен към един курс.</div>
+        <h1 class="mb-1">🎯 Select a course for a Lesson</h1>
+        <div class="text-muted">A lesson can only be added to one course.</div>
     </div>
 
-    <a asp-action="Index" class="btn btn-outline-secondary">← Назад</a>
+    <a asp-action="Index" class="btn btn-outline-secondary">← Back</a>
 </div>
 
 <div class="card shadow-sm">
@@ -61,10 +61,10 @@
                 <input id="courseSearch"
                        type="text"
                        class="form-control"
-                       placeholder="Търси курс по име..." />
+                       placeholder="Search course by name..." />
             </div>
             <div class="mb-3">
-                <label asp-for="OrderIndex" class="form-label">Ред на урока в курса</label>
+                <label asp-for="OrderIndex" class="form-label">Index for the Lesson in the Course</label>
                     <select asp-for="OrderIndex" class="form-select" id="order-index">
                     </select>
                     <span asp-validation-for="OrderIndex" class="text-danger"></span>
@@ -97,8 +97,8 @@
             </div>
 
             <div class="d-flex gap-2 mt-4">
-                <button type="submit" class="btn btn-primary">💾 Запази</button>
-                <a asp-action="Index" class="btn btn-outline-secondary">Отказ</a>
+                <button type="submit" class="btn btn-primary">💾 Save</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
             </div>
         </form>
     </div>

@@ -14,12 +14,12 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="text-muted">Редактирай multiple-choice упражнение.</div>
+    <div class="text-muted">Edit multiple-choice exercise.</div>
     <a asp-area="Teacher"
        asp-controller="Lesson"
        asp-action="Index"
        class="btn btn-outline-secondary">
-        ← Назад
+        ← Back
     </a>
 </div>
 <div class="multiple-exercise-admin">
@@ -30,7 +30,7 @@
         <input type="hidden" name="id" value="@Model.Id" />
         <input type="hidden" name="lessonId" value="@Model.LessonId" />
         <button type="submit" class="btn btn-danger btn-sm">
-            Изтрий
+            Delete
         </button>
     </form>
 </div>
@@ -46,12 +46,12 @@
                         <label asp-for="Question" class="form-label">Въпрос</label>
                         <input asp-for="Question"
                                class="form-control"
-                               placeholder="Пример: Какво означава Haus?" />
+                               placeholder="Exp: Was bedeutet das Haus?" />
                         <span asp-validation-for="Question" class="text-danger"></span>
                     </div>
 
                     <div class="mb-4">
-                        <label asp-for="DifficultyLevel" class="form-label">Трудност</label>
+                        <label asp-for="DifficultyLevel" class="form-label">Difficulty Level</label>
                         <select asp-for="DifficultyLevel" class="form-select">
                             @foreach (var option in difficultyOptions)
                             {
@@ -70,7 +70,7 @@
                                 <label class="form-label">Опция @(i + 1)</label>
                                 <input asp-for="Options[i].AnswerText"
                                        class="form-control"
-                                       placeholder="Въведи отговор" />
+                                       placeholder="Add answer" />
                                 <span asp-validation-for="Options[i].AnswerText" class="text-danger"></span>
 
                                 <input asp-for="Options[i].OrderIndex" type="hidden" />
@@ -92,12 +92,12 @@
                     }
 
                     <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary">💾 Запази</button>
+                        <button type="submit" class="btn btn-primary">💾 Save</button>
                         <a asp-area="Teacher"
                            asp-controller="Lesson"
                            asp-action="Index"
                            class="btn btn-outline-secondary">
-                            Отказ
+                            Cancel
                         </a>
                     </div>
                 </form>

@@ -14,11 +14,11 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-    <div class="text-muted">Създай translation упражнение.</div>
+    <div class="text-muted">Edit translation exercise.</div>
     <a asp-controller="Lesson"
        asp-action="Details"
        asp-route-id="@Model.LessonId"
-       class="btn btn-outline-secondary">← Назад</a>
+       class="btn btn-outline-secondary">← Back</a>
 </div>
 
 <div class="row justify-content-center">
@@ -32,19 +32,19 @@
                     <input asp-for="LessonId" type="hidden" />
                     
                     <div class="mb-3">
-                        <label asp-for="SentenceBg" class="form-label">Изречение на български.</label>
+                        <label asp-for="SentenceBg" class="form-label"> Bulgarish sentence .</label>
                         <input asp-for="SentenceBg" class="form-control" placeholder="Къщата е червена." />
                         <span asp-validation-for="SentenceBg" class="text-danger"></span>
                     </div>
                     
                     <div class="mb-3">
-                        <label asp-for="SentenceEn" class="form-label">Изречение на английски</label>
+                        <label asp-for="SentenceEn" class="form-label">English sentence</label>
                         <input asp-for="SentenceEn" class="form-control" placeholder="The house is red." />
                         <span asp-validation-for="SentenceEn" class="text-danger"></span>
                     </div>
                     
                     <div class="mb-3">
-                        <label asp-for="GermanCorrectTranslation" class="form-label">Правилно преведнео изречение.</label>
+                        <label asp-for="GermanCorrectTranslation" class="form-label">Correct german translation.</label>
                         <input asp-for="GermanCorrectTranslation" class="form-control" placeholder="Das Haus ist rot." />
                         <span asp-validation-for="GermanCorrectTranslation" class="text-danger"></span>
                     </div>
@@ -61,11 +61,11 @@
                     </div>
                     
                     <div class="d-flex gap-2 mt-4">
-                        <button type="submit" class="btn btn-primary">💾 Създай</button>
+                        <button type="submit" class="btn btn-primary">💾 Create</button>
                         <a asp-controller="Lesson"
                            asp-action="Details"
                            asp-route-id="@Model.LessonId"
-                           class="btn btn-outline-secondary">Отказ</a>
+                           class="btn btn-outline-secondary">Cancel</a>
                     </div>
                 </form>
             </div>
