@@ -606,4 +606,69 @@ public class ListeningExerciseService(
         await questionRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }
+
+    public async Task<ServiceResult> CreateQuestionAsync(AddListeningQuestionToExerciseViewModel model, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(model.ExerciseId) || !Guid.TryParse(model.ExerciseId, out Guid exerciseId))
+        {
+            return ServiceResult.Fail(InvalidQuestionMessage, ServiceErrorType.NotFound);
+        }
+        
+        ListeningExercise? exercise = await listeningExerciseRepository
+            .GetByIdAsync(exerciseId);
+        
+        if (exercise == null)
+        {
+            return ServiceResult.Fail(InvalidQuestionMessage, ServiceErrorType.NotFound);
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = user != null && await userManager.IsInRoleAsync(user, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || exercise.PublisherId != teacherId))
+        {
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
+        }
+
+        ListeningQuestion newQuestion = new()
+        {
+            Id = Guid.NewGuid(),
+            Question = model.QuestionText,
+            ListeningExerciseId = exerciseId,
+            PublisherId = teacherId.Value
+        };
+        
+        var filledOptions = model.Options
+            .Where(o => !string.IsNullOrWhiteSpace(o.AnswerText))
+            .ToList();
+        
+        if (filledOptions.Count <= 1)
+        {
+            return ServiceResult.Fail("Add at least two options for the question.", ServiceErrorType.General);
+        }
+        
+        var newOptions = new List<ListeningExerciseOption>();
+        foreach (var option in filledOptions)
+        {
+            var newOption = new ListeningExerciseOption
+            {
+                Id = Guid.NewGuid(),
+                Answer = option.AnswerText,
+                OrderIndex = option.OrderIndex,
+                ListeningQuestionId = newQuestion.Id,
+            };
+            
+            if (option.OrderIndex == model.CorrectOptionIndex)
+            {
+                newOption.IsCorrect = true;
+            }
+            newOptions.Add(newOption);
+        }
+        newQuestion.Options = newOptions;
+        questionRepository.Add(newQuestion);
+        await questionRepository.SaveChangesAsync();
+        
+        return ServiceResult.Success();
+    }
 }

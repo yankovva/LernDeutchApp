@@ -162,17 +162,28 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return View(id);
+            return RedirectToAction("Index", "Home", new { area = "Teacher"});
         }
         
         TempData["SuccessMessage"] = "Successfully deleted question.";
         return RedirectToAction("Edit", "ListeningExercise", new { area = "Teacher", id = exerciseId });
     }
     
-    [HttpGet]
-    public async Task<IActionResult> CreateQuestion(string exerciseId)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> CreateQuestion(AddListeningQuestionToExerciseViewModel model)
     {
-        return View();
+        var userId = User.GetUserId()!;
+        var result = await exerciseService
+            .CreateQuestionAsync(model, userId);
+        
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return RedirectToAction("Index", "Home", new { area = "Teacher"});
+        }
+        return RedirectToAction("Edit", "ListeningExercise", new { area = "Teacher", id = model.ExerciseId });
+
     }
     
 }
