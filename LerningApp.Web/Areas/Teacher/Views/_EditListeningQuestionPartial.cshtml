@@ -13,26 +13,26 @@
     <input asp-for="ExerciseId" type="hidden" />
 
     <div class="mb-4">
-        <label asp-for="QuestionText" class="form-label fw-semibold">Question Text</label>
+        <label asp-for="QuestionText" class="form-label fw-semibold fs-5">Question Text</label>
         <input asp-for="QuestionText" class="form-control" placeholder="Enter the question" />
         <span asp-validation-for="QuestionText" class="text-danger"></span>
     </div>
 
-    <h6 class="mb-3">Answer Options</h6>
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6 class="mb-0 fs-4">Answer Options</h6>
 
-    <div class="row g-3">
-        @for (int i = 0; i < Model.Options.Count; i++)
+        <button type="button" class="btn btn-sm btn-outline-success add-option-btn">
+            <i class="fa-solid fa-plus"></i>
+            Add Option
+        </button>
+    </div>
+
+    <div class="row g-3 question-options-container">
+    @for (int i = 0; i < Model.Options.Count; i++)
         {
-            <div class="col-md-6">
-                <button type="button"
-                        class="btn btn-sm btn-outline-danger delete-option-btn"
-                        data-option-id="@Model.Options[i].Id"
-                        data-question-id="@Model.Id">
-                    <i class="fa-solid fa-circle-minus" style="color: rgb(255, 63, 0);"></i>
-                </button>
-
-                <div class="border rounded p-3 bg-light h-100">
-                    <label asp-for="Options[i].AnswerText" class="form-label">
+            <div class="col-md-6 option-item">
+            <div class="border rounded p-3 bg-light h-100 d-flex flex-column">
+                    <label asp-for="Options[i].AnswerText" class="form-label fw-semibold">
                         Option @(i + 1)
                     </label>
 
@@ -52,6 +52,16 @@
                                checked="@(Model.CorrectOptionIndex == i)"/>
                         <label class="form-check-label">Correct Answer</label>
                     </div>
+
+                    <div class="mt-auto pt-3">
+                        <button type="button"
+                                class="btn btn-sm btn-outline-danger delete-option-btn"
+                                data-option-id="@Model.Options[i].Id"
+                                data-question-id="@Model.Id">
+                            <i class="fa-solid fa-circle-minus"></i>
+                            Remove Option
+                        </button>
+                    </div>
                 </div>
             </div>
         }
@@ -63,7 +73,7 @@
                 Cancel
             </button>
             <button type="submit" class="btn btn-primary">
-                Save 
+                Save
             </button>
         </div>
     </div>

@@ -209,64 +209,69 @@
                         {
                             var question = Model.Questions[i];
 
-                            <div class="border rounded p-3 bg-light-subtle">
-                                <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
-                                    <div>
-                                        <div class="text-muted small mb-1">Question @(i + 1)</div>
-                                        <h5 class="mb-0">@question.QuestionText</h5>
+                            <div class="border rounded p-3 bg-light-subtle question-card" id="question-card-@question.Id">
+                                <div class="question-preview">
+                                    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+                                        <div>
+                                            <div class="text-muted small mb-1">Question @(i + 1)</div>
+                                            <h5 class="mb-0">@question.QuestionText</h5>
+                                        </div>
+
+                                        <div class="d-flex align-items-start gap-2">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-outline-primary load-question-editor"
+                                                    data-question-id="@question.Id"
+                                                    data-target-id="question-editor-@question.Id"
+                                                    data-card-id="question-card-@question.Id">
+                                                Edit
+                                            </button>
+
+                                            <form asp-area="Teacher"
+                                                  asp-controller="ListeningExercise"
+                                                  asp-action="DeleteQuestion"
+                                                  method="post"
+                                                  class="d-inline"
+                                                  onsubmit="return confirm('Are you sure you want to delete this question?');">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@question.Id" />
+                                                <input type="hidden" name="exerciseId" value="@Model.Id" />
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </div>
 
-                                    <button type="button"
-                                            class="btn btn-sm btn-outline-primary load-question-editor"
-                                            data-question-id="@question.Id"
-                                            data-target-id="question-editor-@question.Id">
-                                        Edit
-                                    </button>
+                                    @if (question.Options == null || !question.Options.Any())
+                                    {
+                                        <div class="text-muted">No answer options are available for this question.</div>
+                                    }
+                                    else
+                                    {
+                                        <ul class="list-group">
+                                            @for (int j = 0; j < question.Options.Count; j++)
+                                            {
+                                                var option = question.Options[j];
 
-                                    <div id="question-editor-@question.Id"></div>
+                                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                    <span>@option.AnswerText</span>
 
-                                    <form asp-area="Teacher"
-                                              asp-controller="ListeningExercise"
-                                              asp-action="DeleteQuestion"
-                                              method="post"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Are you sure you want to delete this question?');">
-                                            @Html.AntiForgeryToken()
-                                            <input type="hidden" name="id" value="@question.Id" />
-                                           <input type="hidden" name="exerciseId" value="@Model.Id" />
-                                              <button type="submit" class="btn btn-sm btn-outline-danger">
-                                               Delete
-                                               </button>
-                                        </form>
-                                    </div>
+                                                    @if (option.IsCorrect)
+                                                    {
+                                                        <span class="badge bg-success">Correct Answer</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-secondary">Option</span>
+                                                    }
+                                                </li>
+                                            }
+                                        </ul>
+                                    }
                                 </div>
 
-                                @if (question.Options == null || !question.Options.Any())
-                                {
-                                    <div class="text-muted">No answer options are available for this question.</div>
-                                }
-                                else
-                                {
-                                    <ul class="list-group">
-                                        @for (int j = 0; j < question.Options.Count; j++)
-                                        {
-                                            var option = question.Options[j];
-
-                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                <span>@option.AnswerText</span>
-
-                                                @if (option.IsCorrect)
-                                                {
-                                                    <span class="badge bg-success">Correct Answer</span>
-                                                }
-                                                else
-                                                {
-                                                    <span class="badge bg-secondary">Option</span>
-                                                }
-                                            </li>
-                                        }
-                                    </ul>
-                                }
+                                <div id="question-editor-@question.Id" class="question-editor-container"></div>
+                            </div>
                         }
                     </div>
                 }
@@ -277,20 +282,35 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <style>
+        .question-card-editing .question-preview {
+            display: none;
+        }
+
+        .question-editor-container {
+            margin-top: 1rem;
+        }
+    </style>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.load-question-editor').forEach(btn => {
                 btn.addEventListener('click', async function () {
                     const questionId = this.dataset.questionId;
                     const targetId = this.dataset.targetId;
+                    const cardId = this.dataset.cardId;
                     const container = document.getElementById(targetId);
+                    const card = document.getElementById(cardId);
 
-                    if (!questionId || !container) {
-                        console.error('Missing questionId or target container.', { questionId, targetId });
+                    if (!questionId || !container || !card) {
+                        console.error('Missing questionId, target container, or card.', { questionId, targetId, cardId });
                         return;
                     }
 
                     try {
+                        document.querySelectorAll('.question-editor-container').forEach(editor => editor.innerHTML = '');
+                        document.querySelectorAll('.question-card').forEach(questionCard => questionCard.classList.remove('question-card-editing'));
+
                         const response = await fetch(`/Teacher/ListeningExercise/EditQuestion?id=${questionId}`, {
                             method: 'GET',
                             credentials: 'include'
@@ -303,6 +323,7 @@
 
                         const html = await response.text();
                         container.innerHTML = html;
+                        card.classList.add('question-card-editing');
                         container.scrollIntoView({ behavior: 'smooth', block: 'start' });
                     } catch (error) {
                         console.error(error);
@@ -354,9 +375,51 @@
             if (!form) return;
 
             const container = form.parentElement;
+            const card = form.closest('.question-card');
             if (container) {
                 container.innerHTML = '';
             }
+            if (card) {
+                card.classList.remove('question-card-editing');
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            const addBtn = event.target.closest('.add-option-btn');
+            if (!addBtn) return;
+
+            const form = addBtn.closest('#editListeningQuestionForm');
+            if (!form) return;
+
+            const container = form.querySelector('.question-options-container');
+            if (!container) return;
+
+            const newIndex = container.querySelectorAll('.option-item').length;
+
+            const optionHtml = `
+        <div class="col-md-6 option-item">
+            <div class="border rounded p-3 bg-light h-100 d-flex flex-column">
+                <label class="form-label fw-semibold">Option ${newIndex + 1}</label>
+
+                <input name="Options[${newIndex}].AnswerText"
+                       class="form-control mb-2"
+                       placeholder="Enter answer option" />
+
+                <input name="Options[${newIndex}].Id" type="hidden" value="" />
+                <input name="Options[${newIndex}].OrderIndex" type="hidden" value="${newIndex}" />
+
+                <div class="form-check mt-2">
+                    <input type="radio"
+                           class="form-check-input"
+                           name="CorrectOptionIndex"
+                           value="${newIndex}" />
+                    <label class="form-check-label">Correct Answer</label>
+                </div>
+            </div>
+        </div>
+    `;
+
+            container.insertAdjacentHTML('beforeend', optionHtml);
         });
     </script>
 
