@@ -24,18 +24,13 @@
         @for (int i = 0; i < Model.Options.Count; i++)
         {
             <div class="col-md-6">
-                <form asp-area="Teacher"
-                      asp-controller="ListeningExercise"
-                      asp-action="DeleteOption"
-                      method="post"
-                      class="d-inline"
-                    @Html.AntiForgeryToken()>
-                    <input type="hidden" name="optionId" value="@Model.Options[i]" />
-                    <input type="hidden" name="questionId" value="@Model.Id" />
-                    <button type="submit" class="btn btn-sm btn-outline-danger">
-                        <i class="fa-solid fa-circle-minus" style="color: rgb(255, 63, 0);"></i>
-                    </button>
-                </form>
+                <button type="button"
+                        class="btn btn-sm btn-outline-danger delete-option-btn"
+                        data-option-id="@Model.Options[i].Id"
+                        data-question-id="@Model.Id">
+                    <i class="fa-solid fa-circle-minus" style="color: rgb(255, 63, 0);"></i>
+                </button>
+
                 <div class="border rounded p-3 bg-light h-100">
                     <label asp-for="Options[i].AnswerText" class="form-label">
                         Option @(i + 1)
@@ -63,22 +58,8 @@
     </div>
 
     <div class="d-flex justify-content-between mt-4">
-        <form asp-area="Teacher"
-              asp-controller="ListeningExercise"
-              asp-action="DeleteQuestion"
-              method="post"
-              class="d-inline"
-              onsubmit="return confirm('Are you sure you want to delete this question?');">
-            @Html.AntiForgeryToken()
-            <input type="hidden" name="questionId" value="@Model.Id" />
-            <input type="hidden" name="exerciseId" value="@Model.ExerciseId" />
-            <button type="submit" class="btn btn-outline-danger">
-                Delete
-            </button>
-        </form>
-
         <div class="d-flex gap-2">
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+            <button type="button" class="btn btn-outline-secondary cancel-question-editor-btn">
                 Cancel
             </button>
             <button type="submit" class="btn btn-primary">

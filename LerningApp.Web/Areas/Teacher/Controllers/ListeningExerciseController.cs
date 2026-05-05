@@ -74,7 +74,7 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
         if (result.Result == false)
         {
             TempData["ErrorMessage"] = result.Message;
-            return View(model);
+            return RedirectToAction("Index", "Home");
         }
         return RedirectToAction("Manage", "Lesson", new { area = "Teacher", id = model.LessonId });
     }
@@ -111,6 +111,7 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
     }
     
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditQuestion(EditListeningQuestionInputModel model)
     {
         if (!ModelState.IsValid)
@@ -127,4 +128,51 @@ public class ListeningExerciseController(IListeningExerciseService exerciseServi
         }
         return RedirectToAction("Edit", "ListeningExercise", new { area = "Teacher", id = model.ExerciseId });
     }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteOption([FromBody]DeleteListeningOptionViewModel model)
+    {
+        var userId = User.GetUserId()!;
+        var result = await exerciseService
+            .DeleteOptionAsync(model, userId);
+        
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+        }
+
+        var questionResult = await exerciseService.GetEditListeningQuestion(model.QuestionId, userId);
+
+        if (questionResult.Result == false)
+        {
+            return BadRequest(questionResult.Message);
+        }
+
+        return PartialView("~/Areas/Teacher/Views/_EditListeningQuestionPartial.cshtml", questionResult.Data);
+    }
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteQuestion(string id , string exerciseId)
+    {
+        var userId = User.GetUserId()!;
+        var result = await exerciseService
+            .SoftDeleteQuestionAsync(id, userId);
+        
+        if (result.Result == false)
+        {
+            TempData["ErrorMessage"] = result.Message;
+            return View(id);
+        }
+        
+        TempData["SuccessMessage"] = "Successfully deleted question.";
+        return RedirectToAction("Edit", "ListeningExercise", new { area = "Teacher", id = exerciseId });
+    }
+    
+    [HttpGet]
+    public async Task<IActionResult> CreateQuestion(string exerciseId)
+    {
+        return View();
+    }
+    
 }

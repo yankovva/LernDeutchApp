@@ -1,11 +1,10 @@
 using LerningApp.Common;
 using LerningApp.Contracts.ListeningExerciseDtos;
-using LerningApp.Data;
 using LerningApp.Data.Models;
 using LerningApp.Data.Repository.Interfaces;
 using LerningApp.Services.Data.Interfaces;
 using LerningApp.Web.ViewModels.ListeningExercise;
-using LerningApp.Web.ViewModels.MultipleChoiceExercise;
+
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -336,6 +335,7 @@ public class ListeningExerciseService(
             DifficultyLevel = exercise.DifficultyLevel,
             AudioPath = exercise.AudioPath,
             Questions = exercise.Questions
+                .Where(q => q.IsDeleted == false)
                 .Select(q => new EditListeningQuestionInputModel()
                 {
                     QuestionText = q.Question,
@@ -554,6 +554,55 @@ public class ListeningExerciseService(
         }
         
         question.Question = model.QuestionText;
+        await questionRepository.SaveChangesAsync();
+        return ServiceResult.Success();
+    }
+
+    public async Task<ServiceResult> DeleteOptionAsync(DeleteListeningOptionViewModel model, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(model.Id) || !Guid.TryParse(model.Id, out Guid optionId))
+        {
+            return ServiceResult.Fail(InvalidOptionMessage, ServiceErrorType.NotFound);
+        }
+        
+        ListeningExerciseOption? option = await optionRepository
+            .GetByIdAsync(optionId);
+        
+        if (option == null)
+        {
+            return ServiceResult.Fail(InvalidOptionMessage, ServiceErrorType.NotFound);
+        }
+        
+        optionRepository.DeleteByEntity(option);
+        await optionRepository.SaveChangesAsync();
+        return ServiceResult.Success();
+    }
+
+    public async Task<ServiceResult> SoftDeleteQuestionAsync(string id, string userId)
+    {
+        if (string.IsNullOrWhiteSpace(id) || !Guid.TryParse(id, out Guid optionId))
+        {
+            return ServiceResult.Fail(InvalidQuestionMessage, ServiceErrorType.NotFound);
+        }
+        
+        ListeningQuestion? question = await questionRepository
+            .GetByIdAsync(optionId);
+        
+        if (question == null)
+        {
+            return ServiceResult.Fail(InvalidQuestionMessage, ServiceErrorType.NotFound);
+        }
+        
+        Guid? teacherId = await teacherService.GetTeacherIdAsync(userId);
+        var user = await userManager.FindByIdAsync(userId);
+        bool isAdmin = user != null && await userManager.IsInRoleAsync(user, AdminRole);
+        
+        if (!isAdmin && (teacherId == null || question.PublisherId != teacherId))
+        {
+            return ServiceResult.Fail(AccessDeniedMessage, ServiceErrorType.AccessDenied);
+        }
+        
+        question.IsDeleted = true;
         await questionRepository.SaveChangesAsync();
         return ServiceResult.Success();
     }

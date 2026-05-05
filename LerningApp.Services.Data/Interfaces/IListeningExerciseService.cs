@@ -14,5 +14,6 @@ public interface IListeningExerciseService
      Task<ServiceResult> PostEditListeningExercise(EditListeningExerciseViewModel model, string userId);
      Task<ServiceResultT<EditListeningQuestionInputModel>> GetEditListeningQuestion(string id, string userId);
      Task<ServiceResult> PostEditListeningQuestion(EditListeningQuestionInputModel model, string userId);
-
+     Task<ServiceResult> DeleteOptionAsync (DeleteListeningOptionViewModel model, string userId);
+     Task<ServiceResult> SoftDeleteQuestionAsync (string id, string userId);
 }
