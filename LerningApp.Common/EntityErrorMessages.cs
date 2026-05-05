@@ -41,6 +41,10 @@ public static class EntityErrorMessages
    {
       public const string InvalidExerciseIdMessage = "Invalid exercise.";
       public const string ExerciseNotFoundMessage = "Exercise not found.";
+      
+      public const string InvalidOptionMessage = "Invalid option.";
+      public const string InvalidQuestionMessage = "Invalid question.";
+
    }
    public static class Card
    {
